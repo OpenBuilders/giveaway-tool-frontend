@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+:root {
+  --tg-theme-section-separator-color: #efeff4;
+}
+
+@theme {
+  --color-bg: #efeff4;
+  --color-secondary-bg: #ffffff;
+  --color-button: #007aff;
+  --color-second-button: rgba(0, 122, 255, 0.1);
+  --color-button-text: #ffffff;
+  --color-text: #000000;
+  --color-subtitle: #8e8e93;
+  --color-link: #007aff;
+  --color-tertiary-fill-bg: rgba(116, 116, 128, 0.12);
+  --color-quaternary-fill-bg: rgba(116, 116, 128, 0.08);
+  --color-accent-text: #007aff;
+  --color-section-header-text: #6d6d72;
+  --color-section-border: #c8c7cc;
+  --text-xs: 11px;
+  --text-xs--line-height: 13px;
+  --text-sm: 13px;
+  --text-sm--line-height: 18px;
+  --text-sm-max: 14px;
+  --text-sm-max--line-height: 18px;
+  --text-3xl: 28px;
+  --text-3xl--line-height: 38px;
+  --tracking-footnote: -0.08px;
+  --tracking-subheadline: -0.15px;
+  --tracking-title: 0.38px;
+  --tracking-body: -0.43px;
+  --rounded-sm: 4px;
+  --rounded-md: 6px;
+  --rounded-lg: 9px;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+
+    font-family: "SF Pro", sans-serif;
+    font-weight: 400;
+    line-height: 22px;
+    font-size: 17px;
+  }
+
+  #root {
+    @apply flex flex-col justify-between min-h-screen;
+  }
+
+  main {
+    @apply px-6 py-3;
+  }
+
+  .border-top-button {
+    border-top: 0.33px solid rgba(60, 60, 67, 0.36);
+  }
+
+  .border-giveaway {
+    @apply relative after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-px after:bg-section-border;
+  }
+
+  .dropdown-menu {
+    filter: drop-shadow(0px 4px 15px rgba(0, 0, 0, 0.16));
+    background: #f5f5f5;
+    backdrop-filter: blur(25px);
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+
+  .dropdown-menu li:not(:last-child) {
+    border-bottom: 0.5px solid rgba(128, 128, 128, 0.55);
+  }
+}
