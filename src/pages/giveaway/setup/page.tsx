@@ -2,39 +2,43 @@ import { BottomBar } from "@/components/BottomBar";
 import { Layout } from "@/components/Layout";
 import { AddButton } from "@/components/ui/buttons/AddButton";
 import { CreateGiveawayButton } from "@/components/ui/buttons/CreateGiveawayButton";
-import { LabeledInput } from "@/components/ui/inputs/Input";
+import { LabeledInput, Input } from "@/components/ui/inputs/Input";
 import { Select } from "@/components/ui/inputs/SelectInput";
 import { List } from "@/components/ui/list/List";
+import { ListItem } from "@/components/ui/list/ListItem";
 import { useGiveawayStore } from "@/store/giveaway.slice";
 import { BackButton } from "@twa-dev/sdk/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import type { IListItem } from "@/interfaces";
 
 export default function GiveawaySetUpPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
 
   const {
+    title,
+    setTitle,
+
     duration,
     setDuration,
 
-    winners,
+    winners_count,
     setWinners,
 
     prizes,
-    addEmptyPrize,
-
+    requirements,
     reset,
   } = useGiveawayStore((state) => state);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (winners > 0 && prizes.length > 0) {
+    if (winners_count > 0 && prizes.length > 0 && title.length > 0) {
       setCreateButtonDisabled(false);
     } else {
       setCreateButtonDisabled(true);
     }
-  }, [winners, prizes]);
+  }, [winners_count, prizes, title]);
 
   return (
     <>
@@ -47,10 +51,20 @@ export default function GiveawaySetUpPage() {
       />
 
       <Layout title="Set Up Giveaway" titleSpace>
+        <Input
+          label="Title"
+          placeholder="Name"
+          value={title}
+          onChange={(e) => {
+            setTitle(e.target.value);
+          }}
+          type="text"
+        />
+
         <LabeledInput
           label="Winners"
           placeholder="0"
-          value={winners > 0 ? winners.toString() : undefined}
+          value={winners_count > 0 ? winners_count.toString() : undefined}
           onChange={(e) => {
             setWinners(parseInt(e.target.value.replace(",", "")) || 0);
           }}
@@ -68,28 +82,62 @@ export default function GiveawaySetUpPage() {
           ]}
           selectedValue={duration}
           onChange={(value) => {
-            setDuration(value);
+            setDuration(Number(value));
           }}
           className="w-full"
         />
 
+        <div className={`flex flex-col ${prizes.length > 0 ? "gap-2.5" : ""}`}>
+          <List groupName="prizes" className="grid grid-cols-2 gap-2.5">
+            {prizes.map((prize, index) => (
+              <ListItem
+                id={index.toString()}
+                logo={prize.type === "custom" ? "/gift.svg" : undefined}
+                title={prize.type.charAt(0).toUpperCase() + prize.type.slice(1)}
+                description={`${prize.fields.length} inputs`}
+                onClick={() => {
+                  navigate(`/giveaway/setup/prize/${index}`);
+                }}
+                className="rounded-[10px] after:h-0 [&_img]:scale-75"
+                isArrow={false}
+              />
+            ))}
+          </List>
+
+          <div className="py-2 px-4 max-h-[44px] items-center flex bg-white w-full justify-between border-giveaway rounded-[10px]">
+            <AddButton
+              onClick={() => {
+                navigate("/giveaway/setup/prize");
+              }}
+            >
+              Add Prize
+            </AddButton>
+          </div>
+        </div>
+
         <List
-          groupName="prize tiers"
-          items={prizes.map((prize, index) => ({
-            id: index.toString(),
-            title: prize.name,
-            description: "Tap to Configure the Tier",
-          }))}
+          groupName="joining requirements"
+          items={requirements.map(
+            (requirement, index) =>
+              ({
+                id: index.toString(),
+                logo:
+                  requirement.type === "subscription" ? "/gift.svg" : undefined,
+                title: requirement.name,
+                description: requirement.value,
+                className: "[&_img]:scale-75",
+              } as IListItem)
+          )}
           onItemClick={({ id }) => {
-            navigate(`/giveaway/setup/prize/${id}`);
+            navigate(`/giveaway/setup/requirement/${id}`);
           }}
           addButton={
             <AddButton
               onClick={() => {
-                addEmptyPrize();
+                navigate("/giveaway/setup/requirement");
               }}
             >
-              Add Tier
+              Add Requirement
             </AddButton>
           }
         />

@@ -4,7 +4,7 @@ import type { InputHTMLAttributes } from "react";
 interface LabeledInputProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange"> {
   label: string;
-  value: string | undefined;
+  value: string | number | undefined;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   containerClassName?: string;
   additionalLabel?: string;
@@ -19,7 +19,7 @@ export const Input: React.FC<LabeledInputProps> = ({
   return (
     <div
       className={`
-        flex items-center justify-between relative overflow-hidden bg-white rounded-[10px] px-4 h-11
+        flex items-center justify-between relative overflow-hidden bg-card-bg rounded-[10px] px-4 h-11
         ${containerClassName}
       `}
     >
@@ -57,14 +57,19 @@ export const LabeledInput: React.FC<LabeledInputProps> = ({
   return (
     <div
       className={`
-        flex items-center justify-between relative overflow-hidden bg-white rounded-[10px] px-4 h-11
+        flex items-center justify-between relative overflow-hidden bg-card-bg rounded-[10px] px-4 h-11
         ${containerClassName}
       `}
     >
-      <span className="font-medium">{label}</span>
+      <span className="font-medium w-full">{label}</span>
 
-      <div className={`${Number(value) <= 0 || !value ? "text-subtitle" : ""}`}>
+      <div
+        className={`w-full flex justify-end ${
+          Number(value) <= 0 || !value ? "text-subtitle" : ""
+        }`}
+      >
         <input
+          key={label}
           type={type}
           value={value}
           onChange={onChange}
@@ -76,11 +81,11 @@ export const LabeledInput: React.FC<LabeledInputProps> = ({
             paddingRight: `${additionalLabelNode?.clientWidth}px`,
           }}
           className="
-          text-right 
-          bg-transparent 
-          focus:outline-none 
-          placeholder:text-subtitle
-        "
+            text-right 
+            bg-transparent 
+            focus:outline-none 
+            placeholder:text-subtitle
+          "
           {...rest}
         />
 

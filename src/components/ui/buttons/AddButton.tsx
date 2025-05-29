@@ -16,7 +16,7 @@ export const AddButton = ({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-center gap-4 bg-white w-full ${className}`}
+      className={`flex items-center gap-4 w-full ${className}`}
     >
       <CirclePlusIcon className="pl-1.5" />
       <span className="text-accent-text">{children}</span>

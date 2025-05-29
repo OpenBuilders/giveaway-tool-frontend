@@ -1,37 +1,89 @@
-import type { IListItem } from "@/interfaces";
 import { BottomBar } from "../components/BottomBar";
 import { CreateGiveawayButton } from "../components/ui/buttons/CreateGiveawayButton";
 import { List } from "../components/ui/list/List";
 import { Layout } from "@/components/Layout";
+import { useNavigate } from "react-router";
+import { useTabs } from "@/hooks/useTabs";
 import { useQuery } from "@tanstack/react-query";
-import { userApi } from "@/api";
-
-const items: IListItem[] = [
-  {
-    id: "1",
-    logo: "/logo.png",
-    title: "Giveaway 1",
-    giveaway: {
-      isAdmin: true,
-      endsAt: "2023-10-01T12:00:00Z",
-      participants: 10220,
-      telegramUsername: "user1",
-    },
-  },
-  {
-    id: "2",
-    logo: "/logo.png",
-    title: "Giveaway 2",
-    giveaway: {
-      isAdmin: false,
-      endsAt: "2025-05-15T12:00:00Z",
-      participants: 200,
-      telegramUsername: "user2",
-    },
-  },
-];
+import { getMyGiveaways } from "@/api/giveaway.api";
 
 export default function MainPage() {
+  const navigate = useNavigate();
+
+  const { data: myGiveaways } = useQuery({
+    queryKey: ["my-giveaways"],
+    queryFn: () => getMyGiveaways(),
+  });
+
+  const { TabContent, TabsComponent } = useTabs({
+    tabs: [
+      {
+        key: "top-100",
+        label: "TOP-100",
+        content: (
+          <List
+            giveaways={
+              myGiveaways
+                ?.filter((g) => g.status === "active")
+                ?.map((g) => ({
+                  ...g,
+                  description: undefined,
+                  giveaway: {
+                    isAdmin: g.can_edit,
+                    endsAt: g.ends_at,
+                    participants: g.participants_count,
+                    requirements: g.requirements,
+                  },
+                })) || []
+            }
+          />
+        ),
+      },
+      {
+        key: "my-giveaways",
+        label: "My Giveaways",
+        content: (
+          <>
+            <List
+              groupName={"active"}
+              giveaways={
+                myGiveaways
+                  ?.filter((g) => g.status === "active")
+                  ?.map((g) => ({
+                    ...g,
+                    description: undefined,
+                    giveaway: {
+                      isAdmin: g.can_edit,
+                      endsAt: g.ends_at,
+                      participants: g.participants_count,
+                      requirements: g.requirements,
+                    },
+                  })) || []
+              }
+            />
+            <List
+              groupName={"finished"}
+              giveaways={
+                myGiveaways
+                  ?.filter((g) => g.status === "cancelled")
+                  ?.map((g) => ({
+                    ...g,
+                    description: undefined,
+                    giveaway: {
+                      isAdmin: g.can_edit,
+                      endsAt: g.ends_at,
+                      participants: g.participants_count,
+                      requirements: g.requirements,
+                    },
+                  })) || []
+              }
+            />
+          </>
+        ),
+      },
+    ],
+  });
+
   return (
     <>
       <Layout
@@ -48,8 +100,9 @@ export default function MainPage() {
         //   </>
         // }
       >
-        <List groupName={"active"} items={items} />
-        <List groupName={"finished"} items={items} />
+        <TabsComponent />
+
+        <TabContent />
       </Layout>
 
       <div className="flex flex-col">
@@ -62,7 +115,7 @@ export default function MainPage() {
         </p>
 
         <BottomBar>
-          <CreateGiveawayButton />
+          <CreateGiveawayButton onClick={() => navigate("/giveaway/setup")} />
         </BottomBar>
       </div>
     </>

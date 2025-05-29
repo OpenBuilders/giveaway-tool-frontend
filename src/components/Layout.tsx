@@ -4,14 +4,20 @@ export const Layout = ({
   title,
   description,
   titleSpace = false,
+  center = false,
 }: {
   children: React.ReactNode;
   icon?: string;
   title: React.ReactNode | string;
   description?: React.ReactNode | string;
   titleSpace?: boolean;
+  center?: boolean;
 }) => (
-  <main className="flex flex-col justify-between h-full overflow-y-auto">
+  <main 
+    className={`flex flex-col justify-between overflow-y-auto ${
+      center ? "items-center h-[calc(100vh-var(--bottom-bar-height))]" : "h-full"
+    }`}
+  >
     <div className="flex flex-col gap-4 items-center justify-center h-full">
       {icon && <img src={icon} alt="icon" />}
 

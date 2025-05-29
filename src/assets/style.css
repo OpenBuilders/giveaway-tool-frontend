@@ -6,15 +6,20 @@
 
 @theme {
   --color-bg: #efeff4;
+  /* --color-bg: #ffffff; */
   --color-secondary-bg: #ffffff;
   --color-button: #007aff;
   --color-second-button: rgba(0, 122, 255, 0.1);
+  --bottom-bar-height: 56px;
   --color-button-text: #ffffff;
   --color-text: #000000;
   --color-subtitle: #8e8e93;
   --color-link: #007aff;
   --color-tertiary-fill-bg: rgba(116, 116, 128, 0.12);
   --color-quaternary-fill-bg: rgba(116, 116, 128, 0.08);
+  --color-card-bg: #ffffff;
+  /* --color-card-bg: rgba(244, 244, 245, 1); */
+  --color-segmented_control_active_bg: rgba(255, 255, 255, 1);
   --color-accent-text: #007aff;
   --color-section-header-text: #6d6d72;
   --color-section-border: #c8c7cc;
@@ -24,6 +29,8 @@
   --text-sm--line-height: 18px;
   --text-sm-max: 14px;
   --text-sm-max--line-height: 18px;
+  --text-base: 17px;
+  --text-base--line-height: 22px;
   --text-3xl: 28px;
   --text-3xl--line-height: 38px;
   --tracking-footnote: -0.08px;
@@ -33,6 +40,7 @@
   --rounded-sm: 4px;
   --rounded-md: 6px;
   --rounded-lg: 9px;
+  --shadow-tab: 0px 3px 8px rgba(0, 0, 0, 0.12), 0px 3px 1px rgba(0, 0, 0, 0.04);
 }
 
 @layer base {
@@ -63,9 +71,10 @@
   }
 
   .dropdown-menu {
-    filter: drop-shadow(0px 4px 15px rgba(0, 0, 0, 0.16));
-    background: #f5f5f5;
-    backdrop-filter: blur(25px);
+    /* filter: drop-shadow(0px 4px 15px rgba(0, 0, 0, 0.16)); */
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.16);
+    background: rgba(179, 179, 179, 0.12);
+    backdrop-filter: blur(15px);
     border-radius: 12px;
     margin-bottom: 20px;
   }

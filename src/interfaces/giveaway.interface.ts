@@ -1,40 +1,57 @@
+// export interface IGiveawayPrize {
+//   name: string;
+//   places: {
+//     from: number;
+//     to: number;
+//   };
+//   items: {
+//     id: string;
+//     name: string;
+//   }[];
+// }
+
 export interface IGiveawayPrize {
-  name: string;
-  places: {
-    from: number;
-    to: number;
-  };
-  items: {
-    id: string;
-    name: string;
+  type: GiveawayPrizeTemplateType;
+  fields: {
+    [key: string]: string;
   }[];
 }
 
-export interface IGiveawayRequirment {
+export interface IGiveawayRequirement {
   name: string;
   value: string[] | string;
-  type: "stars" | "channel" | "boost";
+  type: "subscription";
 }
 
+export type GiveawayStatus = "active" | "cancelled";
+
 export interface IGiveaway {
-  winners: number;
+  id: string;
+  title: string;
+  winners_count: number;
   duration: number;
   prizes: IGiveawayPrize[];
-  requirements: IGiveawayRequirment[];
+  requirements: IGiveawayRequirement[];
+  status: GiveawayStatus;
+  can_edit: boolean;
+  ends_at: string;
+  participants_count: number;
 }
 
 export interface IGiveawayActions {
   setWinners: (winners: number) => void;
-  setDuration: (duration: string) => void;
+  setDuration: (duration: number) => void;
+  setTitle: (title: string) => void;
 
   setPrizes: (prizes: IGiveawayPrize[]) => void;
   updatePrize: (index: number, prize: IGiveawayPrize) => void;
-  addEmptyPrize: () => void;
+  // addEmptyPrize: () => void;
+  addPrize: (prize: IGiveawayPrize) => void;
 
-  setRequirements: (requirements: IGiveawayRequirment[]) => void;
+  setRequirements: (requirements: IGiveawayRequirement[]) => void;
+  addRequirement: (requirement: IGiveawayRequirement) => void;
   reset(): void;
 }
-
 
 export interface IGiveawayCreateRequest {
   allow_tickets?: boolean;
@@ -44,19 +61,44 @@ export interface IGiveawayCreateRequest {
   max_participants?: number;
   prizes: {
     place: number;
-    prize_id: string;
+    prize_id?: string;
     prize_type: string;
-  }[];
-  requirements?: {
-    enabled: boolean;
-    join_type: string;
-    requirements: {
-      chat_id: string;
-      chat_name: string;
-      chat_type: "channel";
-      type: "subscription";
+    fields: {
+      [key: string]: string;
     }[];
-  };
+  }[];
+  requirements?: IGiveawayRequirement[];
   title?: string;
   winners_count: number;
+}
+
+export type GiveawayPrizeTemplateType = "custom";
+
+export const GiveawayPrizeTemplateType = {
+  Custom: "custom",
+} as const;
+
+export interface IGiveawayPrizeTemplate {
+  name: string;
+  description: string;
+  type: GiveawayPrizeTemplateType;
+}
+
+export interface IGiveawayRequirementTemplate {
+  id: string;
+  name: string;
+  type: "subscription";
+}
+
+export interface IGiveawayCheckChannelResponse {
+  bot_status: {
+    can_check_members: boolean;
+    status: string;
+  };
+  channel: {
+    id: number;
+    type: string;
+    title: string;
+    username: string;
+  };
 }

@@ -1,3 +1,5 @@
+import type { IGiveawayRequirement } from "./giveaway.interface";
+
 export interface IListItem {
   id: string;
   logo?: string;
@@ -7,6 +9,7 @@ export interface IListItem {
     isAdmin: boolean;
     endsAt: string;
     participants: number;
-    telegramUsername: string;
+    telegramUsername?: string;
+    requirements?: IGiveawayRequirement[];
   };
 }

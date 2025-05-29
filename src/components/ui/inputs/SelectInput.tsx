@@ -1,4 +1,5 @@
 import { CheckMark } from "@/assets/icons/CheckMarkIcon";
+import { SelectIcon } from "@/assets/icons/SelectIcon";
 import React, { useState, useRef, useEffect } from "react";
 
 interface Option {
@@ -10,8 +11,9 @@ interface SelectProps {
   label: string;
   options: Option[];
   selectedValue: string | number;
-  onChange: (value: string) => void;
+  onChange: (value: string | number) => void;
   className?: string;
+  type?: "default" | "withIcon";
 }
 
 export const Select: React.FC<SelectProps> = ({
@@ -20,6 +22,7 @@ export const Select: React.FC<SelectProps> = ({
   selectedValue,
   onChange,
   className = "",
+  type = "default",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -45,14 +48,24 @@ export const Select: React.FC<SelectProps> = ({
         type="button"
         onClick={() => setIsOpen((v) => !v)}
         className="
-          flex items-center justify-between relative overflow-hidden bg-white rounded-[10px] px-4 w-full h-11
+          flex items-center justify-between relative overflow-hidden bg-card-bg rounded-[10px] px-4 w-full h-11
         "
       >
         <span>{label}</span>
-        <div className="px-3 py-[5px] bg-tertiary-fill-bg rounded-lg">
-          <span className={`${isOpen && "text-accent-text"} transition-all duration-100`}>
+        <div
+          className={`px-3 py-[5px] rounded-lg ${
+            type === "default" ? "bg-tertiary-fill-bg" : "flex gap-2 items-center"
+          }`}
+        >
+          <span
+            className={`${
+              (isOpen || type) === "withIcon" && "text-accent-text"
+            } transition-all duration-100`}
+          >
             {selectedOption?.label}
           </span>
+
+          {type === "withIcon" && <SelectIcon />}
         </div>
       </button>
 
