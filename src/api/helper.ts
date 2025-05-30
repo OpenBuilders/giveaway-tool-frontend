@@ -29,7 +29,6 @@ declare global {
 
 export function getWebAppData(isUnsafe = false): any {
   if (import.meta.env.VITE_INIT_DATA) {
-    // return Object.fromEntries(new URLSearchParams(import.meta.env.VITE_INIT_DATA));
     return import.meta.env.VITE_INIT_DATA;
   }
 
@@ -50,12 +49,8 @@ api.interceptors.request.use(
       const webAppData = getWebAppData();
 
       if (webAppData) {
-        // const xHash = JSON.stringify(webAppData);
-
-        // const xHashUtf8 = utf8.encode(xHash);
-        // const xHashBase64 = base64.encode(xHashUtf8);
-
-        config.headers["init_data"] = webAppData;
+        config.params = config.params || {};
+        config.params.init_data = webAppData;
       }
 
       return config;
