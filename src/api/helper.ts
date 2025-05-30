@@ -37,9 +37,7 @@ export function getWebAppData(isUnsafe = false): any {
     return window.Telegram.WebApp.initDataUnsafe;
   } else {
     try {
-      return Object.fromEntries(
-        new URLSearchParams(window.Telegram.WebApp.initData)
-      );
+      return window.Telegram.WebApp.initData;
     } catch {
       return null;
     }

@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'SF Pro Rounded';
+  src: url('https://raw.githubusercontent.com/Austcool-Walker/San-Francisco-Pro/main/SF-Pro-Rounded-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --tg-theme-section-separator-color: #efeff4;
 }
@@ -7,6 +15,7 @@
 @theme {
   --color-bg: #efeff4;
   /* --color-bg: #ffffff; */
+  --color-text-secondary: rgba(0, 0, 0, 0.5);
   --color-secondary-bg: #ffffff;
   --color-button: #007aff;
   --color-second-button: rgba(0, 122, 255, 0.1);
@@ -33,10 +42,13 @@
   --text-base--line-height: 22px;
   --text-3xl: 28px;
   --text-3xl--line-height: 38px;
+  --text-big-title: 64px;
+  --text-big-title--line-height: 72px;
   --tracking-footnote: -0.08px;
   --tracking-subheadline: -0.15px;
   --tracking-title: 0.38px;
   --tracking-body: -0.43px;
+  --tracking-big-title: 0.38px;
   --rounded-sm: 4px;
   --rounded-md: 6px;
   --rounded-lg: 9px;
@@ -81,5 +93,18 @@
 
   .dropdown-menu li:not(:last-child) {
     border-bottom: 0.5px solid rgba(128, 128, 128, 0.55);
+  }
+
+  .text-timer-bold {
+    font-family: "SF Pro Rounded";
+    font-weight: 700;
+    font-size: 64px;
+    line-height: 72px;
+    letter-spacing: 0.38px;
+    background: linear-gradient(131.09deg, #FF9D00 13.86%, #FD571A 88.77%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 }

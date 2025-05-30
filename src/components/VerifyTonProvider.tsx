@@ -9,36 +9,21 @@ export const VerifyTonProvider = () => {
 
   const verifyTonProofFetch = useMutation({
     mutationFn: (data: {
-      proof: any;
-      address: any;
-      publicKey: any;
-      walletStateInit: any;
+      proof: unknown;
+      address: unknown;
+      publicKey: unknown;
+      walletStateInit: unknown;
     }) => {
       return verifyTonProof(data);
     },
     onSuccess({ verify }) {
       if (verify) {
-        // openPopup(<BlurredToast title="Wallet connected" />, "success");
-      } else {
-        // невалидный proof — отключаем кошелёк
         tonConnectUI.disconnect();
-        // openPopup(
-        //   <BlurredToast
-        //     title="Verification failed"
-        //     message="Please try again"
-        //   />,
-        //   "error"
-        // );
+      } else {
+        tonConnectUI.disconnect();
       }
     },
-    onError: (error: any) => {
-    //   openPopup(
-    //     <BlurredToast
-    //       title={error?.response?.data?.message || "Error"}
-    //       message={"Failed to verify wallet address"}
-    //     />,
-    //     "error"
-    //   );
+    onError: () => {
       tonConnectUI.disconnect();
     },
     retry: 0,
