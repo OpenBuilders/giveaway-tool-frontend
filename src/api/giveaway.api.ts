@@ -24,6 +24,11 @@ export const getUserGiveaways = async (): Promise<IGiveaway[]> => {
   return res.data;
 };
 
+export const getGiveawayById = async (id: string): Promise<IGiveaway> => {
+  const res = await api.get(`/v1/giveaways/${id}`);
+  return res.data;
+};
+
 export const getGiveawayPrizeTemplates = async (): Promise<
   IGiveawayPrizeTemplate[]
 > => {
