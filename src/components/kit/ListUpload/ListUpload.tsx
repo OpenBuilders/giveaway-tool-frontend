@@ -1,20 +1,20 @@
-import { List, ListItem, Spinner, Text } from '@kit'
-import { collapseEnd } from '@utils'
-import Papa from 'papaparse'
-import { useEffect, useState } from 'react'
+import { List, ListItem, Spinner, Text } from "@kit";
+import { collapseEnd } from "@utils";
+import Papa from "papaparse";
+import { useEffect, useState } from "react";
 
-import styles from './ListUpload.module.scss'
-import { FileData } from './types'
+import styles from "./ListUpload.module.scss";
+import { FileData } from "./types";
 
 interface ListUploadProps {
-  allowedFileTypes: string
-  onChange: (file: FileData) => void
-  onError: (error: Error) => void
-  onSuccess: (file: FileData) => void
-  className?: string
-  text?: string
-  showPreview?: boolean
-  uploadedFile?: FileData
+  allowedFileTypes: string;
+  onChange: (file: FileData) => void;
+  onError: (error: Error) => void;
+  onSuccess: (file: FileData) => void;
+  className?: string;
+  text?: string;
+  showPreview?: boolean;
+  uploadedFile?: FileData;
 }
 
 export const ListUpload = ({
@@ -23,43 +23,43 @@ export const ListUpload = ({
   onError,
   onSuccess,
   // className,
-  text = 'Upload',
+  text = "Upload",
   showPreview = true,
   uploadedFile,
 }: ListUploadProps) => {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   const [fileData, setFileData] = useState<FileData | null>({
-    name: uploadedFile?.name || '',
-    url: uploadedFile?.url || '',
-    description: uploadedFile?.description || '',
+    name: uploadedFile?.name || "",
+    url: uploadedFile?.url || "",
+    description: uploadedFile?.description || "",
     users: uploadedFile?.users || [],
-  })
+  });
 
   useEffect(() => {
     if (uploadedFile) {
-      setFileData(uploadedFile)
+      setFileData(uploadedFile);
     }
-  }, [uploadedFile])
+  }, [uploadedFile]);
 
   const readFileContent = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader()
+      const reader = new FileReader();
 
       reader.onload = (event) => {
         if (event.target?.result) {
-          resolve(event.target.result as string)
+          resolve(event.target.result as string);
         } else {
-          reject(new Error('Failed to read file'))
+          reject(new Error("Failed to read file"));
         }
-      }
+      };
 
       reader.onerror = () => {
-        reject(new Error('Failed to read file'))
-      }
+        reject(new Error("Failed to read file"));
+      };
 
-      reader.readAsText(file)
-    })
-  }
+      reader.readAsText(file);
+    });
+  };
 
   const parseCSV = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -68,88 +68,88 @@ export const ListUpload = ({
         skipEmptyLines: true,
         complete: (results) => {
           // results.data будет типа string[][]
-          const rawData = results.data as string[][]
-          const extractedIds = rawData.map((row) => row[0])
-          resolve(extractedIds.join(','))
+          const rawData = results.data as string[][];
+          const extractedIds = rawData.map((row) => row[0]);
+          resolve(extractedIds.join(","));
         },
         error: () => {
-          reject(new Error('Failed to parse CSV'))
+          reject(new Error("Failed to parse CSV"));
         },
-      })
-    })
-  }
+      });
+    });
+  };
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     try {
-      setIsLoading(true)
-      const file = event.target.files?.[0]
+      setIsLoading(true);
+      const file = event.target.files?.[0];
       if (!file) {
-        throw new Error('No file selected')
+        throw new Error("No file selected");
       }
 
-      const fileExtension = file.name.split('.').pop()?.toLowerCase()
-      if (!allowedFileTypes.includes(fileExtension || '')) {
-        throw new Error('Invalid file type')
+      const fileExtension = file.name.split(".").pop()?.toLowerCase();
+      if (!allowedFileTypes.includes(fileExtension || "")) {
+        throw new Error("Invalid file type");
       }
 
-      let content: string
+      let content: string;
 
-      if (fileExtension === 'csv') {
-        content = await parseCSV(file)
-        content = JSON.stringify(content.split(','))
+      if (fileExtension === "csv") {
+        content = await parseCSV(file);
+        content = JSON.stringify(content.split(","));
       } else {
-        content = await readFileContent(file)
+        content = await readFileContent(file);
       }
 
-      const contentData = JSON.parse(content)
+      const contentData = JSON.parse(content);
 
       if (!contentData || !Array.isArray(contentData)) {
-        throw new Error('Invalid file content')
+        throw new Error("Invalid file content");
       }
 
       const allNumbers = contentData.every((item: string) => {
-        return !isNaN(Number(item))
-      })
+        return !isNaN(Number(item));
+      });
 
       if (!allNumbers) {
-        throw new Error('Invalid file content')
+        throw new Error("Invalid file content");
       }
 
       // Создаем URL для файла
-      const fileUrl = URL.createObjectURL(file)
+      const fileUrl = URL.createObjectURL(file);
 
       const fileData = {
         url: `https://t.me/c/${fileUrl}`,
         name: file.name,
-        description: '',
+        description: "",
         users: contentData,
-      }
+      };
 
-      setFileData(fileData)
-      onChange(fileData)
-      onSuccess(fileData)
+      setFileData(fileData);
+      onChange(fileData);
+      onSuccess(fileData);
     } catch (error) {
-      console.error(error)
+      console.error(error);
       if (error instanceof Error) {
-        onError(error)
+        onError(error);
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <List>
       <ListItem
         text={
           <Text type="text">
-            {text}{' '}
+            {text}{" "}
             {allowedFileTypes
               .toLocaleUpperCase()
-              .replaceAll('.', '')
-              .replaceAll(',', ', ')}
+              .replaceAll(".", "")
+              .replaceAll(",", ", ")}
           </Text>
         }
         after={
@@ -157,7 +157,7 @@ export const ListUpload = ({
             <Spinner />
           ) : (
             <Text type="text" color="accent">
-              {fileData?.name ? collapseEnd(fileData.name, 14) : 'Upload'}
+              {fileData?.name ? collapseEnd(fileData.name, 14) : "Upload"}
             </Text>
           )
         }
@@ -175,5 +175,5 @@ export const ListUpload = ({
         <ListItem text={`${fileData?.users?.length} Users Added`} />
       )}
     </List>
-  )
-}
+  );
+};

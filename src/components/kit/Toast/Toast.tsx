@@ -1,7 +1,7 @@
-import React, { useCallback, useContext, useState, memo } from 'react'
-import { createPortal } from 'react-dom'
+import React, { useCallback, useContext, useState, memo } from "react";
+import { createPortal } from "react-dom";
 
-import { ToastElement, ToastOptions } from './ToastElement'
+import { ToastElement, ToastOptions } from "./ToastElement";
 
 const ToastContainer = memo(({ toasts }: any) => {
   return createPortal(
@@ -11,41 +11,41 @@ const ToastContainer = memo(({ toasts }: any) => {
       </ToastElement>
     )),
     document.body
-  )
-})
+  );
+});
 
 interface ToastContextInterface {
-  showToast: (options: ToastOptions) => void
-  hideToast: (id: string | number) => void
-  hideToasts: () => void
+  showToast: (options: ToastOptions) => void;
+  hideToast: (id: string | number) => void;
+  hideToasts: () => void;
 }
 
 const ToastContext = React.createContext<ToastContextInterface>({
-  showToast: (options: ToastOptions) => {},
-  hideToast: (id: string | number) => {},
+  showToast: () => {},
+  hideToast: () => {},
   hideToasts: () => {},
-})
+});
 
-let id = 1
+let id = 1;
 
 export function ToastProvider({ children }: any) {
-  const [toasts, setToasts] = useState<any>([])
+  const [toasts, setToasts] = useState<any>([]);
 
   const showToast = useCallback((options: ToastOptions) => {
     const newToast = {
       id: id++,
       options,
-    }
-    setToasts((prevToasts: any) => [...prevToasts, newToast])
-  }, [])
+    };
+    setToasts((prevToasts: any) => [...prevToasts, newToast]);
+  }, []);
 
   const hideToast = useCallback((id: any) => {
-    setToasts((prevToasts: any) => prevToasts.filter((t: any) => t.id !== id))
-  }, [])
+    setToasts((prevToasts: any) => prevToasts.filter((t: any) => t.id !== id));
+  }, []);
 
   const hideToasts = useCallback(() => {
-    setToasts([])
-  }, [])
+    setToasts([]);
+  }, []);
 
   const contextValue = React.useMemo(
     () => ({
@@ -54,20 +54,20 @@ export function ToastProvider({ children }: any) {
       hideToasts,
     }),
     [showToast, hideToast, hideToasts]
-  )
+  );
 
   return (
     <ToastContext.Provider value={contextValue}>
       <ToastContainer toasts={toasts} />
       {children}
     </ToastContext.Provider>
-  )
+  );
 }
 
 const useToast = () => {
-  const toastHelpers = useContext(ToastContext)
-  return toastHelpers
-}
+  const toastHelpers = useContext(ToastContext);
+  return toastHelpers;
+};
 
-export { ToastContext, useToast }
-export default ToastProvider
+export { ToastContext, useToast };
+export default ToastProvider;

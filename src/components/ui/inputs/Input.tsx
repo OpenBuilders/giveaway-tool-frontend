@@ -1,6 +1,5 @@
 import { ListInput, ListInputProps } from "@/components/kit";
 import React, { useCallback, useState } from "react";
-import type { InputHTMLAttributes } from "react";
 
 interface LabeledInputProps extends ListInputProps {
   label: string;
