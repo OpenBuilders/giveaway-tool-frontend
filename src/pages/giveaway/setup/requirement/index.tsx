@@ -1,6 +1,3 @@
-import { BottomBar } from "@/components/BottomBar";
-import { Layout } from "@/components/Layout";
-import { CreateGiveawayButton } from "@/components/ui/buttons/CreateGiveawayButton";
 import { LabeledInput } from "@/components/ui/inputs/Input";
 import { List } from "@/components/ui/list/List";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -19,6 +16,14 @@ import type {
   IGiveawayRequirement,
 } from "@/interfaces/giveaway.interface";
 import type { AxiosError } from "axios";
+import {
+  ListInputProps,
+  PageLayout,
+  TelegramMainButton,
+  Block,
+  Text,
+  useToast,
+} from "@/components/kit";
 
 export default function RequirementPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
@@ -36,6 +41,7 @@ export default function RequirementPage() {
   const { addRequirement } = useGiveawayStore();
 
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const { data: requirementTemplates } = useQuery({
     queryKey: ["requirement-templates"],
@@ -49,17 +55,25 @@ export default function RequirementPage() {
         const requirementData: IGiveawayRequirement = {
           type: selectedRequirementType as IGiveawayRequirement["type"],
           name: data.channel.title,
-          value: data.channel.username,
+          value: `@${data.channel.username}`,
         };
 
         addRequirement(requirementData);
         navigate("/giveaway/setup");
       } else {
-        alert("Bot can't check members");
+        showToast({
+          message: "Bot can't check members",
+          type: "error",
+          time: 2000,
+        });
       }
     },
     onError: (data: AxiosError & { response: { data: { error: string } } }) => {
-      alert(data.response?.data?.error);
+      showToast({
+        message: data.response?.data?.error,
+        type: "error",
+        time: 4000,
+      });
       setCreateButtonDisabled(true);
     },
   });
@@ -87,8 +101,6 @@ export default function RequirementPage() {
     } else {
       setCreateButtonDisabled(false);
     }
-
-    console.log(fieldsData);
   }, [fieldsData, selectedRequirementType]);
 
   return (
@@ -99,30 +111,38 @@ export default function RequirementPage() {
         }}
       />
 
-      <Layout title={<>Add Requirement</>} titleSpace>
-        {selectedRequirementType ? (
-          <div className="flex flex-col gap-6">
-            <List>
-              <Select
-                label="Type"
-                type="withIcon"
-                options={
-                  requirementTemplates?.map((template) => ({
-                    value: template.type,
-                    label: template.name,
-                  })) || []
-                }
-                selectedValue={String(selectedRequirementType)}
-                onChange={(value) => {
-                  setSelectedRequirementType(String(value));
-                  setFieldsData([]);
-                }}
-              />
-            </List>
+      <PageLayout>
+        <Block margin="top" marginValue={44}>
+          <Text type="title" align="center" weight="bold">
+            Add Prize
+          </Text>
+        </Block>
 
-            <List>
-              {fieldBase[selectedRequirementType as keyof typeof fieldBase].map(
-                (field) => (
+        <Block margin="top" marginValue={44}>
+          {selectedRequirementType ? (
+            <Block gap={24}>
+              <List>
+                <Select
+                  label="Type"
+                  type="withIcon"
+                  options={
+                    requirementTemplates?.map((template) => ({
+                      value: template.type,
+                      label: template.name,
+                    })) || []
+                  }
+                  selectedValue={String(selectedRequirementType)}
+                  onChange={(value) => {
+                    setSelectedRequirementType(String(value));
+                    setFieldsData([]);
+                  }}
+                />
+              </List>
+
+              <List>
+                {fieldBase[
+                  selectedRequirementType as keyof typeof fieldBase
+                ].map((field) => (
                   <LabeledInput
                     key={field.label}
                     containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
@@ -132,7 +152,7 @@ export default function RequirementPage() {
                     value={
                       fieldsData.find((f) => f.label === field.label)?.value
                     }
-                    onChange={(e) => {
+                    onChange={(value) => {
                       setFieldsData((prev) => {
                         const existingField = prev.find(
                           (f) => f.label === field.label
@@ -142,51 +162,45 @@ export default function RequirementPage() {
                             if (f.label === field.label) {
                               return {
                                 ...f,
-                                value: e.target.value,
+                                value,
                               };
                             }
                             return f;
                           });
                         }
-                        return [...prev, { ...field, value: e.target.value }];
+                        return [...prev, { ...field, value }];
                       });
                     }}
-                    type={field.type}
+                    type={field.type as ListInputProps["type"]}
                   />
-                )
-              )}
+                ))}
+              </List>
+            </Block>
+          ) : (
+            <List>
+              {requirementTemplates?.map((template, index) => (
+                <ListItem
+                  key={template.id}
+                  id={template.id}
+                  title={template.name}
+                  onClick={() => {
+                    setSelectedRequirementType(template.type);
+                  }}
+                  separator={requirementTemplates?.length !== index + 1}
+                />
+              ))}
             </List>
-          </div>
-        ) : (
-          <List>
-            {requirementTemplates?.map((template) => (
-              <ListItem
-                key={template.id}
-                id={template.id}
-                title={template.name}
-                onClick={() => {
-                  setSelectedRequirementType(template.type);
-                }}
-              />
-            ))}
-          </List>
-        )}
-      </Layout>
+          )}
+        </Block>
+      </PageLayout>
 
-      {selectedRequirementType && (
-        <div className="flex flex-col">
-          <BottomBar>
-            <CreateGiveawayButton
-              disabled={createButtonDisabled || checkBotExistInChannelFetch.isPending}
-              onClick={() => {
-                checkBotExistInChannelFetch.mutate(fieldsData[0].value);
-              }}
-            >
-              Add Requirement
-            </CreateGiveawayButton>
-          </BottomBar>
-        </div>
-      )}
+      <TelegramMainButton
+        text="Add Requirement"
+        onClick={() => {
+          checkBotExistInChannelFetch.mutate(fieldsData[0].value);
+        }}
+        disabled={createButtonDisabled || checkBotExistInChannelFetch.isPending}
+      />
     </>
   );
 }

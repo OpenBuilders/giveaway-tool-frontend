@@ -2,6 +2,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { VerifyTonProvider } from "./VerifyTonProvider.tsx";
 import { UiLoader } from "./UiLoader.tsx";
+import { ToastProvider } from "./kit/Toast/Toast.tsx";
+import { ThemeProvider } from "../context/ThemeProvider/ThemeProvider.tsx";
 
 function makeQueryClient() {
   return new QueryClient({
@@ -32,12 +34,18 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TonConnectUIProvider
-        manifestUrl={`${import.meta.env.VITE_APP_URL}/tonconnect-manifest.json`}
-      >
-        <VerifyTonProvider />
-        <UiLoader>{children}</UiLoader>
-      </TonConnectUIProvider>
+      <ToastProvider>
+        <ThemeProvider>
+          <TonConnectUIProvider
+            manifestUrl={`${
+              import.meta.env.VITE_APP_URL
+            }/tonconnect-manifest.json`}
+          >
+            <VerifyTonProvider />
+            <UiLoader>{children}</UiLoader>
+          </TonConnectUIProvider>
+        </ThemeProvider>
+      </ToastProvider>
     </QueryClientProvider>
   );
 }

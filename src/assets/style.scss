@@ -1,0 +1,58 @@
+@use "variables" as *;
+@use "themes" as *;
+
+@font-face {
+  font-family: 'SF Pro Rounded';
+  src: url('https://raw.githubusercontent.com/Austcool-Walker/San-Francisco-Pro/main/SF-Pro-Rounded-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --tg-theme-section-separator-color: #efeff4;
+}
+
+* {
+  box-sizing: border-box;
+
+  font-family:
+    -apple-system, 'SF Pro Text', 'SF UI Text', system-ui, 'Helvetica Neue',
+    Helvetica, Arial, sans-serif;
+
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: var(--color-textIconsPrimary);
+  background-color: var(--color-backgroundSecondary);
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+}
+
+::-webkit-scrollbar-track {
+  visibility: hidden;
+}
+
+::-webkit-scrollbar-thumb {
+  visibility: hidden;
+}
+
+::-webkit-scrollbar:window-inactive {
+  visibility: hidden;
+}
+
+body::-webkit-scrollbar {
+  /*Chrome, Safari, Edge*/
+  display: none;
+}

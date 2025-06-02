@@ -2,38 +2,47 @@ import type { IListItem } from "@/interfaces";
 import { ListItem } from "./ListItem";
 import { GiveawayItem } from "./GiveawayItem";
 
-export const List = ({
-  groupName,
-  items,
-  giveaways,
-  onItemClick,
-  children,
-  addButton,
-  className,
-}: {
-  groupName?: string;
+interface ListProps {
+  header?: string;
   items?: IListItem[];
   giveaways?: IListItem[];
-  onItemClick?: (item: IListItem) => void;
   children?: React.ReactNode;
+  onItemClick?: (item: IListItem) => void;
   addButton?: React.ReactNode;
   className?: string;
-}) => {
-  if (!items?.length && !giveaways?.length && !children && !addButton) return null;
+}
+
+export const List = ({
+  header,
+  items,
+  giveaways,
+  children,
+  onItemClick,
+  addButton,
+  className,
+}: ListProps) => {
+  if (!items?.length && !giveaways?.length && !children && !addButton)
+    return null;
 
   return (
     <div className="flex flex-col w-full items-start">
-      {groupName && (
+      {header && (
         <p className="px-4 py-[5px] uppercase text-sm text-section-header-text tracking-footnote">
-          {groupName}
+          {header}
         </p>
       )}
 
-      <div className={`flex flex-col w-full rounded-[10px] overflow-hidden gap-3 ${className}`}>
+      <div
+        className={`flex flex-col w-full rounded-[10px] overflow-hidden ${
+          (items?.length || giveaways?.length) && !addButton ? "gap-3" : ""
+        } ${className}`}
+      >
         {!children && (items || giveaways) ? (
           <>
             {items?.map((item, index) => (
-              <ListItem {...item} onClick={onItemClick} key={index} />
+              <ListItem {...item} onClick={onItemClick} key={index} separator={
+                !addButton ? index !== items.length - 1 : true
+              } />
             ))}
 
             {giveaways?.map((giveaway, index) => (

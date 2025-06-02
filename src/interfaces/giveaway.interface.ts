@@ -11,7 +11,8 @@
 // }
 
 export interface IGiveawayPrize {
-  type: GiveawayPrizeTemplateType;
+  prize_id?: string;
+  prize_type: GiveawayPrizeTemplateType;
   fields: {
     [key: string]: string;
   }[];
@@ -36,6 +37,8 @@ export interface IGiveaway {
   can_edit: boolean;
   ends_at: string;
   participants_count: number;
+  user_role?: "owner" | "user";
+  msg_id?: number;
 }
 
 export interface IGiveawayActions {
@@ -45,7 +48,6 @@ export interface IGiveawayActions {
 
   setPrizes: (prizes: IGiveawayPrize[]) => void;
   updatePrize: (index: number, prize: IGiveawayPrize) => void;
-  // addEmptyPrize: () => void;
   addPrize: (prize: IGiveawayPrize) => void;
 
   setRequirements: (requirements: IGiveawayRequirement[]) => void;

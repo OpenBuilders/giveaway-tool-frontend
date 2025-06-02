@@ -1,4 +1,4 @@
-export const CreateGiveawayButton = ({
+export const Button = ({
   disabled = false,
   onClick,
   children,

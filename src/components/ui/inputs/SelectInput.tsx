@@ -53,13 +53,17 @@ export const Select: React.FC<SelectProps> = ({
       >
         <span>{label}</span>
         <div
-          className={`px-3 py-[5px] rounded-lg ${
-            type === "default" ? "bg-tertiary-fill-bg" : "flex gap-2 items-center"
+          className={`py-[5px] rounded-lg ${
+            type === "default"
+              ? "bg-tertiary-fill-bg"
+              : "flex gap-2 items-center"
+          } ${
+            type !== "withIcon" && "px-3"
           }`}
         >
           <span
             className={`${
-              (isOpen || type) === "withIcon" && "text-accent-text"
+              (isOpen || type === "withIcon") && "text-accent-text"
             } transition-all duration-100`}
           >
             {selectedOption?.label}

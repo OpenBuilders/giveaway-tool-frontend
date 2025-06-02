@@ -1,40 +1,16 @@
+import { ListInput, ListInputProps } from "@/components/kit";
 import React, { useCallback, useState } from "react";
 import type { InputHTMLAttributes } from "react";
 
-interface LabeledInputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange"> {
+interface LabeledInputProps extends ListInputProps {
   label: string;
-  value: string | number | undefined;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   containerClassName?: string;
   additionalLabel?: string;
 }
 
-export const Input: React.FC<LabeledInputProps> = ({
-  value,
-  onChange,
-  containerClassName = "",
-  ...rest
-}) => {
+export const Input: React.FC<ListInputProps> = (props) => {
   return (
-    <div
-      className={`
-        flex items-center justify-between relative overflow-hidden bg-card-bg rounded-[10px] px-4 h-11
-        ${containerClassName}
-      `}
-    >
-      <input
-        type="text"
-        value={value}
-        onChange={onChange}
-        className="
-          bg-transparent 
-          focus:outline-none 
-          placeholder:text-subtitle
-        "
-        {...rest}
-      />
-    </div>
+    <ListInput {...props} className="!bg-card-bg !rounded-[10px] !px-4 !h-11" />
   );
 };
 
@@ -61,7 +37,7 @@ export const LabeledInput: React.FC<LabeledInputProps> = ({
         ${containerClassName}
       `}
     >
-      <span className="font-medium w-full">{label}</span>
+      <span className="w-full">{label}</span>
 
       <div
         className={`w-full flex justify-end ${
@@ -72,9 +48,9 @@ export const LabeledInput: React.FC<LabeledInputProps> = ({
           key={label}
           type={type}
           value={value}
-          onChange={onChange}
+          onChange={(e) => onChange?.(e.target.value)}
           placeholder={placeholder}
-          inputMode="numeric"
+          inputMode={rest.inputMode}
           autoCorrect="off"
           spellCheck="false"
           style={{

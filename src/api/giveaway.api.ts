@@ -29,6 +29,11 @@ export const getGiveawayById = async (id: string): Promise<IGiveaway> => {
   return res.data;
 };
 
+export const joinToGiveaway = async (id: string): Promise<void> => {
+  const res = await api.post(`/v1/giveaways/${id}/join`);
+  return res.data;
+};
+
 export const getGiveawayPrizeTemplates = async (): Promise<
   IGiveawayPrizeTemplate[]
 > => {

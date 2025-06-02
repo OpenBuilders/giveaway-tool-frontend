@@ -9,17 +9,19 @@ export const ListItem = ({
   giveaway,
   onClick,
   className,
+  separator = true,
   isArrow = true,
 }: IListItem & {
   onClick?: (item: IListItem) => void;
   className?: string;
+  separator?: boolean;
   isArrow?: boolean;
 }) => {
   return (
     <div
       className={`py-[11px] px-4 items-start flex bg-card-bg w-full justify-between border-giveaway ${
         logo ? "after:left-[65px]" : "after:left-[16px]"
-      }${className}`}
+      } ${!separator ? "after:hidden" : ""} ${className}`}
       onClick={() => {
         if (onClick) onClick({ id, logo, title, description, giveaway });
       }}
