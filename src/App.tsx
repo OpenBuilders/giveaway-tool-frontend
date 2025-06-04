@@ -15,6 +15,7 @@ function App() {
     document.documentElement.setAttribute(
       "data-theme",
       darkTheme ? "dark" : "light"
+      // "light"
     );
 
     if (darkTheme) {

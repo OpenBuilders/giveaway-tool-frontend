@@ -12,6 +12,7 @@ export const useGiveawayStore = create<IGiveaway & IGiveawayActions>((set) => ({
   can_edit: false,
   ends_at: "",
   participants_count: 0,
+  winners: [],
 
   title: "",
   winners_count: 0,

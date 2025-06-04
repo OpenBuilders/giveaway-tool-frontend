@@ -8,7 +8,7 @@ import type {
 import api from "./helper";
 
 export const getMyGiveaways = async (): Promise<IGiveaway[]> => {
-  const res = await api.get("/v1/giveaways/top");
+  const res = await api.get("/v1/giveaways/me/all");
   return res.data;
 };
 
@@ -19,8 +19,8 @@ export const createGiveaway = async (
   return res.data;
 };
 
-export const getUserGiveaways = async (): Promise<IGiveaway[]> => {
-  const res = await api.get("/v1/giveaways/user");
+export const getTopGiveaways = async (): Promise<IGiveaway[]> => {
+  const res = await api.get("/v1/giveaways/top");
   return res.data;
 };
 

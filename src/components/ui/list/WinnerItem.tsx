@@ -1,21 +1,17 @@
-import { ArrowIcon } from "@/assets/icons/ArrowIcon";
 import type { IListItem } from "@/interfaces";
 
-export const ListItem = ({
+export const WinnerItem = ({
   id,
   logo,
   title,
-  description,
-  giveaway,
+  winner,
   onClick,
   className,
   separator = true,
-  isArrow = true,
 }: IListItem & {
   onClick?: (item: IListItem) => void;
   className?: string;
   separator?: boolean;
-  isArrow?: boolean;
 }) => {
   return (
     <div
@@ -23,7 +19,7 @@ export const ListItem = ({
         logo ? "after:left-[65px]" : "after:left-[16px]"
       } ${!separator ? "after:hidden" : ""} ${className}`}
       onClick={() => {
-        if (onClick) onClick({ id, logo, title, description, giveaway });
+        if (onClick) onClick({ id, logo, title, winner });
       }}
     >
       {logo && (
@@ -37,24 +33,11 @@ export const ListItem = ({
           )}
         </div>
       )}
-      <div className="flex flex-col w-full items-start">
-        <div className="flex flex-col">
-          <div className="flex gap-1.5 items-center">
-            <span className="font-medium tracking-body">{title}</span>
-          </div>
-        </div>
+      <div className="flex w-full justify-between items-center">
+        <span className="font-medium tracking-body">{title}</span>
 
-        {description && (
-          <span className="description text-hint text-sm-max tracking-subheadline">
-            {description}
-          </span>
-        )}
+        <span className="text-hint tracking-body">{winner?.place}</span>
       </div>
-      {isArrow && (
-        <div className="pl-4 flex items-center justify-center self-stretch">
-          <ArrowIcon />
-        </div>
-      )}
     </div>
   );
 };

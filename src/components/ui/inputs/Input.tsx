@@ -9,7 +9,7 @@ interface LabeledInputProps extends ListInputProps {
 
 export const Input: React.FC<ListInputProps> = (props) => {
   return (
-    <ListInput {...props} className="!bg-card-bg !rounded-[10px] !px-4 !h-11" />
+    <ListInput {...props} className="!bg-section-bg !rounded-[10px] !px-4 !h-11" />
   );
 };
 
@@ -32,7 +32,7 @@ export const LabeledInput: React.FC<LabeledInputProps> = ({
   return (
     <div
       className={`
-        flex items-center justify-between relative overflow-hidden bg-card-bg rounded-[10px] px-4 h-11
+        flex items-center justify-between relative overflow-hidden bg-section-bg rounded-[10px] px-4 h-11
         ${containerClassName}
       `}
     >
@@ -40,7 +40,7 @@ export const LabeledInput: React.FC<LabeledInputProps> = ({
 
       <div
         className={`w-full flex justify-end ${
-          Number(value) <= 0 || !value ? "text-subtitle" : ""
+          Number(value) <= 0 || !value ? "text-hint" : ""
         }`}
       >
         <input
@@ -59,7 +59,7 @@ export const LabeledInput: React.FC<LabeledInputProps> = ({
             text-right 
             bg-transparent 
             focus:outline-none 
-            placeholder:text-subtitle
+            placeholder:text-hint
           "
           {...rest}
         />

@@ -60,8 +60,8 @@ export default function GiveawaySetUpPage() {
       winners_count,
       duration: duration * 60,
       description: "Giveaway Description",
-      prizes: prizes.map((prize, index) => ({
-        place: index + 1,
+      prizes: prizes.map((prize) => ({
+        place: "all",
         ...prize,
       })),
       requirements,
@@ -128,96 +128,6 @@ export default function GiveawaySetUpPage() {
           />
         </Block>
 
-        {/* {pageState === "created" && (
-          <>
-            <ConfettiAnimation active />
-
-            <Image
-              size={112}
-              src="/gift.svg"
-              borderRadius={50}
-              fallback={"Giveaway"}
-            />
-
-            <Block margin="top" marginValue={8}>
-              <Text type="title" align="center" weight="bold">
-                {title}
-              </Text>
-
-              <div className="flex flex-col items-center justify-center">
-                <span className="text-timer-bold">
-                  {timeRemaining || "00:00"}
-                </span>
-                <span className="tracking-body font-medium">
-                  until end{" "}
-                  {new Date(createdGiveaway?.ends_at || "").toLocaleString(
-                    "en-US",
-                    {
-                      hour: "numeric",
-                      minute: "numeric",
-                      hour12: true,
-                      ...(new Date().toDateString() ===
-                      new Date(createdGiveaway?.ends_at || "").toDateString()
-                        ? {}
-                        : {
-                            weekday: "long",
-                            month: "short",
-                            day: "numeric",
-                          }),
-                    }
-                  )}
-                </span>
-              </div>
-            </Block>
-
-            <Block gap={24} margin="top" marginValue={24}>
-              <Block gap={12}>
-                <div
-                  className="bg-card-bg rounded-[12px] py-2 px-4 w-full cursor-pointer flex items-center justify-between gap-4"
-                  onClick={() => {
-                    navigator.clipboard.writeText(giveawayLink);
-                    showToast({
-                      message: "Link copied to clipboard",
-                      type: "success",
-                      time: 2000,
-                    });
-                  }}
-                >
-                  <span className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[calc(100%-28px)]">
-                    {giveawayLink}
-                  </span>
-                  <div className="w-[28px] h-[28px]">
-                    <CopyIcon />
-                  </div>
-                </div>
-
-                <CreateGiveawayButton
-                  onClick={() => {
-                    WebApp.shareMessage(String(createdGiveaway?.msg_id));
-                  }}
-                  className="flex items-center justify-center gap-1.5"
-                >
-                  <ForwardIcon />
-                  Share to Channel
-                </CreateGiveawayButton>
-              </Block>
-
-              <div className="grid grid-cols-3 gap-2.5 w-full">
-                <SmallDetailsCard
-                  title="winners"
-                  value={createdGiveaway?.winners_count}
-                />
-                <SmallDetailsCard
-                  title="joined"
-                  value={createdGiveaway?.participants_count}
-                />
-                <SmallDetailsCard title="duration" value={duration + "m"} />
-              </div>
-            </Block>
-          </>
-        )}
-        */}
-
         <Block margin="top" marginValue={24} gap={24}>
           <div
             className={`flex flex-col ${prizes.length > 0 ? "gap-2.5" : ""}`}
@@ -241,7 +151,7 @@ export default function GiveawaySetUpPage() {
               ))}
             </List>
 
-            <div className="py-2 px-4 max-h-[44px] items-center flex bg-white w-full justify-between border-giveaway rounded-[10px]">
+            <div className="bg-section-bg border-giveaway flex max-h-[44px] w-full items-center justify-between rounded-[10px] px-4 py-2">
               <AddButton
                 onClick={() => {
                   navigate("/giveaway/setup/prize");
@@ -265,11 +175,8 @@ export default function GiveawaySetUpPage() {
                   title: requirement.name,
                   description: requirement.value,
                   className: "[&_img]:scale-75",
-                } as IListItem)
+                }) as IListItem,
             )}
-            onItemClick={({ id }) => {
-              navigate(`/giveaway/setup/requirement/${id}`);
-            }}
             addButton={
               <AddButton
                 onClick={() => {

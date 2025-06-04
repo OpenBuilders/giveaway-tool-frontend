@@ -1,11 +1,13 @@
 import type { IListItem } from "@/interfaces";
 import { ListItem } from "./ListItem";
 import { GiveawayItem } from "./GiveawayItem";
+import { WinnerItem } from "./WinnerItem";
 
 interface ListProps {
   header?: string;
   items?: IListItem[];
   giveaways?: IListItem[];
+  winners?: IListItem[];
   children?: React.ReactNode;
   onItemClick?: (item: IListItem) => void;
   addButton?: React.ReactNode;
@@ -16,6 +18,7 @@ export const List = ({
   header,
   items,
   giveaways,
+  winners,
   children,
   onItemClick,
   addButton,
@@ -49,8 +52,12 @@ export const List = ({
               <GiveawayItem {...giveaway} onClick={onItemClick} key={index} />
             ))}
 
+            {winners?.map((winner, index) => (
+              <WinnerItem {...winner} onClick={onItemClick} key={index} />
+            ))}
+
             {addButton && (
-              <div className="py-2 px-4 max-h-[44px] items-center flex bg-card-bg w-full justify-between border-giveaway">
+              <div className="py-2 px-4 max-h-[44px] items-center flex bg-section-bg w-full justify-between border-giveaway">
                 {addButton}
               </div>
             )}

@@ -2,8 +2,15 @@ import { List } from "../components/ui/list/List";
 import { useNavigate } from "react-router";
 import { useTabs } from "@/hooks/useTabs";
 import { useQuery } from "@tanstack/react-query";
-import { getMyGiveaways } from "@/api/giveaway.api";
-import { PageLayout, TelegramMainButton, Image, Block, Text } from "@kit";
+import { getMyGiveaways, getTopGiveaways } from "@/api/giveaway.api";
+import {
+  PageLayout,
+  TelegramMainButton,
+  Block,
+  Text,
+  StickerPlayer,
+} from "@kit";
+import giftLottie from "@assets/tgs/gift.json";
 
 export default function MainPage() {
   const navigate = useNavigate();
@@ -14,23 +21,48 @@ export default function MainPage() {
     refetchOnMount: "always",
   });
 
-  const mappedGiveaways = myGiveaways?.map((g) => ({
+  const { data: topGiveaways } = useQuery({
+    queryKey: ["top-giveaways"],
+    queryFn: getTopGiveaways,
+    refetchOnMount: "always",
+  });
+
+  const mappedMyGiveaways = myGiveaways?.map((g) => ({
     ...g,
     description: undefined,
     giveaway: {
-      isAdmin: g.can_edit,
+      isAdmin: g.user_role === "owner",
       endsAt: g.ends_at,
       participants: g.participants_count,
       requirements: g.requirements,
+      winners_count: g.winners_count,
     },
   }));
 
   const top100Giveaways =
-    mappedGiveaways?.filter((g) => g.status === "active") ?? [];
+    topGiveaways
+      ?.filter((g) => g.status === "active")
+      ?.map((g) => ({
+        ...g,
+        description: undefined,
+        giveaway: {
+          isAdmin: g.user_role === "owner",
+          endsAt: g.ends_at,
+          participants: g.participants_count,
+          requirements: g.requirements,
+          winners_count: g.winners_count,
+        },
+      })) ?? [];
   const myActiveGiveaways =
-    mappedGiveaways?.filter((g) => g.status === "active") ?? [];
-  const myCancelledGiveaways =
-    mappedGiveaways?.filter((g) => g.status === "cancelled") ?? [];
+    mappedMyGiveaways?.filter((g) => g.status === "active") ?? [];
+  const myFinishedGiveaways =
+    mappedMyGiveaways?.filter(
+      (g) => g.status === "cancelled" || g.status === "completed"
+    ) ?? [];
+  const myPausedGiveaways =
+    mappedMyGiveaways?.filter((g) => g.status === "paused") ?? [];
+  const myDeletedGiveaways =
+    mappedMyGiveaways?.filter((g) => g.status === "deleted") ?? [];
 
   const { TabContent, TabsComponent } = useTabs({
     tabs: [
@@ -41,7 +73,6 @@ export default function MainPage() {
           <>
             {top100Giveaways.length > 0 ? (
               <List
-                header="active"
                 giveaways={top100Giveaways}
                 onItemClick={({ id }) => {
                   navigate(`/giveaway/${id}`);
@@ -67,8 +98,8 @@ export default function MainPage() {
         label: "My Giveaways",
         content: (
           <>
-            {myActiveGiveaways.length > 0 || myCancelledGiveaways.length > 0 ? (
-              <>
+            {myActiveGiveaways.length > 0 || myFinishedGiveaways.length > 0 ? (
+              <Block gap={24}>
                 <List
                   header="active"
                   giveaways={myActiveGiveaways}
@@ -77,13 +108,27 @@ export default function MainPage() {
                   }}
                 />
                 <List
-                  header="finished"
-                  giveaways={myCancelledGiveaways}
+                  header="stopped"
+                  giveaways={myPausedGiveaways}
                   onItemClick={({ id }) => {
                     navigate(`/giveaway/${id}`);
                   }}
                 />
-              </>
+                <List
+                  header="finished"
+                  giveaways={myFinishedGiveaways}
+                  onItemClick={({ id }) => {
+                    navigate(`/giveaway/${id}`);
+                  }}
+                />
+                <List
+                  header="deleted"
+                  giveaways={myDeletedGiveaways}
+                  onItemClick={({ id }) => {
+                    navigate(`/giveaway/${id}`);
+                  }}
+                />
+              </Block>
             ) : (
               <div className="flex items-center justify-center h-[45vh]">
                 <Block gap={6}>
@@ -110,12 +155,7 @@ export default function MainPage() {
       />
 
       <PageLayout>
-        <Image
-          size={112}
-          src="/gift.svg"
-          borderRadius={50}
-          fallback={"Giveaway"}
-        />
+        <StickerPlayer lottie={giftLottie} height={112} width={112} />
 
         <Block margin="top" marginValue={8}>
           <Text type="title" align="center" weight="bold">
@@ -131,7 +171,7 @@ export default function MainPage() {
           </Block>
         </Block>
 
-        <Block margin="top" marginValue="auto" fixed={"bottom"}>
+        <Block margin="top" marginValue="auto" fixed="bottom">
           <Text align="center" type="caption" color="tertiary">
             This is open source contributed by independent
             <br />

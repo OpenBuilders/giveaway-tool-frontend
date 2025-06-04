@@ -24,12 +24,19 @@ export interface IGiveawayRequirement {
   type: "subscription";
 }
 
-export type GiveawayStatus = "active" | "cancelled";
+export interface IGiveawayWinners {
+  user_id: number;
+	username: string;
+	place: number;
+}
+
+export type GiveawayStatus = "active" | "cancelled" | "completed" | "pending" | "paused" | "deleted";
 
 export interface IGiveaway {
   id: string;
   title: string;
   winners_count: number;
+  winners: IGiveawayWinners[];
   duration: number;
   prizes: IGiveawayPrize[];
   requirements: IGiveawayRequirement[];
@@ -62,7 +69,7 @@ export interface IGiveawayCreateRequest {
   duration: number;
   max_participants?: number;
   prizes: {
-    place: number;
+    place: number | "all";
     prize_id?: string;
     prize_type: string;
     fields: {

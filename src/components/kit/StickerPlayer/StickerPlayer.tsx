@@ -2,7 +2,7 @@ import Lottie from 'lottie-react'
 import { useRef } from 'react'
 
 interface StickerPlayerProps {
-  lottie: string
+  lottie: string | object
   height?: number
   width?: number
 }

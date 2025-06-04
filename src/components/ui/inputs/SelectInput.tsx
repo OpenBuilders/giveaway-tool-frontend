@@ -48,7 +48,7 @@ export const Select: React.FC<SelectProps> = ({
         type="button"
         onClick={() => setIsOpen((v) => !v)}
         className="
-          flex items-center justify-between relative overflow-hidden bg-card-bg rounded-[10px] px-4 w-full h-11
+          flex items-center justify-between relative overflow-hidden bg-section-bg rounded-[10px] px-4 w-full h-11
         "
       >
         <span>{label}</span>

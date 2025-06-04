@@ -20,6 +20,8 @@ import {
 import { IListItem } from "@/interfaces";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { joinToGiveaway } from "@/api/giveaway.api";
+import { WinnerCup } from "@/assets/icons/WinnerCup";
+import { DoneIcon } from "@/assets/icons/DoneIcon";
 
 const SmallDetailsCard = ({
   title,
@@ -29,9 +31,9 @@ const SmallDetailsCard = ({
   value?: string | number;
 }) => {
   return (
-    <div className="flex flex-col items-center w-full px-4 py-3 rounded-[12px] bg-card-bg">
+    <div className="flex flex-col items-center w-full px-4 py-3 rounded-[12px] bg-section-bg">
       <span>{value?.toLocaleString("en-US")}</span>
-      <span className="text-text-secondary text-sm-max tracking-subheadline">
+      <span className="text-h text-sm-max tracking-subheadline">
         {title}
       </span>
     </div>
@@ -47,6 +49,8 @@ export default function GiveawayPage() {
   });
 
   const [timeRemaining, setTimeRemaining] = useState<string>("");
+  const [timeRemainingText, setTimeRemainingText] = useState<string>("");
+  const [resultCardData, setResultCardData] = useState<IListItem | null>(null);
   const [alreadyViewed, setAlreadyViewed] = useState(true);
 
   const isAdmin = giveaway?.user_role === "owner";
@@ -77,6 +81,82 @@ export default function GiveawayPage() {
   }, [id, isAdmin]);
 
   useEffect(() => {
+    switch (giveaway?.status) {
+      case "completed":
+      case "pending":
+        setTimeRemaining("Ended");
+        setTimeRemainingText(
+          "on " +
+            new Date(giveaway?.ends_at || "").toLocaleString("en-US", {
+              hour: "numeric",
+              minute: "numeric",
+              hour12: true,
+              ...(new Date().toDateString() ===
+              new Date(giveaway?.ends_at || "").toDateString()
+                ? {}
+                : {
+                    month: "short",
+                    day: "numeric",
+                  }),
+            })
+        );
+
+        if (giveaway?.status === "completed") {
+          const currentUserId = WebApp.initDataUnsafe.user?.id;
+          const winner = giveaway?.winners.find(
+            (winner) => winner.user_id === currentUserId
+          );
+          if (winner) {
+            setResultCardData({
+              id: giveaway?.id,
+              title: "You’re in!",
+              description:
+                "Now just wait for it to end — results will be announced after the deadline.",
+              logo: <DoneIcon />,
+            });
+          }
+        } else if (giveaway?.status === "pending") {
+          setResultCardData({
+            id: giveaway?.id,
+            title: "Winners will be announced soon",
+            description:
+              "Winners have been picked — check back soon to see the results.",
+            logo: <WinnerCup />,
+          });
+        }
+
+        return;
+      case "paused":
+        setTimeRemaining("Stopped");
+        setTimeRemainingText("you can resume it anytime");
+
+        return;
+      case "active":
+        setTimeRemainingText(
+          "until end " +
+            (new Date().toDateString() ===
+            new Date(giveaway?.ends_at || "").toDateString()
+              ? "today at "
+              : "") +
+            new Date(giveaway?.ends_at || "").toLocaleString("en-US", {
+              hour: "numeric",
+              minute: "numeric",
+              hour12: true,
+              ...(new Date().toDateString() ===
+              new Date(giveaway?.ends_at || "").toDateString()
+                ? {}
+                : {
+                    // weekday: "long",
+                    month: "short",
+                    day: "numeric",
+                  }),
+            })
+        );
+        break;
+      default:
+        setTimeRemaining("Ended");
+    }
+
     if (giveaway?.ends_at) {
       const endTime = new Date(giveaway.ends_at).getTime();
 
@@ -122,7 +202,7 @@ export default function GiveawayPage() {
     mutationFn: ({ id }: { id: string }) => joinToGiveaway(id),
     onSuccess: () => {
       showToast({
-        message: "Joined to giveaway",
+        message: "Joined! Wait for the results",
         type: "success",
         time: 2000,
       });
@@ -148,7 +228,7 @@ export default function GiveawayPage() {
         onClick={() => {
           joinToGiveawayFetch.mutate({ id: String(id) });
         }}
-        isVisible={!isAdmin}
+        isVisible={isAdmin ? false : giveaway?.status === "active"}
       />
 
       <PageLayout>
@@ -172,20 +252,7 @@ export default function GiveawayPage() {
                 {timeRemaining || "00:00"}
               </span>
               <span className="tracking-body font-medium">
-                until end{" "}
-                {new Date(giveaway?.ends_at || "").toLocaleString("en-US", {
-                  hour: "numeric",
-                  minute: "numeric",
-                  hour12: true,
-                  ...(new Date().toDateString() ===
-                  new Date(giveaway?.ends_at || "").toDateString()
-                    ? {}
-                    : {
-                        weekday: "long",
-                        month: "short",
-                        day: "numeric",
-                      }),
-                })}
+                {timeRemainingText}
               </span>
             </div>
           </Block>
@@ -195,7 +262,7 @@ export default function GiveawayPage() {
           {isAdmin && (
             <Block gap={12}>
               <div
-                className="bg-card-bg rounded-[12px] py-2 px-4 w-full cursor-pointer flex items-center justify-between gap-4"
+                className="bg-section-bg rounded-[12px] py-2 px-4 w-full cursor-pointer flex items-center justify-between gap-4"
                 onClick={() => {
                   navigator.clipboard.writeText(giveawayLink);
                   showToast({
@@ -225,17 +292,38 @@ export default function GiveawayPage() {
             </Block>
           )}
 
-          <div className="grid grid-cols-3 gap-2.5 w-full">
-            <SmallDetailsCard title="winners" value={giveaway?.winners_count} />
-            <SmallDetailsCard
-              title="joined"
-              value={giveaway?.participants_count}
-            />
-            <SmallDetailsCard
-              title="prize count"
-              value={giveaway?.prizes.length}
-            />
-          </div>
+          <Block gap={10}>
+            {resultCardData && !isAdmin && (
+              <ListItem
+                id={resultCardData.id}
+                title={resultCardData.title}
+                description={resultCardData.description}
+                logo={
+                  <div className="[&_svg]:w-9 [&_svg]:h-9 mr-3">
+                    {resultCardData.logo}
+                  </div>
+                }
+                className="rounded-[16px]"
+                separator={false}
+                isArrow={false}
+              />
+            )}
+
+            <div className="grid grid-cols-3 gap-2.5 w-full">
+              <SmallDetailsCard
+                title="winners"
+                value={giveaway?.winners_count}
+              />
+              <SmallDetailsCard
+                title="joined"
+                value={giveaway?.participants_count}
+              />
+              <SmallDetailsCard
+                title="prize count"
+                value={giveaway?.prizes.length}
+              />
+            </div>
+          </Block>
         </Block>
 
         <Block margin="top" marginValue={24} gap={24}>
@@ -264,25 +352,53 @@ export default function GiveawayPage() {
             </List>
           </div>
 
-          <List
-            header="joining requirements"
-            items={(giveaway?.requirements ?? []).map(
-              (requirement, index) =>
-                ({
-                  id: index.toString(),
-                  logo:
-                    requirement.type === "subscription"
-                      ? "/gift.svg"
-                      : undefined,
-                  title: requirement.name,
-                  description: requirement.value,
-                  className: "[&_img]:scale-75",
-                } as IListItem)
-            )}
-            onItemClick={({ id }) => {
-              navigate(`/giveaway/setup/requirement/${id}`);
-            }}
-          />
+          {giveaway?.status === "active" && (
+            <List
+              header="joining requirements"
+              items={(giveaway?.requirements ?? []).map(
+                (requirement, index) =>
+                  ({
+                    id: index.toString(),
+                    logo:
+                      requirement.type === "subscription"
+                        ? "/gift.svg"
+                        : undefined,
+                    title: `Subscribe to ${requirement.name}`,
+                    description: `Not completed`,
+                    className: `[&_img]:scale-75 ${
+                      // only if already completed
+                      requirement.type === "subscription"
+                        ? "[&_span.description]:text-accent-text"
+                        : ""
+                    }`,
+                  } as IListItem)
+              )}
+              onItemClick={() => {
+                // check valid
+              }}
+            />
+          )}
+
+          {giveaway?.winners && giveaway?.winners.length > 0 && (
+            <List
+              header={`winners (${giveaway?.winners.length} users)`}
+              winners={giveaway?.winners.map(
+                (winner, index) =>
+                  ({
+                    id: index.toString(),
+                    logo: "/gift.svg",
+                    title: winner.username,
+                    winner: {
+                      place: winner.place,
+                      isWinner:
+                        WebApp.initDataUnsafe.user?.id === winner.user_id,
+                    },
+                    className: "[&_img]:scale-75",
+                    isArrow: isAdmin,
+                  } as IListItem)
+              )}
+            />
+          )}
         </Block>
       </PageLayout>
     </>

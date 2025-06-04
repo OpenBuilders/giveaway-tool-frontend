@@ -1,5 +1,7 @@
-@use "variables" as *;
-@use "themes" as *;
+@use "tailwindcss";
+@use "variables"as *;
+@use "themes"as *;
+@use "./tailwind.css";
 
 @font-face {
   font-family: 'SF Pro Rounded';
@@ -7,10 +9,6 @@
   font-weight: 700;
   font-style: normal;
   font-display: swap;
-}
-
-:root {
-  --tg-theme-section-separator-color: #efeff4;
 }
 
 * {
@@ -31,8 +29,6 @@ body {
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-  color: var(--color-textIconsPrimary);
-  background-color: var(--color-backgroundSecondary);
   overflow-x: hidden;
 }
 

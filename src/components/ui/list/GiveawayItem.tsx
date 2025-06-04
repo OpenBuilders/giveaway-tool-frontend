@@ -1,9 +1,11 @@
 import { UsersIcon } from "@/assets/icons/UsersIcon";
 import { useCallback, useEffect, useState } from "react";
 import type { IListItem } from "@/interfaces";
+import { WinnerCup } from "@/assets/icons/WinnerCup";
+import { Block, Text } from "@/components/kit";
 
 const AdminBadge = () => (
-  <div className="bg-quaternary-fill-bg text-subtitle font-medium text-xs px-1 py-0.5 rounded-md uppercase">
+  <div className="bg-quaternary-fill-bg text-hint rounded-md px-1 py-0.5 text-xs font-medium uppercase">
     admin
   </div>
 );
@@ -61,7 +63,7 @@ export const GiveawayItem = ({
 
   return (
     <div
-      className={`py-[11px] px-4 items-start flex bg-card-bg w-full justify-between rounded-[14px] ${
+      className={`bg-section-bg flex w-full items-start justify-between rounded-[14px] px-4 py-[11px] ${
         logo ? "after:left-[65px]" : "after:left-[16px]"
       } ${giveaway ? "min-h-[60px]" : ""} ${className}`}
       onClick={() => {
@@ -69,23 +71,33 @@ export const GiveawayItem = ({
       }}
     >
       {logo && (
-        <div className="mr-2.5 rounded-full max-w-9 bg-black aspect-square overflow-hidden">
-          <img src={logo} alt="giveaway logo" />
+        <div
+          className={`mr-2.5 overflow-hidden ${
+            typeof logo === "string"
+              ? "aspect-square max-w-9 rounded-full bg-black"
+              : ""
+          }`}
+        >
+          {typeof logo === "string" ? (
+            <img src={logo} alt="giveaway logo" />
+          ) : (
+            logo
+          )}
         </div>
       )}
-      <div className="flex flex-col w-full items-start">
+      <div className="flex w-full flex-col items-start">
         <div className={`flex flex-col ${giveaway ? "pb-2.5" : ""}`}>
-          <div className="flex gap-1.5 items-center">
-            <span className="font-medium tracking-body">{title}</span>
+          <div className="flex items-center gap-1.5">
+            <span className="tracking-body font-medium">{title}</span>
             {giveaway?.isAdmin && <AdminBadge />}
           </div>
-  
+
           {giveaway && (
             <>
-              <div className="flex gap-1 items-center">
+              <div className="flex items-center gap-1">
                 <UsersIcon />
-  
-                <span className="text-subtitle text-sm-max tracking-subheadline">
+
+                <span className="text-hint text-sm-max tracking-subheadline">
                   {giveaway.participants.toLocaleString("en-US", {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 0,
@@ -93,43 +105,28 @@ export const GiveawayItem = ({
                   · {endsIn}
                 </span>
               </div>
-  
-              {/* <span className="text-subtitle text-sm-max tracking-subheadline">
+
+              {/* <span className="text-hint text-sm-max tracking-subheadline">
                 @{giveaway.telegramUsername}
               </span> */}
             </>
           )}
         </div>
 
-        {giveaway && giveaway.requirements && giveaway.requirements.length > 0 && (
-          <div className="overflow-x-scroll flex gap-2">
-            {giveaway.requirements.map((requirement, index) => (
-              <div
-                key={index}
-                className="px-1.5 py-1 rounded-[10px] bg-white flex gap-1 items-center"
-              >
-                <img
-                  src={
-                    requirement.type === "subscription"
-                      ? "/gift.svg"
-                      : "/gift.svg"
-                  }
-                  alt=""
-                  width={20}
-                  className="rounded-full bg-black"
-                />
-                <span className="text-sm-max tracking-subheadline">
-                  {String(requirement.value).replace("@", "")}
-                </span>
-              </div>
-            ))}
+        <Block row gap={8}>
+          <div className="bg-tertiary-fill-bg flex items-center gap-1 rounded-[10px] px-1.5 py-1">
+            <WinnerCup />
+
+            <Text type="caption" weight="medium">
+              {giveaway?.winners_count}
+            </Text>
           </div>
-        )}
+        </Block>
 
         {description && (
-          <span className="text-subtitle text-sm-max tracking-subheadline">
+          <Text type="caption" weight="medium">
             {description}
-          </span>
+          </Text>
         )}
       </div>
     </div>
