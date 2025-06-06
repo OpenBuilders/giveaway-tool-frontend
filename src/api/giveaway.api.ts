@@ -4,6 +4,7 @@ import type {
   IGiveawayPrizeTemplate,
   IGiveawayRequirementTemplate,
   IGiveawayCheckChannelResponse,
+  IGiveawayCheckRequirementsResponse,
 } from "@/interfaces/giveaway.interface";
 import api from "./helper";
 
@@ -52,5 +53,10 @@ export const checkChannel = async (
   username: string
 ): Promise<IGiveawayCheckChannelResponse> => {
   const res = await api.post("/v1/bot/check", { username });
+  return res.data;
+};
+
+export const checkGiveawayRequirements = async (id: string): Promise<IGiveawayCheckRequirementsResponse> => {
+  const res = await api.get(`/v1/giveaways/${id}/check-requirements`);
   return res.data;
 };

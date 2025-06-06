@@ -57,7 +57,7 @@ export default function MainPage() {
     mappedMyGiveaways?.filter((g) => g.status === "active") ?? [];
   const myFinishedGiveaways =
     mappedMyGiveaways?.filter(
-      (g) => g.status === "cancelled" || g.status === "completed"
+      (g) => g.status === "cancelled" || g.status === "completed",
     ) ?? [];
   const myPausedGiveaways =
     mappedMyGiveaways?.filter((g) => g.status === "paused") ?? [];
@@ -79,7 +79,7 @@ export default function MainPage() {
                 }}
               />
             ) : (
-              <div className="flex items-center justify-center h-[45vh]">
+              <div className="flex h-[45vh] items-center justify-center">
                 <Block gap={6}>
                   <Text type="text" align="center" weight="medium">
                     No Giveaways Yet
@@ -130,7 +130,7 @@ export default function MainPage() {
                 />
               </Block>
             ) : (
-              <div className="flex items-center justify-center h-[45vh]">
+              <div className="flex h-[45vh] items-center justify-center">
                 <Block gap={6}>
                   <Text type="text" align="center" weight="medium">
                     No Giveaways Yet
@@ -171,22 +171,24 @@ export default function MainPage() {
           </Block>
         </Block>
 
-        <Block margin="top" marginValue="auto" fixed="bottom">
-          <Text align="center" type="caption" color="tertiary">
-            This is open source contributed by independent
-            <br />
-            developers, as part of
-            <Text
-              type="caption"
-              href="https://tools.tg"
-              color="accent"
-              as="span"
-            >
-              {" "}
-              Telegram Tools
+        <div className="flex h-full items-end">
+          <Block padding="full" paddingValue={12} align="end">
+            <Text align="center" type="caption" color="tertiary">
+              This is open source contributed by independent
+              <br />
+              developers, as part of
+              <Text
+                type="caption"
+                href="https://tools.tg"
+                color="accent"
+                as="span"
+              >
+                {" "}
+                Telegram Tools
+              </Text>
             </Text>
-          </Text>
-        </Block>
+          </Block>
+        </div>
       </PageLayout>
     </>
   );

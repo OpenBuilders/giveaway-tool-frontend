@@ -1,6 +1,7 @@
 import type {
   IGiveaway,
   IGiveawayActions,
+  IGiveawayCreator,
   IGiveawayPrize,
   IGiveawayRequirement,
 } from "@/interfaces/giveaway.interface";
@@ -19,6 +20,7 @@ export const useGiveawayStore = create<IGiveaway & IGiveawayActions>((set) => ({
   duration: 60 * 24, // 1 day
   prizes: [],
   requirements: [],
+  creators: [],
   setWinners: (winners) => set({ winners_count: winners }),
   setDuration: (duration) => set({ duration }),
   setTitle: (title) => set({ title }),
@@ -37,6 +39,25 @@ export const useGiveawayStore = create<IGiveaway & IGiveawayActions>((set) => ({
   setRequirements: (requirements) => set({ requirements }),
   addRequirement: (requirement: IGiveawayRequirement) =>
     set((state) => ({ requirements: [...state.requirements, requirement] })),
+  removeRequirement: (index) =>
+    set((state) => {
+      const newRequirements = [...state.requirements];
+      newRequirements.splice(index, 1);
+
+      return { requirements: newRequirements };
+    }),
+
+  setCreators: (creators) => set({ creators }),
+  addCreator: (creator: IGiveawayCreator) =>
+    set((state) => ({ creators: [...state.creators, creator] })),
+  removeCreator: (index) =>
+    set((state) => {
+      const newCreators = [...state.creators];
+      newCreators.splice(index, 1);
+
+      return { creators: newCreators };
+    }),
+
   reset: () =>
     set({
       title: "",

@@ -89,10 +89,10 @@ export const Select: React.FC<SelectProps> = ({
               }}
               className="
                 px-4 cursor-pointer h-11 
-                flex justify-between items-center
+                flex justify-between items-center text-accent-text
               "
             >
-              <span className="text-gray-800">{opt.label}</span>
+              <span className="text-text">{opt.label}</span>
               {opt.value === selectedValue && <CheckMark />}
             </li>
           ))}

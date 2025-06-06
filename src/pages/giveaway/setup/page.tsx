@@ -34,6 +34,11 @@ export default function GiveawaySetUpPage() {
 
     prizes,
     requirements,
+    removeRequirement,
+
+    creators,
+    removeCreator,
+
     reset,
   } = useGiveawayStore((state) => state);
   const navigate = useNavigate();
@@ -115,6 +120,7 @@ export default function GiveawaySetUpPage() {
           <Select
             label="Duration"
             options={[
+              { label: "5 minutes", value: 5 },
               { label: "1 hour", value: 60 },
               { label: "1 day", value: 60 * 24 },
               { label: "1 week", value: 60 * 24 * 7 },
@@ -129,6 +135,38 @@ export default function GiveawaySetUpPage() {
         </Block>
 
         <Block margin="top" marginValue={24} gap={24}>
+          <div
+            className={`flex flex-col ${creators.length > 0 ? "gap-2.5" : ""}`}
+          >
+            <List header="creators" className="grid grid-cols-2 gap-2.5">
+              {creators.map((creator, index) => (
+                <ListItem
+                  id={index.toString()}
+                  logo={creator.image}
+                  title={creator.name}
+                  onClick={() => {
+                    navigate(`/giveaway/setup/creator/${index}`);
+                  }}
+                  onActionClick={() => {
+                    removeCreator(index);
+                  }}
+                  className="rounded-[10px] after:h-0 [&_img]:scale-75"
+                  rightIcon="remove"
+                />
+              ))}
+            </List>
+
+            <div className="bg-section-bg border-giveaway flex max-h-[44px] w-full items-center justify-between rounded-[10px] px-4 py-2">
+              <AddButton
+                onClick={() => {
+                  navigate("/giveaway/setup/creator");
+                }}
+              >
+                Add Creator
+              </AddButton>
+            </div>
+          </div>
+
           <div
             className={`flex flex-col ${prizes.length > 0 ? "gap-2.5" : ""}`}
           >
@@ -146,7 +184,7 @@ export default function GiveawaySetUpPage() {
                     navigate(`/giveaway/setup/prize/${index}`);
                   }}
                   className="rounded-[10px] after:h-0 [&_img]:scale-75"
-                  isArrow={false}
+                  rightIcon={undefined}
                 />
               ))}
             </List>
@@ -172,9 +210,13 @@ export default function GiveawaySetUpPage() {
                     requirement.type === "subscription"
                       ? "/gift.svg"
                       : undefined,
-                  title: requirement.name,
-                  description: requirement.value,
+                  title: `Subscribe`,
+                  description: requirement.username,
                   className: "[&_img]:scale-75",
+                  rightIcon: "remove",
+                  onActionClick: () => {
+                    removeRequirement(index);
+                  },
                 }) as IListItem,
             )}
             addButton={

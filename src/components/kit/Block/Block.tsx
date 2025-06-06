@@ -21,7 +21,7 @@ interface BlockProps {
     | 32
     | 44
     | 'auto'
-  padding?: 'top' | 'bottom' | 'left' | 'right'
+  padding?: 'top' | 'bottom' | 'left' | 'right' | 'full'
   paddingValue?:
     | 0
     | 2
@@ -71,6 +71,7 @@ export const Block = ({
     paddingBottom: padding === 'bottom' ? paddingValue : 0,
     paddingLeft: padding === 'left' ? paddingValue : 0,
     paddingRight: padding === 'right' ? paddingValue : 0,
+    padding: padding === 'full' ? paddingValue : 0,
   }
   return (
     <div

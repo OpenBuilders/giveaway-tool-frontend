@@ -3,8 +3,8 @@ import { useRef } from 'react'
 
 interface StickerPlayerProps {
   lottie: string | object
-  height?: number
-  width?: number
+  height?: number | string
+  width?: number | string
 }
 
 export const StickerPlayer = ({

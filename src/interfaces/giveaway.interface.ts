@@ -10,6 +10,14 @@
 //   }[];
 // }
 
+export type GiveawayPrizeTemplateType = "custom";
+export type GiveawayRequirementType = "subscription";
+export type GiveawayStatus = "active" | "cancelled" | "completed" | "pending" | "paused" | "deleted";
+
+export const GiveawayPrizeTemplateType = {
+  Custom: "custom",
+} as const;
+
 export interface IGiveawayPrize {
   prize_id?: string;
   prize_type: GiveawayPrizeTemplateType;
@@ -19,9 +27,9 @@ export interface IGiveawayPrize {
 }
 
 export interface IGiveawayRequirement {
-  name: string;
-  value: string[] | string;
-  type: "subscription";
+  name?: string;
+  type: GiveawayRequirementType;
+  username?: string;
 }
 
 export interface IGiveawayWinners {
@@ -30,7 +38,12 @@ export interface IGiveawayWinners {
 	place: number;
 }
 
-export type GiveawayStatus = "active" | "cancelled" | "completed" | "pending" | "paused" | "deleted";
+export interface IGiveawayCreator {
+  id: string;
+  name: string;
+  image?: string;
+  is_verified?: boolean;
+}
 
 export interface IGiveaway {
   id: string;
@@ -40,11 +53,12 @@ export interface IGiveaway {
   duration: number;
   prizes: IGiveawayPrize[];
   requirements: IGiveawayRequirement[];
+  creators: IGiveawayCreator[];
   status: GiveawayStatus;
   can_edit: boolean;
   ends_at: string;
   participants_count: number;
-  user_role?: "owner" | "user";
+  user_role?: "owner" | "user" | "participant";
   msg_id?: number;
 }
 
@@ -59,6 +73,12 @@ export interface IGiveawayActions {
 
   setRequirements: (requirements: IGiveawayRequirement[]) => void;
   addRequirement: (requirement: IGiveawayRequirement) => void;
+  removeRequirement: (index: number) => void;
+
+  setCreators: (creators: IGiveawayCreator[]) => void;
+  addCreator: (creator: IGiveawayCreator) => void;
+  removeCreator: (index: number) => void;
+
   reset(): void;
 }
 
@@ -81,12 +101,6 @@ export interface IGiveawayCreateRequest {
   winners_count: number;
 }
 
-export type GiveawayPrizeTemplateType = "custom";
-
-export const GiveawayPrizeTemplateType = {
-  Custom: "custom",
-} as const;
-
 export interface IGiveawayPrizeTemplate {
   name: string;
   description: string;
@@ -96,7 +110,7 @@ export interface IGiveawayPrizeTemplate {
 export interface IGiveawayRequirementTemplate {
   id: string;
   name: string;
-  type: "subscription";
+  type: GiveawayRequirementType;
 }
 
 export interface IGiveawayCheckChannelResponse {
@@ -111,3 +125,22 @@ export interface IGiveawayCheckChannelResponse {
     username: string;
   };
 }
+
+export interface IGiveawayCheckRequirementsResponse {
+  giveaway_id: string;
+  results: {
+    name: string;
+    type: GiveawayRequirementType;
+    username: string;
+    status: 'failed' | 'success';
+    error?: string;
+    link?: string; // URL to redirect users to (Telegram channel/chat)
+    chat_info: {
+      title: string;
+      username: string;
+      type: string;
+    };
+  }[];
+  all_met: boolean;
+}
+  

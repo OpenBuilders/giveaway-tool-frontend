@@ -1,15 +1,7 @@
 @use "tailwindcss";
 @use "variables"as *;
 @use "themes"as *;
-@use "./tailwind.css";
-
-@font-face {
-  font-family: 'SF Pro Rounded';
-  src: url('https://raw.githubusercontent.com/Austcool-Walker/San-Francisco-Pro/main/SF-Pro-Rounded-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
+@use "./index.css";
 
 * {
   box-sizing: border-box;

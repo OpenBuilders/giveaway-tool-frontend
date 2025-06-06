@@ -16,12 +16,17 @@ import {
   TelegramMainButton,
   Text,
   useToast,
+  StickerPlayer,
 } from "@/components/kit";
 import { IListItem } from "@/interfaces";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { joinToGiveaway } from "@/api/giveaway.api";
-import { WinnerCup } from "@/assets/icons/WinnerCup";
-import { DoneIcon } from "@/assets/icons/DoneIcon";
+
+import doneSticker from "@/assets/tgs/DoneSticker.json";
+import winnerCupSticker from "@/assets/tgs/WinnerCupSticker.json";
+import sadSticker from "@/assets/tgs/SadSticker.json";
+import congratsSticker from "@/assets/tgs/CongratsSticker.json";
+import { goTo } from "@/utils";
 
 const SmallDetailsCard = ({
   title,
@@ -31,9 +36,9 @@ const SmallDetailsCard = ({
   value?: string | number;
 }) => {
   return (
-    <div className="flex flex-col items-center w-full px-4 py-3 rounded-[12px] bg-section-bg">
+    <div className="bg-section-bg flex w-full flex-col items-center rounded-[12px] px-4 py-3">
       <span>{value?.toLocaleString("en-US")}</span>
-      <span className="text-h text-sm-max tracking-subheadline">
+      <span className="text-hint text-sm-max tracking-subheadline">
         {title}
       </span>
     </div>
@@ -43,10 +48,23 @@ const SmallDetailsCard = ({
 export default function GiveawayPage() {
   const { id } = useParams();
 
+  // Track which requirements are currently being checked (loading state)
+  const [checkingRequirements, setCheckingRequirements] = useState<{
+    [key: string]: boolean;
+  }>({});
+
   const { data: giveaway } = useQuery({
     queryKey: ["giveaway", id],
     queryFn: () => giveawayApi.getGiveawayById(String(id)),
+    enabled: !!id,
   });
+
+  const { data: checkRequirements, refetch: refetchCheckRequirements } =
+    useQuery({
+      queryKey: ["checkRequirements", id, giveaway?.user_role],
+      queryFn: () => giveawayApi.checkGiveawayRequirements(String(id)),
+      enabled: !!id && giveaway?.user_role === "user",
+    });
 
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [timeRemainingText, setTimeRemainingText] = useState<string>("");
@@ -61,6 +79,16 @@ export default function GiveawayPage() {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
+  const setParticipantsInfoJoined = () => {
+    setResultCardData({
+      id: id!,
+      title: "You’re in!",
+      description:
+        "Now just wait for it to end — results will be announced after the deadline.",
+      logo: <StickerPlayer lottie={doneSticker} height={36} width={36} />,
+    });
+  };
+
   useEffect(() => {
     if (isAdmin) {
       const viewedGiveaways = localStorage.getItem("viewedGiveaways");
@@ -69,7 +97,7 @@ export default function GiveawayPage() {
         if (!viewedGiveawaysArray.includes(id)) {
           localStorage.setItem(
             "viewedGiveaways",
-            JSON.stringify([...viewedGiveawaysArray, id])
+            JSON.stringify([...viewedGiveawaysArray, id]),
           );
           setAlreadyViewed(false);
         }
@@ -77,8 +105,28 @@ export default function GiveawayPage() {
         localStorage.setItem("viewedGiveaways", JSON.stringify([id]));
         setAlreadyViewed(false);
       }
+    } else if (
+      giveaway?.status === "completed" &&
+      giveaway?.winners?.find(
+        (winner) => winner.user_id === WebApp.initDataUnsafe.user?.id,
+      )
+    ) {
+      const wonGiveaways = localStorage.getItem("wonGiveaways");
+      if (wonGiveaways) {
+        const wonGiveawaysArray = JSON.parse(wonGiveaways);
+        if (!wonGiveawaysArray.includes(id)) {
+          localStorage.setItem(
+            "wonGiveaways",
+            JSON.stringify([...wonGiveawaysArray, id]),
+          );
+          setAlreadyViewed(false);
+        }
+      } else {
+        localStorage.setItem("wonGiveaways", JSON.stringify([id]));
+        setAlreadyViewed(false);
+      }
     }
-  }, [id, isAdmin]);
+  }, [id, isAdmin, giveaway]);
 
   useEffect(() => {
     switch (giveaway?.status) {
@@ -98,21 +146,37 @@ export default function GiveawayPage() {
                     month: "short",
                     day: "numeric",
                   }),
-            })
+            }),
         );
 
         if (giveaway?.status === "completed") {
           const currentUserId = WebApp.initDataUnsafe.user?.id;
-          const winner = giveaway?.winners.find(
-            (winner) => winner.user_id === currentUserId
+          const winner = giveaway?.winners?.find(
+            (winner) => winner.user_id === currentUserId,
           );
           if (winner) {
             setResultCardData({
               id: giveaway?.id,
-              title: "You’re in!",
+              title: "You won!",
               description:
-                "Now just wait for it to end — results will be announced after the deadline.",
-              logo: <DoneIcon />,
+                "Congratulations! You got lucky this time — your prize will be delivered soon.",
+              logo: (
+                <StickerPlayer
+                  lottie={congratsSticker}
+                  height={36}
+                  width={36}
+                />
+              ),
+            });
+          } else {
+            setResultCardData({
+              id: giveaway?.id,
+              title: "You didn’t win this time",
+              description:
+                "Better luck next time! Try joining another giveaway — your turn will come.",
+              logo: (
+                <StickerPlayer lottie={sadSticker} height={36} width={36} />
+              ),
             });
           }
         } else if (giveaway?.status === "pending") {
@@ -121,7 +185,9 @@ export default function GiveawayPage() {
             title: "Winners will be announced soon",
             description:
               "Winners have been picked — check back soon to see the results.",
-            logo: <WinnerCup />,
+            logo: (
+              <StickerPlayer lottie={winnerCupSticker} height={36} width={36} />
+            ),
           });
         }
 
@@ -150,8 +216,13 @@ export default function GiveawayPage() {
                     month: "short",
                     day: "numeric",
                   }),
-            })
+            }),
         );
+
+        if (giveaway?.user_role === "participant") {
+          setParticipantsInfoJoined();
+        }
+
         break;
       default:
         setTimeRemaining("Ended");
@@ -171,7 +242,7 @@ export default function GiveawayPage() {
 
         const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
         const hours = Math.floor(
-          (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+          (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
         );
         const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
 
@@ -179,13 +250,13 @@ export default function GiveawayPage() {
           setTimeRemaining(
             `${days}:${hours.toString().padStart(2, "0")}:${minutes
               .toString()
-              .padStart(2, "0")}`
+              .padStart(2, "0")}`,
           );
         } else {
           setTimeRemaining(
             `${hours.toString().padStart(2, "0")}:${minutes
               .toString()
-              .padStart(2, "0")}`
+              .padStart(2, "0")}`,
           );
         }
       };
@@ -206,6 +277,8 @@ export default function GiveawayPage() {
         type: "success",
         time: 2000,
       });
+
+      setParticipantsInfoJoined();
     },
     onError: () => {
       showToast({
@@ -233,7 +306,7 @@ export default function GiveawayPage() {
 
       <PageLayout>
         <>
-          {isAdmin && !alreadyViewed && <ConfettiAnimation active />}
+          {!alreadyViewed && <ConfettiAnimation active />}
 
           <Image
             size={112}
@@ -262,20 +335,20 @@ export default function GiveawayPage() {
           {isAdmin && (
             <Block gap={12}>
               <div
-                className="bg-section-bg rounded-[12px] py-2 px-4 w-full cursor-pointer flex items-center justify-between gap-4"
+                className="bg-section-bg flex w-full cursor-pointer items-center justify-between gap-4 rounded-[12px] px-4 py-2"
                 onClick={() => {
                   navigator.clipboard.writeText(giveawayLink);
                   showToast({
-                    message: "Link copied to clipboard",
+                    message: "Link copied",
                     type: "success",
                     time: 2000,
                   });
                 }}
               >
-                <span className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[calc(100%-28px)]">
+                <span className="max-w-[calc(100%-28px)] overflow-hidden text-ellipsis whitespace-nowrap">
                   {giveawayLink}
                 </span>
-                <div className="w-[28px] h-[28px]">
+                <div className="h-[28px] w-[28px]">
                   <CopyIcon />
                 </div>
               </div>
@@ -298,18 +371,14 @@ export default function GiveawayPage() {
                 id={resultCardData.id}
                 title={resultCardData.title}
                 description={resultCardData.description}
-                logo={
-                  <div className="[&_svg]:w-9 [&_svg]:h-9 mr-3">
-                    {resultCardData.logo}
-                  </div>
-                }
+                logo={<div className="mr-3 h-9 w-9">{resultCardData.logo}</div>}
                 className="rounded-[16px]"
                 separator={false}
-                isArrow={false}
+                rightIcon={undefined}
               />
             )}
 
-            <div className="grid grid-cols-3 gap-2.5 w-full">
+            <div className="grid w-full grid-cols-3 gap-2.5">
               <SmallDetailsCard
                 title="winners"
                 value={giveaway?.winners_count}
@@ -346,13 +415,12 @@ export default function GiveawayPage() {
                     navigate(`/giveaway/setup/prize/${index}`);
                   }}
                   className="rounded-[10px] after:h-0 [&_img]:scale-75"
-                  isArrow={false}
                 />
               ))}
             </List>
           </div>
 
-          {giveaway?.status === "active" && (
+          {isAdmin && (
             <List
               header="joining requirements"
               items={(giveaway?.requirements ?? []).map(
@@ -363,18 +431,79 @@ export default function GiveawayPage() {
                       requirement.type === "subscription"
                         ? "/gift.svg"
                         : undefined,
-                    title: `Subscribe to ${requirement.name}`,
-                    description: `Not completed`,
-                    className: `[&_img]:scale-75 ${
-                      // only if already completed
+                    title: requirement.name,
+                    className: `[&_img]:scale-75`,
+                    rightIcon: "arrow",
+                  }) as IListItem,
+              )}
+            />
+          )}
+
+          {giveaway?.status === "active" && !isAdmin && (
+            <List
+              header="joining requirements"
+              items={(checkRequirements?.results ?? []).map(
+                (requirement, index) =>
+                  ({
+                    id: index.toString(),
+                    logo:
                       requirement.type === "subscription"
-                        ? "[&_span.description]:text-accent-text"
-                        : ""
-                    }`,
-                  } as IListItem)
+                        ? "/gift.svg"
+                        : undefined,
+                    title: requirement.name,
+                    description: requirement.username,
+                    rightIcon:
+                      requirement.status === "success" ? (
+                        "done"
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent the list item click event
+                            if (requirement.type === "subscription") {
+                              // Set loading state for this requirement
+                              setCheckingRequirements((prev) => ({
+                                ...prev,
+                                [index.toString()]: true,
+                              }));
+
+                              // Open the Telegram channel/chat link
+                              if (requirement.username) {
+                                goTo(`https://t.me/${requirement.username}`);
+                              }
+
+                              // Wait at least 3 seconds before checking
+                              setTimeout(() => {
+                                refetchCheckRequirements().finally(() => {
+                                  // Clear loading state after check completes
+                                  setCheckingRequirements((prev) => ({
+                                    ...prev,
+                                    [index.toString()]: false,
+                                  }));
+                                });
+                              }, 3000); // 3-second minimum delay
+                            }
+                          }}
+                          className="bg-button text-button-text !font-rounded text-sm-bold tracking-sm-bold flex items-center gap-1 rounded-[30px] px-3 py-1 font-semibold"
+                          disabled={checkingRequirements[index.toString()]}
+                        >
+                          {checkingRequirements[index.toString()] ? (
+                            <>
+                              <span>Checking...</span>
+                            </>
+                          ) : requirement.type === "subscription" ? (
+                            "Check"
+                          ) : (
+                            "Pay"
+                          )}
+                        </button>
+                      ),
+                    className: `[&_img]:scale-75`,
+                  }) as IListItem,
               )}
               onItemClick={() => {
-                // check valid
+                // onItemClick is still needed for other interactions
+                // but not for the subscription check button
+                refetchCheckRequirements();
               }}
             />
           )}
@@ -395,7 +524,7 @@ export default function GiveawayPage() {
                     },
                     className: "[&_img]:scale-75",
                     isArrow: isAdmin,
-                  } as IListItem)
+                  }) as IListItem,
               )}
             />
           )}

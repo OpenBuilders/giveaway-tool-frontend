@@ -173,6 +173,7 @@ export default function PrizePage() {
                     setSelectedPrizeTemplate(String(prizeTemplate.type));
                   }}
                   separator={prizeTemplatesData?.length !== index + 1}
+                  rightIcon="arrow"
                 />
               ))}
             </List>

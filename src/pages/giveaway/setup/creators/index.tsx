@@ -25,7 +25,7 @@ import {
   useToast,
 } from "@/components/kit";
 
-export default function RequirementPage() {
+export default function CreatorPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
   const [selectedRequirementType, setSelectedRequirementType] = useState<
     string | null
@@ -113,7 +113,7 @@ export default function RequirementPage() {
       <PageLayout>
         <Block margin="top" marginValue={44}>
           <Text type="title" align="center" weight="bold">
-            Add Prize
+            Add Creator
           </Text>
         </Block>
 
@@ -186,7 +186,6 @@ export default function RequirementPage() {
                     setSelectedRequirementType(template.type);
                   }}
                   separator={requirementTemplates?.length !== index + 1}
-                  rightIcon="arrow"
                 />
               ))}
             </List>
@@ -195,7 +194,7 @@ export default function RequirementPage() {
       </PageLayout>
 
       <TelegramMainButton
-        text="Add Requirement"
+        text="Add Creator"
         onClick={() => {
           checkBotExistInChannelFetch.mutate(fieldsData[0].value);
         }}

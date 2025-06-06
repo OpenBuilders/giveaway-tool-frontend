@@ -10,7 +10,7 @@ export const CheckMark = memo(() => (
   >
     <path
       d="M1.5 15.5L5.83176 20.7944C5.91474 20.8958 6.07258 20.8866 6.14322 20.7762L14 8.5"
-      stroke="#007AFF"
+      stroke="currentColor"
       strokeWidth="2.33"
       strokeLinecap="round"
       strokeLinejoin="round"

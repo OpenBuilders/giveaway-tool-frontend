@@ -1,4 +1,3 @@
-import { UsersIcon } from "@/assets/icons/UsersIcon";
 import { useCallback, useEffect, useState } from "react";
 import type { IListItem } from "@/interfaces";
 import { WinnerCup } from "@/assets/icons/WinnerCup";
@@ -35,7 +34,13 @@ export const GiveawayItem = ({
     const diff = endDate.getTime() - now.getTime();
 
     if (diff <= 0) {
-      setEndsIn("Ended");
+      setEndsIn(`Ended ${endDate.toLocaleString(
+        "en-US",
+        {
+          month: "short",
+          day: "numeric",
+        }
+      )}`);
       return;
     }
 
@@ -44,11 +49,11 @@ export const GiveawayItem = ({
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
     if (days > 0) {
-      setEndsIn(`${days}d ${hours}h`);
+      setEndsIn(`Ends in ${days}d ${hours}h`);
     } else if (hours > 0) {
-      setEndsIn(`${hours}h ${minutes}m`);
+      setEndsIn(`Ends in ${hours}h ${minutes}m`);
     } else {
-      setEndsIn(`${minutes}m`);
+      setEndsIn(`Ends in ${minutes}m`);
     }
   }, [giveaway]);
 
@@ -95,14 +100,10 @@ export const GiveawayItem = ({
           {giveaway && (
             <>
               <div className="flex items-center gap-1">
-                <UsersIcon />
+                {/* <UsersIcon /> */}
 
                 <span className="text-hint text-sm-max tracking-subheadline">
-                  {giveaway.participants.toLocaleString("en-US", {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  })}{" "}
-                  · {endsIn}
+                  {endsIn}
                 </span>
               </div>
 
