@@ -6,7 +6,6 @@ import GiveawaySetUpPage from "./pages/giveaway/setup/page";
 import PrizePage from "./pages/giveaway/setup/prize";
 import RequirementPage from "./pages/giveaway/setup/requirement";
 import GiveawayPage from "./pages/giveaway/[id]";
-import CreatorPage from "./pages/giveaway/setup/creators";
 
 function App() {
   const { darkTheme } = useContext(ThemeContext);
@@ -54,7 +53,6 @@ function App() {
 
             <Route path="prize" element={<PrizePage />} />
             <Route path="requirement" element={<RequirementPage />} />
-            <Route path="creator" element={<CreatorPage />} />
           </Route>
         </Route>
       </Routes>

@@ -11,6 +11,8 @@ import {
   StickerPlayer,
 } from "@kit";
 import giftLottie from "@assets/tgs/gift.json";
+import { useEffect } from "react";
+import WebApp from "@twa-dev/sdk";
 
 export default function MainPage() {
   const navigate = useNavigate();
@@ -146,6 +148,13 @@ export default function MainPage() {
       },
     ],
   });
+
+  useEffect(() => {
+    if (WebApp.initDataUnsafe.start_param) {
+      navigate(`/giveaway/${WebApp.initDataUnsafe.start_param}`);
+      WebApp.initDataUnsafe.start_param = "";
+    }
+  }, [navigate]);
 
   return (
     <>

@@ -12,7 +12,13 @@
 
 export type GiveawayPrizeTemplateType = "custom";
 export type GiveawayRequirementType = "subscription";
-export type GiveawayStatus = "active" | "cancelled" | "completed" | "pending" | "paused" | "deleted";
+export type GiveawayStatus =
+  | "active"
+  | "cancelled"
+  | "completed"
+  | "pending"
+  | "paused"
+  | "deleted";
 
 export const GiveawayPrizeTemplateType = {
   Custom: "custom",
@@ -30,16 +36,17 @@ export interface IGiveawayRequirement {
   name?: string;
   type: GiveawayRequirementType;
   username?: string;
+  avatar_url?: string;
 }
 
 export interface IGiveawayWinners {
   user_id: number;
-	username: string;
-	place: number;
+  username: string;
+  place: number;
 }
 
 export interface IGiveawayCreator {
-  id: string;
+  id: number;
   name: string;
   image?: string;
   is_verified?: boolean;
@@ -97,6 +104,9 @@ export interface IGiveawayCreateRequest {
     }[];
   }[];
   requirements?: IGiveawayRequirement[];
+  sponsors?: {
+    id: number;
+  }[];
   title?: string;
   winners_count: number;
 }
@@ -114,16 +124,21 @@ export interface IGiveawayRequirementTemplate {
 }
 
 export interface IGiveawayCheckChannelResponse {
-  bot_status: {
-    can_check_members: boolean;
-    status: string;
-  };
-  channel: {
-    id: number;
-    type: string;
-    title: string;
+  results: {
     username: string;
-  };
+    ok: boolean;
+    error?: string;
+    channel: {
+      id: number;
+      type: string;
+      title: string;
+      username: string;
+    };
+    bot_status: {
+      status: string;
+      can_check_members: boolean;
+    };
+  }[];
 }
 
 export interface IGiveawayCheckRequirementsResponse {
@@ -132,15 +147,27 @@ export interface IGiveawayCheckRequirementsResponse {
     name: string;
     type: GiveawayRequirementType;
     username: string;
-    status: 'failed' | 'success';
+    status: "failed" | "success";
     error?: string;
     link?: string; // URL to redirect users to (Telegram channel/chat)
     chat_info: {
       title: string;
       username: string;
       type: string;
+      avatar_url: string;
     };
   }[];
   all_met: boolean;
 }
-  
+
+export interface IChannelInfo {
+  id: number;
+  title?: string;
+  username: string;
+  avatar_url: string;
+  channel_url: string;
+}
+
+export interface IAvailableChannelsResponse {
+  channels: IChannelInfo[];
+}

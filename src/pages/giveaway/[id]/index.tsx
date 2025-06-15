@@ -395,7 +395,7 @@ export default function GiveawayPage() {
           </Block>
         </Block>
 
-        <Block margin="top" marginValue={24} gap={24}>
+        <Block margin="top" marginValue={24} gap={24} padding="bottom" paddingValue={24}>
           <div
             className={`flex flex-col ${
               (giveaway?.prizes ?? []).length > 0 ? "gap-2.5" : ""
@@ -427,12 +427,8 @@ export default function GiveawayPage() {
                 (requirement, index) =>
                   ({
                     id: index.toString(),
-                    logo:
-                      requirement.type === "subscription"
-                        ? "/gift.svg"
-                        : undefined,
-                    title: requirement.name,
-                    className: `[&_img]:scale-75`,
+                    logo: requirement.avatar_url,
+                    title: `Subscribe ${requirement.username}`,
                     rightIcon: "arrow",
                   }) as IListItem,
               )}
@@ -446,41 +442,32 @@ export default function GiveawayPage() {
                 (requirement, index) =>
                   ({
                     id: index.toString(),
-                    logo:
-                      requirement.type === "subscription"
-                        ? "/gift.svg"
-                        : undefined,
+                    logo: requirement.chat_info.avatar_url,
                     title: requirement.name,
-                    description: requirement.username,
                     rightIcon:
                       requirement.status === "success" ? (
                         "done"
                       ) : (
                         <button
                           onClick={(e) => {
-                            e.stopPropagation(); // Prevent the list item click event
+                            e.stopPropagation();
                             if (requirement.type === "subscription") {
-                              // Set loading state for this requirement
                               setCheckingRequirements((prev) => ({
                                 ...prev,
                                 [index.toString()]: true,
                               }));
 
-                              // Open the Telegram channel/chat link
                               if (requirement.username) {
                                 goTo(`https://t.me/${requirement.username}`);
                               }
-
-                              // Wait at least 3 seconds before checking
                               setTimeout(() => {
                                 refetchCheckRequirements().finally(() => {
-                                  // Clear loading state after check completes
                                   setCheckingRequirements((prev) => ({
                                     ...prev,
                                     [index.toString()]: false,
                                   }));
                                 });
-                              }, 3000); // 3-second minimum delay
+                              }, 3000);
                             }
                           }}
                           className="bg-button text-button-text !font-rounded text-sm-bold tracking-sm-bold flex items-center gap-1 rounded-[30px] px-3 py-1 font-semibold"

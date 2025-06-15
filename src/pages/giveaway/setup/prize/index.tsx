@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BackButton } from "@twa-dev/sdk/react";
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { getGiveawayPrizeTemplates } from "@/api/giveaway.api";
+import { getGiveawayPrizeTemplates } from "@/api/utils.api";
 import { ListItem } from "@/components/ui/list/ListItem";
 import { Select } from "@/components/ui/inputs/SelectInput";
 import { useGiveawayStore } from "@/store/giveaway.slice";

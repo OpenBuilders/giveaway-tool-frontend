@@ -8,7 +8,7 @@ import { BackButton } from "@twa-dev/sdk/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import type { IGiveawayCreateRequest } from "@/interfaces/giveaway.interface";
-import { giveawayApi } from "@/api";
+import { giveawayApi, utilsApi } from "@/api";
 import {
   Block,
   PageLayout,
@@ -21,6 +21,8 @@ import { IListItem } from "@/interfaces";
 
 export default function GiveawaySetUpPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
+  const [creatorUsername, setCreatorUsername] = useState("");
+  const [viewCreatorInput, setViewCreatorInput] = useState(false);
 
   const {
     title,
@@ -38,6 +40,7 @@ export default function GiveawaySetUpPage() {
 
     creators,
     removeCreator,
+    addCreator,
 
     reset,
   } = useGiveawayStore((state) => state);
@@ -49,6 +52,7 @@ export default function GiveawaySetUpPage() {
       await giveawayApi.createGiveaway(data),
     onSuccess: (data) => {
       navigate(`/giveaway/${data.id}`);
+      reset();
     },
     onError: () => {
       showToast({
@@ -59,17 +63,50 @@ export default function GiveawaySetUpPage() {
     },
   });
 
+  const checkChannelFetch = useMutation({
+    mutationFn: async (username: string) =>
+      await utilsApi.getChannelInfo(username),
+    onSuccess: (data) => {
+      addCreator({
+        id: data.id,
+        name: data.username,
+        image: data.avatar_url,
+      });
+      setCreatorUsername("");
+      setViewCreatorInput(false);
+    },
+    onError: () => {
+      showToast({
+        message: "Channel not found",
+        type: "error",
+        time: 2000,
+      });
+    },
+  });
+
   const handleClick = () => {
+    if (createGiveawayFetch.isPending) return;
+    if (createButtonDisabled) {
+      showToast({
+        message: "Fill all fields",
+        type: "error",
+        time: 2000,
+      });
+      return;
+    }
+
     createGiveawayFetch.mutate({
       title,
       winners_count,
       duration: duration * 60,
-      description: "Giveaway Description",
       prizes: prizes.map((prize) => ({
         place: "all",
         ...prize,
       })),
       requirements,
+      sponsors: creators.map((creator) => ({
+        id: creator.id,
+      })),
     });
   };
 
@@ -94,6 +131,7 @@ export default function GiveawaySetUpPage() {
         text="Create Giveaway"
         onClick={handleClick}
         disabled={createButtonDisabled}
+        loading={createGiveawayFetch.isPending}
       />
 
       <PageLayout>
@@ -104,7 +142,12 @@ export default function GiveawaySetUpPage() {
         </Block>
 
         <Block margin="top" marginValue={44} gap={24}>
-          <Input placeholder="Name" value={title} onChange={setTitle} />
+          <Input
+            placeholder="Name"
+            value={title}
+            onChange={setTitle}
+            className="w-full"
+          />
 
           <LabeledInput
             label="Winners"
@@ -135,61 +178,62 @@ export default function GiveawaySetUpPage() {
         </Block>
 
         <Block margin="top" marginValue={24} gap={24}>
-          <div
-            className={`flex flex-col ${creators.length > 0 ? "gap-2.5" : ""}`}
-          >
-            <List header="creators" className="grid grid-cols-2 gap-2.5">
-              {creators.map((creator, index) => (
-                <ListItem
-                  id={index.toString()}
-                  logo={creator.image}
-                  title={creator.name}
+          <List
+            header="creators"
+            footer="The channel or chat you’re adding must be public"
+            addButton={
+              creators.length < 3 && (
+                <AddButton
                   onClick={() => {
-                    navigate(`/giveaway/setup/creator/${index}`);
+                    setViewCreatorInput(true);
                   }}
-                  onActionClick={() => {
-                    removeCreator(index);
+                >
+                  Add Creator
+                </AddButton>
+              )
+            }
+            beforeList={
+              creators.length < 3 &&
+              viewCreatorInput && (
+                <Input
+                  placeholder="@channel"
+                  value={creatorUsername}
+                  onChange={setCreatorUsername}
+                  onBlur={() => {
+                    if (creatorUsername.length === 0) return;
+                    if (
+                      creators.some(
+                        (creator) => creator.name === creatorUsername,
+                      )
+                    ) {
+                      showToast({
+                        message: "Creator already added",
+                        type: "error",
+                        time: 2000,
+                      });
+                      return;
+                    }
+
+                    checkChannelFetch.mutate(creatorUsername);
                   }}
-                  className="rounded-[10px] after:h-0 [&_img]:scale-75"
-                  rightIcon="remove"
                 />
-              ))}
-            </List>
+              )
+            }
+            items={creators.map((creator, index) => ({
+              id: index.toString(),
+              logo: creator.image,
+              title: creator.name,
+              rightIcon: "remove",
+              onActionClick: () => {
+                removeCreator(index);
+              },
+            }))}
+          />
 
-            <div className="bg-section-bg border-giveaway flex max-h-[44px] w-full items-center justify-between rounded-[10px] px-4 py-2">
-              <AddButton
-                onClick={() => {
-                  navigate("/giveaway/setup/creator");
-                }}
-              >
-                Add Creator
-              </AddButton>
-            </div>
-          </div>
-
-          <div
-            className={`flex flex-col ${prizes.length > 0 ? "gap-2.5" : ""}`}
-          >
-            <List header="prizes" className="grid grid-cols-2 gap-2.5">
-              {prizes.map((prize, index) => (
-                <ListItem
-                  id={index.toString()}
-                  logo={prize.prize_type === "custom" ? "/gift.svg" : undefined}
-                  title={
-                    prize.prize_type.charAt(0).toUpperCase() +
-                    prize.prize_type.slice(1)
-                  }
-                  description={`${prize.fields.length} inputs`}
-                  onClick={() => {
-                    navigate(`/giveaway/setup/prize/${index}`);
-                  }}
-                  className="rounded-[10px] after:h-0 [&_img]:scale-75"
-                  rightIcon={undefined}
-                />
-              ))}
-            </List>
-
-            <div className="bg-section-bg border-giveaway flex max-h-[44px] w-full items-center justify-between rounded-[10px] px-4 py-2">
+          <List
+            header="prizes"
+            className="grid grid-cols-2 gap-2.5"
+            addButton={
               <AddButton
                 onClick={() => {
                   navigate("/giveaway/setup/prize");
@@ -197,8 +241,25 @@ export default function GiveawaySetUpPage() {
               >
                 Add Prize
               </AddButton>
-            </div>
-          </div>
+            }
+          >
+            {prizes.map((prize, index) => (
+              <ListItem
+                id={index.toString()}
+                logo={prize.prize_type === "custom" ? "/gift.svg" : undefined}
+                title={
+                  prize.prize_type.charAt(0).toUpperCase() +
+                  prize.prize_type.slice(1)
+                }
+                description={`${prize.fields.length} inputs`}
+                onClick={() => {
+                  navigate(`/giveaway/setup/prize/${index}`);
+                }}
+                className="rounded-[10px] after:h-0 [&_img]:scale-75"
+                rightIcon={undefined}
+              />
+            ))}
+          </List>
 
           <List
             header="joining requirements"
@@ -206,13 +267,8 @@ export default function GiveawaySetUpPage() {
               (requirement, index) =>
                 ({
                   id: index.toString(),
-                  logo:
-                    requirement.type === "subscription"
-                      ? "/gift.svg"
-                      : undefined,
-                  title: `Subscribe`,
-                  description: requirement.username,
-                  className: "[&_img]:scale-75",
+                  logo: requirement.avatar_url,
+                  title: `Subscribe ${requirement.username}`,
                   rightIcon: "remove",
                   onActionClick: () => {
                     removeRequirement(index);

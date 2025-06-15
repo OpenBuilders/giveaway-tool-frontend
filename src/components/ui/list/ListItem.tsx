@@ -22,42 +22,46 @@ export const ListItem = ({
 }) => {
   return (
     <div
-      className={`bg-section-bg border-giveaway flex w-full justify-between px-4 py-[11px] ${
-        logo ? "after:left-[65px]" : "after:left-[16px]"
+      className={`bg-section-bg border-giveaway flex w-full justify-between px-4 ${
+        logo ? "py-[5px] after:left-[65px]" : "py-[11px] after:left-[16px]"
       } ${!separator ? "after:hidden" : ""} ${
         description ? "items-start" : "items-center"
-      } ${className}`}
+      } ${onClick ? "cursor-pointer" : ""} ${className}`}
       onClick={() => {
         if (onClick) onClick({ id, logo, title, description, giveaway });
       }}
     >
-      {logo && (
-        <div
-          className={`mr-2.5 overflow-hidden ${
-            typeof logo === "string"
-              ? "aspect-square max-w-9 rounded-full bg-black"
-              : ""
-          }`}
-        >
-          {typeof logo === "string" ? (
-            <img src={logo} alt="giveaway logo" />
-          ) : (
-            logo
+      <div className="flex items-center gap-2.5">
+        {logo && (
+          <div
+            className={`overflow-hidden rounded-full ${
+              typeof logo === "string" ? "w-10 h-10" : ""
+            }`}
+          >
+            {typeof logo === "string" ? (
+              <img
+                src={logo}
+                alt="giveaway logo"
+                className="object-cover"
+              />
+            ) : (
+              logo
+            )}
+          </div>
+        )}
+        <div className="flex w-fit flex-col items-start">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5">
+              <span className="tracking-body font-medium">{title}</span>
+            </div>
+          </div>
+  
+          {description && (
+            <span className="description text-hint text-sm-max tracking-subheadline">
+              {description}
+            </span>
           )}
         </div>
-      )}
-      <div className="flex w-full flex-col items-start">
-        <div className="flex flex-col">
-          <div className="flex items-center gap-1.5">
-            <span className="tracking-body font-medium">{title}</span>
-          </div>
-        </div>
-
-        {description && (
-          <span className="description text-hint text-sm-max tracking-subheadline">
-            {description}
-          </span>
-        )}
       </div>
 
       {rightIcon && (
@@ -70,7 +74,7 @@ export const ListItem = ({
         >
           {rightIcon === "arrow" && <ArrowIcon />}
           {rightIcon === "done" && (
-            <div className="bg-button-confirm-color cursor-pointer rounded-full h-6 w-6 flex items-center justify-center p-1.5 text-text-overlay">
+            <div className="bg-button-confirm-color text-text-overlay flex h-6 w-6 cursor-pointer items-center justify-center rounded-full p-1.5">
               <CheckMark />
             </div>
           )}

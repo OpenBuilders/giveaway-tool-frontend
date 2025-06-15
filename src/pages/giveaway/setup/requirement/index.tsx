@@ -1,67 +1,90 @@
-import { LabeledInput } from "@/components/ui/inputs/Input";
 import { List } from "@/components/ui/list/List";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { BackButton } from "@twa-dev/sdk/react";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import {
   checkChannel,
   getGiveawayRequirementsTemplates,
-} from "@/api/giveaway.api";
+} from "@/api/utils.api";
 import { ListItem } from "@/components/ui/list/ListItem";
 import { Select } from "@/components/ui/inputs/SelectInput";
 import { useGiveawayStore } from "@/store/giveaway.slice";
 import type {
+  IAvailableChannelsResponse,
   IGiveawayCheckChannelResponse,
   IGiveawayRequirement,
 } from "@/interfaces/giveaway.interface";
 import type { AxiosError } from "axios";
 import {
-  ListInputProps,
   PageLayout,
   TelegramMainButton,
   Block,
   Text,
   useToast,
 } from "@/components/kit";
+import { getAvailableChannels } from "@/api/user.api";
+import { AddButton } from "@/components/ui/buttons/AddButton";
+import { goTo } from "@/utils";
+import { IListItem } from "@/interfaces";
 
 export default function RequirementPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
   const [selectedRequirementType, setSelectedRequirementType] = useState<
     string | null
   >(null);
-  const [fieldsData, setFieldsData] = useState<
-    {
-      type: string;
-      label: string;
-      placeholder: string;
-      value: string;
-    }[]
+  const [subscriptionData, setSubscriptionData] = useState<
+    IAvailableChannelsResponse["channels"]
+  >([]);
+  const [availableChannels, setAvailableChannels] = useState<
+    IAvailableChannelsResponse["channels"]
   >([]);
   const { addRequirement } = useGiveawayStore();
 
   const navigate = useNavigate();
   const { showToast } = useToast();
 
+  const addBotLink = `https://t.me/${
+    import.meta.env.VITE_BOT_USERNAME
+  }?startgroup=&admin=restrict_members+invite_users`;
+
   const { data: requirementTemplates } = useQuery({
     queryKey: ["requirement-templates"],
     queryFn: getGiveawayRequirementsTemplates,
   });
 
-  const checkBotExistInChannelFetch = useMutation({
-    mutationFn: (username: string) => checkChannel(username),
-    onSuccess: (data: IGiveawayCheckChannelResponse) => {
-      if (data.bot_status.can_check_members) {
-        const requirementData: IGiveawayRequirement = {
-          type: selectedRequirementType as IGiveawayRequirement["type"],
-          username: `@${data.channel.username}`,
-        };
+  const { data: availableChannelsData } = useQuery({
+    queryKey: ["available-channels"],
+    queryFn: getAvailableChannels,
+    enabled: selectedRequirementType === "subscription",
+    select: (data) => data.channels,
+  });
 
-        addRequirement(requirementData);
+  const checkBotExistInChannelsFetch = useMutation({
+    mutationFn: (usernames: string[]) => checkChannel(usernames),
+    onSuccess: (data: IGiveawayCheckChannelResponse) => {
+      if (
+        data.results.every(
+          (result) =>
+            !result.error && result.ok && result.bot_status.can_check_members,
+        )
+      ) {
+        const requirementData: IGiveawayRequirement[] = subscriptionData.map(
+          (channel) => ({
+            type: selectedRequirementType as IGiveawayRequirement["type"],
+            username: channel.username,
+            avatar_url: channel.avatar_url,
+          }),
+        );
+
+        for (const requirement of requirementData) {
+          addRequirement(requirement);
+        }
         navigate("/giveaway/setup");
       } else {
+        const firstError = data.results.find((result) => result.error);
         showToast({
-          message: "Bot can't check members",
+          message: firstError?.error || "Bot can't check members",
           type: "error",
           time: 2000,
         });
@@ -77,30 +100,20 @@ export default function RequirementPage() {
     },
   });
 
-  const fieldBase = useMemo(
-    () => ({
-      subscription: [
-        {
-          type: "text",
-          label: "Channel username",
-          placeholder: "@channel_name",
-          value: "",
-        },
-      ],
-    }),
-    []
-  );
-
   useEffect(() => {
-    if (
-      selectedRequirementType &&
-      fieldsData.some((field) => field.value === "")
-    ) {
+    if (selectedRequirementType && subscriptionData?.length === 0) {
       setCreateButtonDisabled(true);
     } else {
       setCreateButtonDisabled(false);
     }
-  }, [fieldsData, selectedRequirementType]);
+  }, [subscriptionData, selectedRequirementType]);
+
+  useEffect(() => {
+    const filteredChannels = availableChannelsData?.filter(
+      (channel) => !subscriptionData.some((sub) => sub.id === channel.id),
+    );
+    setAvailableChannels(filteredChannels || []);
+  }, [availableChannelsData, subscriptionData]);
 
   return (
     <>
@@ -109,11 +122,25 @@ export default function RequirementPage() {
           navigate(-1);
         }}
       />
+      {selectedRequirementType && (
+        <TelegramMainButton
+          text="Add Requirement"
+          onClick={() => {
+            checkBotExistInChannelsFetch.mutate(
+              subscriptionData.map((sub) => sub.username || "@testadsd"),
+            );
+          }}
+          disabled={
+            createButtonDisabled || checkBotExistInChannelsFetch.isPending
+          }
+          loading={checkBotExistInChannelsFetch.isPending}
+        />
+      )}
 
       <PageLayout>
         <Block margin="top" marginValue={44}>
           <Text type="title" align="center" weight="bold">
-            Add Prize
+            Add Requirement
           </Text>
         </Block>
 
@@ -133,47 +160,57 @@ export default function RequirementPage() {
                   selectedValue={String(selectedRequirementType)}
                   onChange={(value) => {
                     setSelectedRequirementType(String(value));
-                    setFieldsData([]);
+                    setSubscriptionData([]);
                   }}
                 />
               </List>
 
-              <List>
-                {fieldBase[
-                  selectedRequirementType as keyof typeof fieldBase
-                ].map((field) => (
-                  <LabeledInput
-                    key={field.label}
-                    containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
-                    label={field.label}
-                    placeholder={field.placeholder}
-                    additionalLabel=""
-                    value={
-                      fieldsData.find((f) => f.label === field.label)?.value
+              {selectedRequirementType === "subscription" && (
+                <>
+                  <List
+                    header="available channels"
+                    items={
+                      availableChannels.map((item, index) => ({
+                        id: index.toString(),
+                        title: item.title,
+                        logo: item.avatar_url,
+                        rightIcon: "arrow",
+                        onClick: () => {
+                          setSubscriptionData((prev) => [...prev, item]);
+                        },
+                      })) as IListItem[]
                     }
-                    onChange={(value) => {
-                      setFieldsData((prev) => {
-                        const existingField = prev.find(
-                          (f) => f.label === field.label
-                        );
-                        if (existingField) {
-                          return prev.map((f) => {
-                            if (f.label === field.label) {
-                              return {
-                                ...f,
-                                value,
-                              };
-                            }
-                            return f;
-                          });
-                        }
-                        return [...prev, { ...field, value }];
-                      });
-                    }}
-                    type={field.type as ListInputProps["type"]}
                   />
-                ))}
-              </List>
+
+                  <List
+                    header="channels"
+                    footer="The channel or chat you’re adding must be public"
+                    items={subscriptionData.map(
+                      (item, index) =>
+                        ({
+                          id: index.toString(),
+                          title: item.title,
+                          logo: item.avatar_url,
+                          rightIcon: "remove",
+                          onActionClick: () => {
+                            setSubscriptionData((prev) =>
+                              prev.filter((_, i) => i !== index),
+                            );
+                          },
+                        }) as IListItem,
+                    )}
+                    addButton={
+                      <AddButton
+                        onClick={() => {
+                          goTo(addBotLink);
+                        }}
+                      >
+                        Add Channel
+                      </AddButton>
+                    }
+                  />
+                </>
+              )}
             </Block>
           ) : (
             <List>
@@ -193,14 +230,6 @@ export default function RequirementPage() {
           )}
         </Block>
       </PageLayout>
-
-      <TelegramMainButton
-        text="Add Requirement"
-        onClick={() => {
-          checkBotExistInChannelFetch.mutate(fieldsData[0].value);
-        }}
-        disabled={createButtonDisabled || checkBotExistInChannelFetch.isPending}
-      />
     </>
   );
 }

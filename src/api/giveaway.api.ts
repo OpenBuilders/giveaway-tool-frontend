@@ -1,9 +1,6 @@
 import type {
   IGiveawayCreateRequest,
   IGiveaway,
-  IGiveawayPrizeTemplate,
-  IGiveawayRequirementTemplate,
-  IGiveawayCheckChannelResponse,
   IGiveawayCheckRequirementsResponse,
 } from "@/interfaces/giveaway.interface";
 import api from "./helper";
@@ -32,27 +29,6 @@ export const getGiveawayById = async (id: string): Promise<IGiveaway> => {
 
 export const joinToGiveaway = async (id: string): Promise<void> => {
   const res = await api.post(`/v1/giveaways/${id}/join`);
-  return res.data;
-};
-
-export const getGiveawayPrizeTemplates = async (): Promise<
-  IGiveawayPrizeTemplate[]
-> => {
-  const res = await api.get("/v1/prizes/templates");
-  return res.data;
-};
-
-export const getGiveawayRequirementsTemplates = async (): Promise<
-  IGiveawayRequirementTemplate[]
-> => {
-  const res = await api.get("/v1/requirements/templates");
-  return res.data;
-};
-
-export const checkChannel = async (
-  username: string
-): Promise<IGiveawayCheckChannelResponse> => {
-  const res = await api.post("/v1/bot/check", { username });
   return res.data;
 };
 

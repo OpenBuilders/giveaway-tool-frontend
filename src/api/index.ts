@@ -17,3 +17,4 @@ export const verifyTonProof = async (data: {
 
 export * as userApi from "./user.api";
 export * as giveawayApi from "./giveaway.api";
+export * as utilsApi from "./utils.api";
