@@ -47,9 +47,10 @@ export interface IGiveawayWinners {
 
 export interface IGiveawayCreator {
   id: number;
-  name: string;
-  image?: string;
-  is_verified?: boolean;
+  title: string;
+  username?: string;
+  avatar_url?: string;
+  channel_url?: string;
 }
 
 export interface IGiveaway {
@@ -60,12 +61,12 @@ export interface IGiveaway {
   duration: number;
   prizes: IGiveawayPrize[];
   requirements: IGiveawayRequirement[];
-  creators: IGiveawayCreator[];
+  sponsors: IGiveawayCreator[];
   status: GiveawayStatus;
   can_edit: boolean;
   ends_at: string;
   participants_count: number;
-  user_role?: "owner" | "user" | "participant";
+  user_role?: "owner" | "user" | "participant" | "winner";
   msg_id?: number;
 }
 
@@ -82,9 +83,9 @@ export interface IGiveawayActions {
   addRequirement: (requirement: IGiveawayRequirement) => void;
   removeRequirement: (index: number) => void;
 
-  setCreators: (creators: IGiveawayCreator[]) => void;
-  addCreator: (creator: IGiveawayCreator) => void;
-  removeCreator: (index: number) => void;
+  setSponsors: (sponsors: IGiveawayCreator[]) => void;
+  addSponsor: (sponsor: IGiveawayCreator) => void;
+  removeSponsor: (index: number) => void;
 
   reset(): void;
 }

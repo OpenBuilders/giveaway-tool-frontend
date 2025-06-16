@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
-import type { IListItem } from "@/interfaces";
 import { WinnerCup } from "@/assets/icons/WinnerCup";
 import { Block, Text } from "@/components/kit";
+import { GiveawayAvatar } from "../GiveawayAvatar";
+import type { IListItem } from "@/interfaces";
 
-const AdminBadge = () => (
-  <div className="bg-quaternary-fill-bg text-hint rounded-md px-1 py-0.5 text-xs font-medium uppercase">
-    admin
-  </div>
-);
+// const AdminBadge = () => (
+//   <div className="bg-quaternary-fill-bg text-hint rounded-md px-1 py-0.5 text-xs font-medium uppercase">
+//     admin
+//   </div>
+// );
 
 export const GiveawayItem = ({
   id,
@@ -17,9 +18,11 @@ export const GiveawayItem = ({
   giveaway,
   onClick,
   className,
+  number,
 }: IListItem & {
   onClick?: (item: IListItem) => void;
   className?: string;
+  number?: number;
 }) => {
   const [endsIn, setEndsIn] = useState("");
 
@@ -34,13 +37,12 @@ export const GiveawayItem = ({
     const diff = endDate.getTime() - now.getTime();
 
     if (diff <= 0) {
-      setEndsIn(`Ended ${endDate.toLocaleString(
-        "en-US",
-        {
+      setEndsIn(
+        `Ended ${endDate.toLocaleString("en-US", {
           month: "short",
           day: "numeric",
-        }
-      )}`);
+        })}`,
+      );
       return;
     }
 
@@ -56,6 +58,19 @@ export const GiveawayItem = ({
       setEndsIn(`Ends in ${minutes}m`);
     }
   }, [giveaway]);
+
+  const getPlaceNumber = useCallback(() => {
+    switch (number) {
+      case 1:
+        return <img src="/top1.svg" alt="" />;
+      case 2:
+        return <img src="/top2.svg" alt="" />;
+      case 3:
+        return <img src="/top3.svg" alt="" />;
+      default:
+        return <Text type="caption2" weight="medium">{number}</Text>;
+    }
+  }, [number]);
 
   useEffect(() => {
     getEndsIn();
@@ -75,42 +90,44 @@ export const GiveawayItem = ({
         if (onClick) onClick({ id, logo, title, description, giveaway });
       }}
     >
-      {logo && (
-        <div
-          className={`mr-2.5 overflow-hidden ${
-            typeof logo === "string"
-              ? "aspect-square max-w-9 rounded-full bg-black"
-              : ""
-          }`}
-        >
-          {typeof logo === "string" ? (
-            <img src={logo} alt="giveaway logo" />
-          ) : (
-            logo
-          )}
+      {(logo || giveaway?.sponsors) && (
+        <div className="mr-2.5">
+          <GiveawayAvatar
+            avatarUrls={
+              giveaway?.sponsors && giveaway?.sponsors.length > 0
+                ? giveaway?.sponsors.map((sponsor) =>
+                    String(sponsor.avatar_url),
+                  )
+                : [String(logo)]
+            }
+            isMini
+          />
         </div>
       )}
+
       <div className="flex w-full flex-col items-start">
-        <div className={`flex flex-col ${giveaway ? "pb-2.5" : ""}`}>
-          <div className="flex items-center gap-1.5">
-            <span className="tracking-body font-medium">{title}</span>
-            {giveaway?.isAdmin && <AdminBadge />}
+        <div className="flex w-full items-center justify-between">
+          <div className={`flex flex-col ${giveaway ? "pb-2.5" : ""}`}>
+            <div className="flex items-center gap-1.5">
+              <span className="tracking-body font-medium">{title}</span>
+              {/* {giveaway?.isAdmin && <AdminBadge />} */}
+            </div>
+
+            {giveaway && (
+              <>
+                <div className="flex items-center gap-1">
+                  <span className="text-hint text-sm-max tracking-subheadline">
+                    {endsIn}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
 
-          {giveaway && (
-            <>
-              <div className="flex items-center gap-1">
-                {/* <UsersIcon /> */}
-
-                <span className="text-hint text-sm-max tracking-subheadline">
-                  {endsIn}
-                </span>
-              </div>
-
-              {/* <span className="text-hint text-sm-max tracking-subheadline">
-                @{giveaway.telegramUsername}
-              </span> */}
-            </>
+          {number && (
+            <div className="bg-bg flex h-6 w-6 items-center justify-center rounded-full">
+              {getPlaceNumber()}
+            </div>
           )}
         </div>
 
@@ -119,7 +136,7 @@ export const GiveawayItem = ({
             <WinnerCup />
 
             <Text type="caption" weight="medium">
-              {giveaway?.winners_count}
+              {giveaway?.winners_count} winners
             </Text>
           </div>
         </Block>

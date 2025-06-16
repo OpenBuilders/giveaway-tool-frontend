@@ -20,7 +20,7 @@ export const useGiveawayStore = create<IGiveaway & IGiveawayActions>((set) => ({
   duration: 60 * 24, // 1 day
   prizes: [],
   requirements: [],
-  creators: [],
+  sponsors: [],
   setWinners: (winners) => set({ winners_count: winners }),
   setDuration: (duration) => set({ duration }),
   setTitle: (title) => set({ title }),
@@ -47,15 +47,15 @@ export const useGiveawayStore = create<IGiveaway & IGiveawayActions>((set) => ({
       return { requirements: newRequirements };
     }),
 
-  setCreators: (creators) => set({ creators }),
-  addCreator: (creator: IGiveawayCreator) =>
-    set((state) => ({ creators: [...state.creators, creator] })),
-  removeCreator: (index) =>
+  setSponsors: (sponsors) => set({ sponsors }),
+  addSponsor: (sponsor: IGiveawayCreator) =>
+    set((state) => ({ sponsors: [...state.sponsors, sponsor] })),
+  removeSponsor: (index) =>
     set((state) => {
-      const newCreators = [...state.creators];
-      newCreators.splice(index, 1);
+      const newSponsors = [...state.sponsors];
+      newSponsors.splice(index, 1);
 
-      return { creators: newCreators };
+      return { sponsors: newSponsors };
     }),
 
   reset: () =>
@@ -65,5 +65,6 @@ export const useGiveawayStore = create<IGiveaway & IGiveawayActions>((set) => ({
       duration: 60 * 24,
       prizes: [],
       requirements: [],
+      sponsors: [],
     }),
 }));

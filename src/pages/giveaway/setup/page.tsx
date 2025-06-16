@@ -38,9 +38,9 @@ export default function GiveawaySetUpPage() {
     requirements,
     removeRequirement,
 
-    creators,
-    removeCreator,
-    addCreator,
+    sponsors,
+    removeSponsor,
+    addSponsor,
 
     reset,
   } = useGiveawayStore((state) => state);
@@ -67,10 +67,10 @@ export default function GiveawaySetUpPage() {
     mutationFn: async (username: string) =>
       await utilsApi.getChannelInfo(username),
     onSuccess: (data) => {
-      addCreator({
+      addSponsor({
         id: data.id,
-        name: data.username,
-        image: data.avatar_url,
+        title: data.title || "",
+        avatar_url: data.avatar_url,
       });
       setCreatorUsername("");
       setViewCreatorInput(false);
@@ -104,8 +104,8 @@ export default function GiveawaySetUpPage() {
         ...prize,
       })),
       requirements,
-      sponsors: creators.map((creator) => ({
-        id: creator.id,
+      sponsors: sponsors.map((sponsor) => ({
+        id: sponsor.id,
       })),
     });
   };
@@ -182,7 +182,7 @@ export default function GiveawaySetUpPage() {
             header="creators"
             footer="The channel or chat you’re adding must be public"
             addButton={
-              creators.length < 3 && (
+              sponsors.length < 3 && (
                 <AddButton
                   onClick={() => {
                     setViewCreatorInput(true);
@@ -193,7 +193,7 @@ export default function GiveawaySetUpPage() {
               )
             }
             beforeList={
-              creators.length < 3 &&
+              sponsors.length < 3 &&
               viewCreatorInput && (
                 <Input
                   placeholder="@channel"
@@ -202,8 +202,8 @@ export default function GiveawaySetUpPage() {
                   onBlur={() => {
                     if (creatorUsername.length === 0) return;
                     if (
-                      creators.some(
-                        (creator) => creator.name === creatorUsername,
+                      sponsors.some(
+                        (sponsor) => sponsor.username === creatorUsername,
                       )
                     ) {
                       showToast({
@@ -219,13 +219,13 @@ export default function GiveawaySetUpPage() {
                 />
               )
             }
-            items={creators.map((creator, index) => ({
+            items={sponsors.map((sponsor, index) => ({
               id: index.toString(),
-              logo: creator.image,
-              title: creator.name,
+              logo: sponsor.avatar_url,
+              title: sponsor.title,
               rightIcon: "remove",
               onActionClick: () => {
-                removeCreator(index);
+                removeSponsor(index);
               },
             }))}
           />

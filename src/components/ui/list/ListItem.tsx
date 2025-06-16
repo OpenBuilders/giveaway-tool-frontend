@@ -81,7 +81,7 @@ export const ListItem = ({
           {rightIcon === "remove" && (
             <div className="bg-destructive after:bg-section-bg relative h-6 w-6 cursor-pointer rounded-full after:absolute after:top-1/2 after:left-1/2 after:h-0.5 after:w-2.5 after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:content-['']" />
           )}
-          {typeof rightIcon !== "string" && rightIcon}
+          {typeof rightIcon !== "string" && <div className="rightSide">{rightIcon}</div>}
         </div>
       )}
     </div>

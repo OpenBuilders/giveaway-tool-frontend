@@ -9,7 +9,6 @@ import { CopyIcon } from "@/assets/icons/CopyIcon";
 import { ForwardIcon } from "@/assets/icons/ForwardIcon";
 import WebApp from "@twa-dev/sdk";
 import {
-  Image,
   Block,
   ConfettiAnimation,
   PageLayout,
@@ -17,6 +16,7 @@ import {
   Text,
   useToast,
   StickerPlayer,
+  DialogModal,
 } from "@/components/kit";
 import { IListItem } from "@/interfaces";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -27,6 +27,10 @@ import winnerCupSticker from "@/assets/tgs/WinnerCupSticker.json";
 import sadSticker from "@/assets/tgs/SadSticker.json";
 import congratsSticker from "@/assets/tgs/CongratsSticker.json";
 import { goTo } from "@/utils";
+import { GiveawayAvatar } from "@/components/ui/GiveawayAvatar";
+import { UploadButton } from "@/components/ui/buttons/UploadButton";
+import { parseUserId } from "@/api/utils.api";
+import { ArrowIcon } from "@/assets/icons/ArrowIcon";
 
 const SmallDetailsCard = ({
   title,
@@ -48,10 +52,9 @@ const SmallDetailsCard = ({
 export default function GiveawayPage() {
   const { id } = useParams();
 
-  // Track which requirements are currently being checked (loading state)
-  const [checkingRequirements, setCheckingRequirements] = useState<{
-    [key: string]: boolean;
-  }>({});
+  // const [checkingRequirements, setCheckingRequirements] = useState<{
+  //   [key: string]: boolean;
+  // }>({});
 
   const { data: giveaway } = useQuery({
     queryKey: ["giveaway", id],
@@ -70,6 +73,8 @@ export default function GiveawayPage() {
   const [timeRemainingText, setTimeRemainingText] = useState<string>("");
   const [resultCardData, setResultCardData] = useState<IListItem | null>(null);
   const [alreadyViewed, setAlreadyViewed] = useState(true);
+  const [showMore, setShowMore] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const isAdmin = giveaway?.user_role === "owner";
   const giveawayLink = `https://t.me/${
@@ -282,10 +287,20 @@ export default function GiveawayPage() {
     },
     onError: () => {
       showToast({
-        message: "Failed to join to giveaway",
+        message: "Complete all requirements to unlock this giveaway.",
         type: "error",
         time: 2000,
       });
+    },
+  });
+
+  const parseUserIdsFetch = useMutation({
+    mutationFn: ({ file }: { file: File }) => parseUserId(file),
+    onSuccess: (data) => {
+      console.log(data);
+    },
+    onError: (err) => {
+      console.error(err);
     },
   });
 
@@ -304,15 +319,38 @@ export default function GiveawayPage() {
         isVisible={isAdmin ? false : giveaway?.status === "active"}
       />
 
+      <DialogModal
+        active={showModal}
+        title="Remove Uploaded List?"
+        description="Once deleted, these users will no longer be able to claim prizes. Are you sure you want to remove?"
+        confirmText="Remove"
+        closeText="Cancel"
+        onClose={() => {
+          setShowModal(false);
+        }}
+        onDelete={() => {
+          parseUserIdsFetch.reset();
+          showToast({
+            message: "You removed uploaded winners list",
+            type: "success",
+            time: 2000,
+          });
+          setShowModal(false);
+        }}
+      />
+
       <PageLayout>
         <>
           {!alreadyViewed && <ConfettiAnimation active />}
 
-          <Image
-            size={112}
-            src="/gift.svg"
-            borderRadius={50}
-            fallback={"Giveaway"}
+          <GiveawayAvatar
+            avatarUrls={
+              giveaway?.sponsors && giveaway?.sponsors?.length > 0
+                ? giveaway?.sponsors?.map((sponsor) =>
+                    String(sponsor.avatar_url),
+                  )
+                : ["/gift.svg"]
+            }
           />
 
           <Block margin="top" marginValue={8}>
@@ -395,126 +433,219 @@ export default function GiveawayPage() {
           </Block>
         </Block>
 
-        <Block margin="top" marginValue={24} gap={24} padding="bottom" paddingValue={24}>
-          <div
-            className={`flex flex-col ${
-              (giveaway?.prizes ?? []).length > 0 ? "gap-2.5" : ""
-            }`}
-          >
-            <List header="prizes" className="grid grid-cols-2 gap-2.5">
-              {(giveaway?.prizes ?? []).map((prize, index) => (
+        <Block padding="bottom" paddingValue={32}>
+          <Block margin="top" marginValue={24} gap={24}>
+            <div
+              className={`flex flex-col ${
+                (giveaway?.prizes ?? []).length > 0 ? "gap-2.5" : ""
+              }`}
+            >
+              <List header="prizes" className="grid grid-cols-2 gap-2.5">
+                {(giveaway?.prizes ?? []).map((prize, index) => (
+                  <ListItem
+                    id={index.toString()}
+                    logo={
+                      prize.prize_type === "custom" ? "/gift.svg" : undefined
+                    }
+                    title={
+                      prize.prize_type.charAt(0).toUpperCase() +
+                      prize.prize_type.slice(1)
+                    }
+                    description={`${prize.fields.length} inputs`}
+                    onClick={() => {
+                      navigate(`/giveaway/setup/prize/${index}`);
+                    }}
+                    className="rounded-[10px] after:h-0 [&_img]:scale-75"
+                  />
+                ))}
+              </List>
+            </div>
+
+            {isAdmin && (
+              <List
+                header="joining requirements"
+                items={(giveaway?.requirements ?? []).map(
+                  (requirement, index) =>
+                    ({
+                      id: index.toString(),
+                      logo: `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`,
+                      title: `Subscribe ${requirement.username}`,
+                      rightIcon: "arrow",
+                    }) as IListItem,
+                )}
+              />
+            )}
+
+            {giveaway?.status === "active" && !isAdmin && (
+              <List
+                header="joining requirements"
+                items={(checkRequirements?.results ?? []).map(
+                  (requirement, index) =>
+                    ({
+                      id: index.toString(),
+                      logo: `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`,
+                      title: requirement.name,
+                      rightIcon:
+                        requirement.status === "success" ? "done" : "arrow",
+                      onClick: () => {
+                        if (requirement.type === "subscription") {
+                          // setCheckingRequirements((prev) => ({
+                          //   ...prev,
+                          //   [index.toString()]: true,
+                          // }));
+
+                          if (requirement.username) {
+                            goTo(`https://t.me/${requirement.username}`);
+                          }
+                          setTimeout(() => {
+                            refetchCheckRequirements().finally(() => {
+                              // setCheckingRequirements((prev) => ({
+                              //   ...prev,
+                              //   [index.toString()]: false,
+                              // }));
+                            });
+                          }, 3000);
+                        }
+                      },
+                    }) as IListItem,
+                )}
+                onItemClick={() => {
+                  refetchCheckRequirements();
+                }}
+              />
+            )}
+
+            {isAdmin && giveaway?.status === "active" && (
+              <List
+                header={`winners (${giveaway?.winners_count} users)`}
+                className="bg-section-bg"
+              >
                 <ListItem
-                  id={index.toString()}
-                  logo={prize.prize_type === "custom" ? "/gift.svg" : undefined}
-                  title={
-                    prize.prize_type.charAt(0).toUpperCase() +
-                    prize.prize_type.slice(1)
-                  }
-                  description={`${prize.fields.length} inputs`}
-                  onClick={() => {
-                    navigate(`/giveaway/setup/prize/${index}`);
-                  }}
-                  className="rounded-[10px] after:h-0 [&_img]:scale-75"
+                  id="1"
+                  title="Winners will appear here soon"
+                  description="Upload your list before the results are finalized. Supported formats: .txt"
                 />
-              ))}
-            </List>
-          </div>
 
-          {isAdmin && (
-            <List
-              header="joining requirements"
-              items={(giveaway?.requirements ?? []).map(
-                (requirement, index) =>
-                  ({
-                    id: index.toString(),
-                    logo: requirement.avatar_url,
-                    title: `Subscribe ${requirement.username}`,
-                    rightIcon: "arrow",
-                  }) as IListItem,
-              )}
-            />
-          )}
+                {parseUserIdsFetch.isSuccess ? (
+                  <button
+                    type="button"
+                    className={`text-destructive w-full cursor-pointer px-4 py-2.5 text-left`}
+                    onClick={() => setShowModal(true)}
+                  >
+                    Remove Winners List
+                  </button>
+                ) : (
+                  <UploadButton
+                    className="px-4 py-2.5"
+                    allowedFileTypes=".txt"
+                    label="Upload Winners List"
+                    isLoading={parseUserIdsFetch.isPending}
+                    onSuccess={(file) => {
+                      const { file: filePayload } = file;
+                      parseUserIdsFetch.mutate({ file: filePayload });
+                    }}
+                    onError={(err) => {
+                      showToast({
+                        message: String(err),
+                        type: "error",
+                        time: 2000,
+                      });
+                    }}
+                  />
+                )}
 
-          {giveaway?.status === "active" && !isAdmin && (
-            <List
-              header="joining requirements"
-              items={(checkRequirements?.results ?? []).map(
-                (requirement, index) =>
-                  ({
-                    id: index.toString(),
-                    logo: requirement.chat_info.avatar_url,
-                    title: requirement.name,
-                    rightIcon:
-                      requirement.status === "success" ? (
-                        "done"
-                      ) : (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (requirement.type === "subscription") {
-                              setCheckingRequirements((prev) => ({
-                                ...prev,
-                                [index.toString()]: true,
-                              }));
+                {parseUserIdsFetch.data &&
+                  parseUserIdsFetch.data.ids.length > 0 &&
+                  parseUserIdsFetch.data.ids
+                    .slice(0, showMore ? parseUserIdsFetch.data.ids.length : 10)
+                    .map((id, index) => (
+                      <ListItem
+                        id={index.toString()}
+                        title={id}
+                        logo="/gift.svg"
+                        rightIcon={index + 1}
+                        className="[&_.rightSide]:text-hint"
+                        separator={
+                          index < parseUserIdsFetch.data?.ids.length - 1
+                        }
+                      />
+                    ))}
 
-                              if (requirement.username) {
-                                goTo(`https://t.me/${requirement.username}`);
-                              }
-                              setTimeout(() => {
-                                refetchCheckRequirements().finally(() => {
-                                  setCheckingRequirements((prev) => ({
-                                    ...prev,
-                                    [index.toString()]: false,
-                                  }));
-                                });
-                              }, 3000);
-                            }
-                          }}
-                          className="bg-button text-button-text !font-rounded text-sm-bold tracking-sm-bold flex items-center gap-1 rounded-[30px] px-3 py-1 font-semibold"
-                          disabled={checkingRequirements[index.toString()]}
-                        >
-                          {checkingRequirements[index.toString()] ? (
-                            <>
-                              <span>Checking...</span>
-                            </>
-                          ) : requirement.type === "subscription" ? (
-                            "Check"
-                          ) : (
-                            "Pay"
-                          )}
-                        </button>
-                      ),
-                    className: `[&_img]:scale-75`,
-                  }) as IListItem,
-              )}
-              onItemClick={() => {
-                // onItemClick is still needed for other interactions
-                // but not for the subscription check button
-                refetchCheckRequirements();
-              }}
-            />
-          )}
+                {parseUserIdsFetch.data &&
+                  parseUserIdsFetch.data?.total_ids >= 10 && (
+                    <button
+                      type="button"
+                      className="text-accent-text flex cursor-pointer items-center px-4 py-2.5 text-left"
+                      onClick={() => {
+                        setShowMore((prev) => !prev);
+                      }}
+                    >
+                      <div
+                        className={`text-accent-text flex w-10 items-center justify-center [&_svg]:scale-125 ${
+                          showMore ? "rotate-270" : "rotate-90"
+                        }`}
+                      >
+                        <ArrowIcon isCustomColor />
+                      </div>
+                      {showMore ? "Show Less" : "Show More"}
+                    </button>
+                  )}
+              </List>
+            )}
 
-          {giveaway?.winners && giveaway?.winners.length > 0 && (
-            <List
-              header={`winners (${giveaway?.winners.length} users)`}
-              winners={giveaway?.winners.map(
-                (winner, index) =>
-                  ({
-                    id: index.toString(),
-                    logo: "/gift.svg",
-                    title: winner.username,
-                    winner: {
-                      place: winner.place,
-                      isWinner:
-                        WebApp.initDataUnsafe.user?.id === winner.user_id,
-                    },
-                    className: "[&_img]:scale-75",
-                    isArrow: isAdmin,
-                  }) as IListItem,
-              )}
-            />
-          )}
+            {giveaway?.winners && giveaway?.winners.length > 0 && (
+              <List
+                header={`winners (${giveaway?.winners.length} users)`}
+                beforeList={
+                  giveaway.user_role === "winner" && (
+                    <ListItem
+                      id="1"
+                      title="You"
+                      logo={WebApp.initDataUnsafe.user?.photo_url}
+                      rightIcon={
+                        giveaway.winners.findIndex(
+                          (winner) =>
+                            winner.user_id === WebApp.initDataUnsafe.user?.id,
+                        ) + 1
+                      }
+                    />
+                  )
+                }
+                winners={giveaway?.winners?.map(
+                  (winner, index) =>
+                    ({
+                      id: index.toString(),
+                      logo: "/gift.svg",
+                      title: winner.username,
+                      winner: {
+                        place: winner.place,
+                        isWinner:
+                          WebApp.initDataUnsafe.user?.id === winner.user_id,
+                      },
+                      isArrow: isAdmin,
+                    }) as IListItem,
+                )}
+              />
+            )}
+
+            {giveaway?.sponsors && giveaway?.sponsors.length > 0 && (
+              <List
+                header={"creators"}
+                items={giveaway?.sponsors.map(
+                  (sponsor, index) =>
+                    ({
+                      id: index.toString(),
+                      logo: sponsor.avatar_url,
+                      title: sponsor.username,
+                      rightIcon: "arrow",
+                      onClick: () => {
+                        if (sponsor.channel_url) goTo(sponsor.channel_url);
+                      },
+                    }) as IListItem,
+                )}
+              />
+            )}
+          </Block>
         </Block>
       </PageLayout>
     </>

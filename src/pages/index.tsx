@@ -38,6 +38,7 @@ export default function MainPage() {
       participants: g.participants_count,
       requirements: g.requirements,
       winners_count: g.winners_count,
+      sponsors: g.sponsors,
     },
   }));
 
@@ -53,6 +54,7 @@ export default function MainPage() {
           participants: g.participants_count,
           requirements: g.requirements,
           winners_count: g.winners_count,
+          sponsors: g.sponsors,
         },
       })) ?? [];
   const myActiveGiveaways =
@@ -79,6 +81,7 @@ export default function MainPage() {
                 onItemClick={({ id }) => {
                   navigate(`/giveaway/${id}`);
                 }}
+                isTopList
               />
             ) : (
               <div className="flex h-[45vh] items-center justify-center">

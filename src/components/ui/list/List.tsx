@@ -14,6 +14,7 @@ interface ListProps {
   className?: string;
   footer?: React.ReactNode;
   beforeList?: React.ReactNode;
+  isTopList?: boolean;
 }
 
 export const List = ({
@@ -27,6 +28,7 @@ export const List = ({
   onItemClick,
   addButton,
   className,
+  isTopList,
 }: ListProps) => {
   const addButtonClass =
     "bg-section-bg border-giveaway flex max-h-[44px] w-full items-center justify-between px-4 py-2";
@@ -63,7 +65,12 @@ export const List = ({
             ))}
 
             {giveaways?.map((giveaway, index) => (
-              <GiveawayItem {...giveaway} onClick={onItemClick} key={index} />
+              <GiveawayItem
+                {...giveaway}
+                onClick={onItemClick}
+                number={isTopList ? index + 1 : undefined}
+                key={index}
+              />
             ))}
 
             {winners?.map((winner, index) => (

@@ -30,6 +30,7 @@ import { IListItem } from "@/interfaces";
 
 export default function RequirementPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
+  const [addButtonPressed, setAddButtonPressed] = useState(false);
   const [selectedRequirementType, setSelectedRequirementType] = useState<
     string | null
   >(null);
@@ -58,6 +59,7 @@ export default function RequirementPage() {
     queryFn: getAvailableChannels,
     enabled: selectedRequirementType === "subscription",
     select: (data) => data.channels,
+    refetchInterval: addButtonPressed ? 5000 : false,
   });
 
   const checkBotExistInChannelsFetch = useMutation({
@@ -203,6 +205,7 @@ export default function RequirementPage() {
                       <AddButton
                         onClick={() => {
                           goTo(addBotLink);
+                          setAddButtonPressed(true);
                         }}
                       >
                         Add Channel

@@ -27,7 +27,24 @@ export const checkChannel = async (
   return res.data;
 };
 
-export const getChannelInfo = async (username: string): Promise<IChannelInfo> => {
+export const getChannelInfo = async (
+  username: string,
+): Promise<IChannelInfo> => {
   const res = await api.get(`/v1/channels/${username}/info`);
+  return res.data;
+};
+
+export const parseUserId = async (
+  file: File,
+): Promise<{ total_ids: number; ids: string[] }> => {
+  const res = await api.post(
+    "/v1/giveaways/parse-ids",
+    { file },
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
+  );
   return res.data;
 };

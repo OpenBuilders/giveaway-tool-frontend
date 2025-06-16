@@ -6,7 +6,7 @@ import { getColor, getFirstLetter } from './helpers'
 interface ImageProps {
   fallback?: string
   src?: string | null
-  size: 24 | 40 | 112
+  size: 24 | 28 | 40 | 112
   borderRadius?: 50 | 12 | 8
 }
 

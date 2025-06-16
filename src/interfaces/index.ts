@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import type {
+  IGiveawayCreator,
   IGiveawayPrize,
   IGiveawayRequirement,
 } from "./giveaway.interface";
@@ -17,6 +18,7 @@ export interface IListItem {
     requirements?: IGiveawayRequirement[];
     prizes?: IGiveawayPrize[];
     winners_count?: number;
+    sponsors?: IGiveawayCreator[];
   };
   winner?: {
     isWinner: boolean;
