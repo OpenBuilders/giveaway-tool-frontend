@@ -18,6 +18,7 @@ import {
 } from "@/components/kit";
 import { useMutation } from "@tanstack/react-query";
 import { IListItem } from "@/interfaces";
+import { getPrizeIcon } from "@/assets/icons/helper";
 
 export default function GiveawaySetUpPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
@@ -246,7 +247,7 @@ export default function GiveawaySetUpPage() {
             {prizes.map((prize, index) => (
               <ListItem
                 id={index.toString()}
-                logo={prize.prize_type === "custom" ? "/gift.svg" : undefined}
+                logo={getPrizeIcon(prize.prize_type)}
                 title={
                   prize.prize_type.charAt(0).toUpperCase() +
                   prize.prize_type.slice(1)
