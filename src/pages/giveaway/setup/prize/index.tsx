@@ -16,6 +16,7 @@ import {
   PageLayout,
   TelegramMainButton,
 } from "@/components/kit";
+import { getPrizeIcon } from "@/assets/icons/helper";
 
 export default function PrizePage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
@@ -56,7 +57,7 @@ export default function PrizePage() {
         },
       ],
     }),
-    []
+    [],
   );
 
   useEffect(() => {
@@ -83,14 +84,15 @@ export default function PrizePage() {
           disabled={createButtonDisabled}
           onClick={() => {
             addPrize({
-              prize_type: GiveawayPrizeTemplateType[
-                Object.keys(GiveawayPrizeTemplateType).find(
-                  (key) =>
-                    GiveawayPrizeTemplateType[
-                      key as keyof typeof GiveawayPrizeTemplateType
-                    ] === selectedPrizeTemplate
-                ) as keyof typeof GiveawayPrizeTemplateType
-              ],
+              prize_type:
+                GiveawayPrizeTemplateType[
+                  Object.keys(GiveawayPrizeTemplateType).find(
+                    (key) =>
+                      GiveawayPrizeTemplateType[
+                        key as keyof typeof GiveawayPrizeTemplateType
+                      ] === selectedPrizeTemplate,
+                  ) as keyof typeof GiveawayPrizeTemplateType
+                ],
               fields: fieldsData.map((field) => ({
                 type: field.type,
                 name: field.label.toLowerCase(),
@@ -140,7 +142,7 @@ export default function PrizePage() {
                       onChange={(value) => {
                         setFieldsData((prev) => {
                           const existingField = prev.find(
-                            (f) => f.label === field.label
+                            (f) => f.label === field.label,
                           );
                           if (existingField) {
                             return prev.map((f) => {
@@ -158,7 +160,7 @@ export default function PrizePage() {
                       }}
                       type={field.type as ListInputProps["type"]}
                     />
-                  )
+                  ),
                 )}
               </List>
             </Block>
@@ -168,6 +170,7 @@ export default function PrizePage() {
                 <ListItem
                   key={String(prizeTemplate.type)}
                   id={String(prizeTemplate.type)}
+                  logo={getPrizeIcon(prizeTemplate.type)}
                   title={prizeTemplate.name}
                   onClick={() => {
                     setSelectedPrizeTemplate(String(prizeTemplate.type));

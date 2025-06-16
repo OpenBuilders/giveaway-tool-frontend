@@ -393,7 +393,8 @@ export default function GiveawayPage() {
 
               <Button
                 onClick={() => {
-                  WebApp.shareMessage(String(giveaway?.msg_id));
+                  // WebApp.shareMessage(String(giveaway?.msg_id));
+                  goTo(`https://t.me/share?url=${giveawayLink}&text=${giveaway?.title}`)
                 }}
                 className="flex items-center justify-center gap-1.5"
               >

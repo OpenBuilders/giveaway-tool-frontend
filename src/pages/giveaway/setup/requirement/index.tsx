@@ -27,6 +27,7 @@ import { getAvailableChannels } from "@/api/user.api";
 import { AddButton } from "@/components/ui/buttons/AddButton";
 import { goTo } from "@/utils";
 import { IListItem } from "@/interfaces";
+import { getRequirementIcon } from "@/assets/icons/helper";
 
 export default function RequirementPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
@@ -222,6 +223,7 @@ export default function RequirementPage() {
                   key={template.id}
                   id={template.id}
                   title={template.name}
+                  logo={getRequirementIcon(template.type)}
                   onClick={() => {
                     setSelectedRequirementType(template.type);
                   }}
