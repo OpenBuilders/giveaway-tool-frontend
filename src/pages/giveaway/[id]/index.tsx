@@ -76,7 +76,7 @@ export default function GiveawayPage() {
   const [showMore, setShowMore] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  const isAdmin = giveaway?.user_role === "owner";
+  const [isAdmin, setIsAdmin] = useState(giveaway?.user_role === "owner");
   const giveawayLink = `https://t.me/${
     import.meta.env.VITE_BOT_USERNAME
   }?startapp=${id}`;
@@ -134,6 +134,10 @@ export default function GiveawayPage() {
   }, [id, isAdmin, giveaway]);
 
   useEffect(() => {
+    if (!giveaway) return;
+
+    setIsAdmin(giveaway?.user_role === "owner");
+
     switch (giveaway?.status) {
       case "completed":
       case "pending":
