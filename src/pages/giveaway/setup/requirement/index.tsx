@@ -28,10 +28,16 @@ import { AddButton } from "@/components/ui/buttons/AddButton";
 import { goTo } from "@/utils";
 import { IListItem } from "@/interfaces";
 import { getRequirementIcon } from "@/assets/icons/helper";
+import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
+import { LabeledInput } from "@/components/ui/inputs/Input";
 
 export default function RequirementPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
   const [addButtonPressed, setAddButtonPressed] = useState(false);
+  const [customData, setCustomData] = useState({
+    title: "",
+    description: "",
+  });
   const [selectedRequirementType, setSelectedRequirementType] = useState<
     string | null
   >(null);
@@ -129,9 +135,21 @@ export default function RequirementPage() {
         <TelegramMainButton
           text="Add Requirement"
           onClick={() => {
-            checkBotExistInChannelsFetch.mutate(
-              subscriptionData.map((sub) => sub.username || "@testadsd"),
-            );
+            if (selectedRequirementType === "subscription") {
+              checkBotExistInChannelsFetch.mutate(
+                subscriptionData.map((sub) => sub.username || "@testadsd"),
+              );
+
+              return;
+            } else if (selectedRequirementType === "custom") {
+              addRequirement({
+                type: selectedRequirementType,
+                name: customData.title,
+                description: customData.description,
+              });
+            }
+
+            navigate("/giveaway/setup");
           }}
           disabled={
             createButtonDisabled || checkBotExistInChannelsFetch.isPending
@@ -176,7 +194,12 @@ export default function RequirementPage() {
                       availableChannels.map((item, index) => ({
                         id: index.toString(),
                         title: item.title,
-                        logo: item.avatar_url,
+                        logo: (
+                          <ChannelAvatar
+                            title={item.title}
+                            avatar_url={item.avatar_url}
+                          />
+                        ),
                         rightIcon: "arrow",
                         onClick: () => {
                           setSubscriptionData((prev) => [...prev, item]);
@@ -193,7 +216,12 @@ export default function RequirementPage() {
                         ({
                           id: index.toString(),
                           title: item.title,
-                          logo: item.avatar_url,
+                          logo: (
+                            <ChannelAvatar
+                              title={item.title}
+                              avatar_url={item.avatar_url}
+                            />
+                          ),
                           rightIcon: "remove",
                           onActionClick: () => {
                             setSubscriptionData((prev) =>
@@ -214,6 +242,35 @@ export default function RequirementPage() {
                     }
                   />
                 </>
+              )}
+
+              {selectedRequirementType === "custom" && (
+                <List>
+                  <LabeledInput
+                    containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
+                    label="Title"
+                    placeholder="Title"
+                    value={customData.title}
+                    onChange={(value) => {
+                      setCustomData((prev) => ({
+                        ...prev,
+                        title: value,
+                      }));
+                    }}
+                  />
+                  <LabeledInput
+                    containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
+                    label="Description"
+                    placeholder="Description"
+                    value={customData.description}
+                    onChange={(value) => {
+                      setCustomData((prev) => ({
+                        ...prev,
+                        description: value,
+                      }));
+                    }}
+                  />
+                </List>
               )}
             </Block>
           ) : (

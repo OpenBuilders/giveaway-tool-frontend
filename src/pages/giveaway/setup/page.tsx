@@ -19,6 +19,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { IListItem } from "@/interfaces";
 import { getPrizeIcon } from "@/assets/icons/helper";
+import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
 
 export default function GiveawaySetUpPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
@@ -222,7 +223,12 @@ export default function GiveawaySetUpPage() {
             }
             items={sponsors.map((sponsor, index) => ({
               id: index.toString(),
-              logo: sponsor.avatar_url,
+              logo: (
+                <ChannelAvatar
+                  title={sponsor.title}
+                  avatar_url={sponsor.avatar_url}
+                />
+              ),
               title: sponsor.title,
               rightIcon: "remove",
               onActionClick: () => {
@@ -268,7 +274,12 @@ export default function GiveawaySetUpPage() {
               (requirement, index) =>
                 ({
                   id: index.toString(),
-                  logo: requirement.avatar_url,
+                  logo: (
+                    <ChannelAvatar
+                      title={requirement.username?.charAt(1)}
+                      avatar_url={requirement.avatar_url}
+                    />
+                  ),
                   title: `Subscribe ${requirement.username}`,
                   rightIcon: "remove",
                   onActionClick: () => {

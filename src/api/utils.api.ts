@@ -48,3 +48,19 @@ export const parseUserId = async (
   );
   return res.data;
 };
+
+export const loadPreWinnerList = async (
+  file: File,
+  giveawayId: string,
+): Promise<{ total_ids: number; ids: string[] }> => {
+  const res = await api.post(
+    "/v1/giveaways/pre-winner-list",
+    { file, giveaway_id: giveawayId },
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
+  );
+  return res.data;
+};

@@ -29,8 +29,10 @@ import congratsSticker from "@/assets/tgs/CongratsSticker.json";
 import { goTo } from "@/utils";
 import { GiveawayAvatar } from "@/components/ui/GiveawayAvatar";
 import { UploadButton } from "@/components/ui/buttons/UploadButton";
-import { parseUserId } from "@/api/utils.api";
+import { loadPreWinnerList } from "@/api/utils.api";
 import { ArrowIcon } from "@/assets/icons/ArrowIcon";
+import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
+import { getPrizeIcon } from "@/assets/icons/helper";
 
 const SmallDetailsCard = ({
   title,
@@ -141,6 +143,7 @@ export default function GiveawayPage() {
     switch (giveaway?.status) {
       case "completed":
       case "pending":
+      case "custom":
         setTimeRemaining("Ended");
         setTimeRemainingText(
           "on " +
@@ -298,8 +301,9 @@ export default function GiveawayPage() {
     },
   });
 
-  const parseUserIdsFetch = useMutation({
-    mutationFn: ({ file }: { file: File }) => parseUserId(file),
+  const loadPreWinnerListFetch = useMutation({
+    mutationFn: ({ file, giveawayId }: { file: File; giveawayId: string }) =>
+      loadPreWinnerList(file, giveawayId),
     onSuccess: (data) => {
       console.log(data);
     },
@@ -315,13 +319,17 @@ export default function GiveawayPage() {
           navigate("/");
         }}
       />
-      <TelegramMainButton
-        text="Join Giveaway"
-        onClick={() => {
-          joinToGiveawayFetch.mutate({ id: String(id) });
-        }}
-        isVisible={isAdmin ? false : giveaway?.status === "active"}
-      />
+
+      {isAdmin ? (
+        false
+      ) : giveaway?.status === "active" && giveaway.user_role === "user" ? (
+        <TelegramMainButton
+          text="Join Giveaway"
+          onClick={() => {
+            joinToGiveawayFetch.mutate({ id: String(id) });
+          }}
+        />
+      ) : null}
 
       <DialogModal
         active={showModal}
@@ -333,7 +341,7 @@ export default function GiveawayPage() {
           setShowModal(false);
         }}
         onDelete={() => {
-          parseUserIdsFetch.reset();
+          loadPreWinnerListFetch.reset();
           showToast({
             message: "You removed uploaded winners list",
             type: "success",
@@ -398,7 +406,9 @@ export default function GiveawayPage() {
               <Button
                 onClick={() => {
                   // WebApp.shareMessage(String(giveaway?.msg_id));
-                  goTo(`https://t.me/share?url=${giveawayLink}&text=${giveaway?.title}`)
+                  goTo(
+                    `https://t.me/share?url=${giveawayLink}&text=${giveaway?.title}`,
+                  );
                 }}
                 className="flex items-center justify-center gap-1.5"
               >
@@ -449,9 +459,7 @@ export default function GiveawayPage() {
                 {(giveaway?.prizes ?? []).map((prize, index) => (
                   <ListItem
                     id={index.toString()}
-                    logo={
-                      prize.prize_type === "custom" ? "/gift.svg" : undefined
-                    }
+                    logo={getPrizeIcon(prize.prize_type)}
                     title={
                       prize.prize_type.charAt(0).toUpperCase() +
                       prize.prize_type.slice(1)
@@ -473,7 +481,12 @@ export default function GiveawayPage() {
                   (requirement, index) =>
                     ({
                       id: index.toString(),
-                      logo: `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`,
+                      logo: (
+                        <ChannelAvatar
+                          title={requirement.username?.replace("@", "")}
+                          avatar_url={`https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`}
+                        />
+                      ),
                       title: `Subscribe ${requirement.username}`,
                       rightIcon: "arrow",
                     }) as IListItem,
@@ -488,7 +501,12 @@ export default function GiveawayPage() {
                   (requirement, index) =>
                     ({
                       id: index.toString(),
-                      logo: `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`,
+                      logo: (
+                        <ChannelAvatar
+                          title={requirement.username?.replace("@", "")}
+                          avatar_url={`https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`}
+                        />
+                      ),
                       title: requirement.name,
                       rightIcon:
                         requirement.status === "success" ? "done" : "arrow",
@@ -520,7 +538,7 @@ export default function GiveawayPage() {
               />
             )}
 
-            {isAdmin && giveaway?.status === "active" && (
+            {isAdmin && giveaway?.status === "custom" && (
               <List
                 header={`winners (${giveaway?.winners_count} users)`}
                 className="bg-section-bg"
@@ -531,7 +549,7 @@ export default function GiveawayPage() {
                   description="Upload your list before the results are finalized. Supported formats: .txt"
                 />
 
-                {parseUserIdsFetch.isSuccess ? (
+                {loadPreWinnerListFetch.isSuccess ? (
                   <button
                     type="button"
                     className={`text-destructive w-full cursor-pointer px-4 py-2.5 text-left`}
@@ -544,10 +562,13 @@ export default function GiveawayPage() {
                     className="px-4 py-2.5"
                     allowedFileTypes=".txt"
                     label="Upload Winners List"
-                    isLoading={parseUserIdsFetch.isPending}
+                    isLoading={loadPreWinnerListFetch.isPending}
                     onSuccess={(file) => {
                       const { file: filePayload } = file;
-                      parseUserIdsFetch.mutate({ file: filePayload });
+                      loadPreWinnerListFetch.mutate({
+                        file: filePayload,
+                        giveawayId: String(id),
+                      });
                     }}
                     onError={(err) => {
                       showToast({
@@ -559,10 +580,13 @@ export default function GiveawayPage() {
                   />
                 )}
 
-                {parseUserIdsFetch.data &&
-                  parseUserIdsFetch.data.ids.length > 0 &&
-                  parseUserIdsFetch.data.ids
-                    .slice(0, showMore ? parseUserIdsFetch.data.ids.length : 10)
+                {loadPreWinnerListFetch.data &&
+                  loadPreWinnerListFetch.data.ids.length > 0 &&
+                  loadPreWinnerListFetch.data.ids
+                    .slice(
+                      0,
+                      showMore ? loadPreWinnerListFetch.data.ids.length : 10,
+                    )
                     .map((id, index) => (
                       <ListItem
                         id={index.toString()}
@@ -571,13 +595,13 @@ export default function GiveawayPage() {
                         rightIcon={index + 1}
                         className="[&_.rightSide]:text-hint"
                         separator={
-                          index < parseUserIdsFetch.data?.ids.length - 1
+                          index < loadPreWinnerListFetch.data?.ids.length - 1
                         }
                       />
                     ))}
 
-                {parseUserIdsFetch.data &&
-                  parseUserIdsFetch.data?.total_ids >= 10 && (
+                {loadPreWinnerListFetch.data &&
+                  loadPreWinnerListFetch.data?.total_ids >= 10 && (
                     <button
                       type="button"
                       className="text-accent-text flex cursor-pointer items-center px-4 py-2.5 text-left"
@@ -640,7 +664,12 @@ export default function GiveawayPage() {
                   (sponsor, index) =>
                     ({
                       id: index.toString(),
-                      logo: sponsor.avatar_url,
+                      logo: (
+                        <ChannelAvatar
+                          title={sponsor.title}
+                          avatar_url={sponsor.avatar_url}
+                        />
+                      ),
                       title: sponsor.username,
                       rightIcon: "arrow",
                       onClick: () => {

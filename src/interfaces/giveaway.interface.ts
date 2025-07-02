@@ -11,14 +11,15 @@
 // }
 
 export type GiveawayPrizeTemplateType = "custom";
-export type GiveawayRequirementType = "subscription";
+export type GiveawayRequirementType = "subscription" | "boost" | "custom";
 export type GiveawayStatus =
   | "active"
   | "cancelled"
   | "completed"
   | "pending"
   | "paused"
-  | "deleted";
+  | "deleted"
+  | "custom";
 
 export const GiveawayPrizeTemplateType = {
   Custom: "custom",
@@ -37,6 +38,7 @@ export interface IGiveawayRequirement {
   type: GiveawayRequirementType;
   username?: string;
   avatar_url?: string;
+  description?: string;
 }
 
 export interface IGiveawayWinners {
