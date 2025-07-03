@@ -9,7 +9,7 @@ interface LabeledInputProps extends ListInputProps {
 
 export const Input: React.FC<ListInputProps> = (props) => {
   return (
-    <ListInput {...props} className="!bg-section-bg !rounded-[10px] !px-4 !h-11" />
+    <ListInput {...props} className={`!bg-section-bg !rounded-[10px] !px-4 !h-11 ${props.className}`} />
   );
 };
 

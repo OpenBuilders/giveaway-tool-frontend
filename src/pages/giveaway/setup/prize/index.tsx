@@ -1,8 +1,8 @@
-import { LabeledInput } from "@/components/ui/inputs/Input";
+import { Input } from "@/components/ui/inputs/Input";
 import { List } from "@/components/ui/list/List";
 import { useQuery } from "@tanstack/react-query";
 import { BackButton } from "@twa-dev/sdk/react";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { getGiveawayPrizeTemplates } from "@/api/utils.api";
 import { ListItem } from "@/components/ui/list/ListItem";
@@ -12,7 +12,6 @@ import { GiveawayPrizeTemplateType } from "@/interfaces/giveaway.interface";
 import {
   Block,
   Text,
-  ListInputProps,
   PageLayout,
   TelegramMainButton,
 } from "@/components/kit";
@@ -39,26 +38,6 @@ export default function PrizePage() {
     queryKey: ["prize-templates"],
     queryFn: getGiveawayPrizeTemplates,
   });
-
-  const fieldBase = useMemo(
-    () => ({
-      custom: [
-        {
-          type: "text",
-          label: "Name",
-          placeholder: "Name",
-          value: "",
-        },
-        {
-          type: "text",
-          label: "Description",
-          placeholder: "Description",
-          value: "",
-        },
-      ],
-    }),
-    [],
-  );
 
   useEffect(() => {
     if (
@@ -128,41 +107,38 @@ export default function PrizePage() {
                 }}
               />
 
-              <List>
-                {fieldBase[selectedPrizeTemplate as keyof typeof fieldBase].map(
-                  (field) => (
-                    <LabeledInput
-                      key={field.label}
-                      containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
-                      label={field.label}
-                      placeholder={field.placeholder}
-                      value={
-                        fieldsData.find((f) => f.label === field.label)?.value
-                      }
-                      onChange={(value) => {
-                        setFieldsData((prev) => {
-                          const existingField = prev.find(
-                            (f) => f.label === field.label,
-                          );
-                          if (existingField) {
-                            return prev.map((f) => {
-                              if (f.label === field.label) {
-                                return {
-                                  ...f,
-                                  value,
-                                };
-                              }
-                              return f;
-                            });
-                          }
-                          return [...prev, { ...field, value }];
-                        });
-                      }}
-                      type={field.type as ListInputProps["type"]}
-                    />
-                  ),
-                )}
-              </List>
+              {selectedPrizeTemplate === GiveawayPrizeTemplateType.Custom && (
+                <List header="Prize Description" className="bg-section-bg">
+                  <Input
+                    rows={2}
+                    className="px-4 py-2.5 !h-[auto] !min-h-[66px] resize-none"
+                    type="textarea"
+                    placeholder="e.g. “Cap with logo”, “2x Concert Tickets”, “Meet & Greet”"
+                    value={
+                      fieldsData.find((f) => f.label === "Prize Description")?.value
+                    }
+                    onChange={(value) => {
+                      setFieldsData((prev) => {
+                        const existingField = prev.find(
+                          (f) => f.label === "Prize Description",
+                        );
+                        if (existingField) {
+                          return prev.map((f) => {
+                            if (f.label === "Prize Description") {
+                              return {
+                                ...f,
+                                value,
+                              };
+                            }
+                            return f;
+                          });
+                        }
+                        return [...prev, { type: "text", value, label: "Prize Description", placeholder: "" }];
+                      });
+                    }}
+                  />
+                </List>
+              )}
             </Block>
           ) : (
             <List>

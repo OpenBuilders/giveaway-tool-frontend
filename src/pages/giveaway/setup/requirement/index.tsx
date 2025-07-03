@@ -135,7 +135,10 @@ export default function RequirementPage() {
         <TelegramMainButton
           text="Add Requirement"
           onClick={() => {
-            if (selectedRequirementType === "subscription") {
+            if (
+              selectedRequirementType === "subscription" ||
+              selectedRequirementType === "boost"
+            ) {
               checkBotExistInChannelsFetch.mutate(
                 subscriptionData.map((sub) => sub.username || "@testadsd"),
               );
@@ -186,7 +189,8 @@ export default function RequirementPage() {
                 />
               </List>
 
-              {selectedRequirementType === "subscription" && (
+              {(selectedRequirementType === "subscription" ||
+                selectedRequirementType === "boost") && (
                 <>
                   <List
                     header="available channels"
