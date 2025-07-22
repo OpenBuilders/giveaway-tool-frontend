@@ -77,6 +77,7 @@ export default function GiveawayPage() {
   const [alreadyViewed, setAlreadyViewed] = useState(true);
   const [showMore, setShowMore] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [hasJoined, setHasJoined] = useState(false);
 
   const [isAdmin, setIsAdmin] = useState(giveaway?.user_role === "owner");
   const giveawayLink = `https://t.me/${
@@ -134,6 +135,12 @@ export default function GiveawayPage() {
       }
     }
   }, [id, isAdmin, giveaway]);
+
+  useEffect(() => {
+    if (giveaway?.user_role === "participant") {
+      setHasJoined(true);
+    }
+  }, [giveaway]);
 
   useEffect(() => {
     if (!giveaway) return;
@@ -291,6 +298,7 @@ export default function GiveawayPage() {
       });
 
       setParticipantsInfoJoined();
+      setHasJoined(true);
     },
     onError: () => {
       showToast({
@@ -320,9 +328,11 @@ export default function GiveawayPage() {
         }}
       />
 
-      {isAdmin ? (
-        false
-      ) : giveaway?.status === "active" && giveaway.user_role === "user" ? (
+      {isAdmin
+        ? false
+        : giveaway?.status === "active" &&
+          giveaway.user_role === "user" &&
+          !hasJoined ? (
         <TelegramMainButton
           text="Join Giveaway"
           onClick={() => {
