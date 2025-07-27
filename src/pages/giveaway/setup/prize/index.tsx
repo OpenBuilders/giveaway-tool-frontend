@@ -17,6 +17,13 @@ import {
 } from "@/components/kit";
 import { getPrizeIcon } from "@/assets/icons/helper";
 
+// Fallback prize template for when API is not available
+const fallbackPrizeTemplate = {
+  name: "Custom Prize",
+  description: "Create your own custom prize",
+  type: "custom" as GiveawayPrizeTemplateType,
+};
+
 export default function PrizePage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
   const [selectedPrizeTemplate, setSelectedPrizeTemplate] = useState<
@@ -34,10 +41,17 @@ export default function PrizePage() {
 
   const navigate = useNavigate();
 
-  const { data: prizeTemplatesData } = useQuery({
+  const { data: prizeTemplatesData, error, isLoading } = useQuery({
     queryKey: ["prize-templates"],
     queryFn: getGiveawayPrizeTemplates,
+    retry: 3,
+    retryDelay: 1000,
   });
+
+  // Use fallback if API fails or returns no data
+  const availableTemplates = prizeTemplatesData && prizeTemplatesData.length > 0 
+    ? prizeTemplatesData 
+    : [fallbackPrizeTemplate];
 
   useEffect(() => {
     if (
@@ -49,6 +63,13 @@ export default function PrizePage() {
       setCreateButtonDisabled(false);
     }
   }, [fieldsData, selectedPrizeTemplate]);
+
+  // Debug-Logging
+  console.log("Prize Templates Data:", prizeTemplatesData);
+  console.log("Error:", error);
+  console.log("Loading:", isLoading);
+  console.log("API URL:", import.meta.env.VITE_API_URL);
+  console.log("Available Templates:", availableTemplates);
 
   return (
     <>
@@ -90,13 +111,26 @@ export default function PrizePage() {
           </Text>
         </Block>
         <Block margin="top" marginValue={44}>
-          {selectedPrizeTemplate ? (
+          {isLoading ? (
+            <Block>
+              <Text type="text" align="center">Loading prize templates...</Text>
+            </Block>
+          ) : error ? (
+            <Block>
+              <Text type="text" align="center">
+                Error loading prize templates: {error.message}
+              </Text>
+              <Text type="caption" align="center">
+                API URL: {import.meta.env.VITE_API_URL || "Not set"}
+              </Text>
+            </Block>
+          ) : selectedPrizeTemplate ? (
             <Block gap={24}>
               <Select
                 label="Type"
                 type="withIcon"
                 options={
-                  prizeTemplatesData?.map((prizeTemplate) => ({
+                  availableTemplates?.map((prizeTemplate) => ({
                     value: String(prizeTemplate.type),
                     label: prizeTemplate.name,
                   })) || []
@@ -113,7 +147,7 @@ export default function PrizePage() {
                     rows={2}
                     className="px-4 py-2.5 !h-[auto] !min-h-[66px] resize-none"
                     type="textarea"
-                    placeholder="e.g. “Cap with logo”, “2x Concert Tickets”, “Meet & Greet”"
+                    placeholder="e.g. "Cap with logo", "2x Concert Tickets", "Meet & Greet""
                     value={
                       fieldsData.find((f) => f.label === "Prize Description")?.value
                     }
@@ -142,7 +176,7 @@ export default function PrizePage() {
             </Block>
           ) : (
             <List>
-              {prizeTemplatesData?.map((prizeTemplate, index) => (
+              {availableTemplates.map((prizeTemplate, index) => (
                 <ListItem
                   key={String(prizeTemplate.type)}
                   id={String(prizeTemplate.type)}
@@ -151,7 +185,7 @@ export default function PrizePage() {
                   onClick={() => {
                     setSelectedPrizeTemplate(String(prizeTemplate.type));
                   }}
-                  separator={prizeTemplatesData?.length !== index + 1}
+                  separator={availableTemplates?.length !== index + 1}
                   rightIcon="arrow"
                 />
               ))}
