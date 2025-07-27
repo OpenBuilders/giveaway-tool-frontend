@@ -147,7 +147,7 @@ export default function PrizePage() {
                     rows={2}
                     className="px-4 py-2.5 !h-[auto] !min-h-[66px] resize-none"
                     type="textarea"
-                    placeholder="e.g. "Cap with logo", "2x Concert Tickets", "Meet & Greet""
+                    placeholder="e.g. Cap with logo, 2x Concert Tickets, Meet & Greet"
                     value={
                       fieldsData.find((f) => f.label === "Prize Description")?.value
                     }
