@@ -23,7 +23,7 @@ export const getGiveawayRequirementsTemplates = async (): Promise<
 export const checkChannel = async (
   usernames: string[],
 ): Promise<IGiveawayCheckChannelResponse> => {
-  const res = await api.post("/v1/bot/check-bulk", { usernames });
+  const res = await api.post("/v1/requirements/channels/check-bulk", { usernames });
   return res.data;
 };
 

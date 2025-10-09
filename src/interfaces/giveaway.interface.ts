@@ -93,25 +93,21 @@ export interface IGiveawayActions {
 }
 
 export interface IGiveawayCreateRequest {
-  allow_tickets?: boolean;
-  auto_distribute?: boolean;
-  description?: string;
+  title: string;
   duration: number;
-  max_participants?: number;
+  winners_count: number;
   prizes: {
-    place: number | "all";
-    prize_id?: string;
-    prize_type: string;
-    fields: {
-      [key: string]: string;
-    }[];
+    place?: number;
+    title: string;
+    description?: string;
+    quantity?: number;
   }[];
+  description?: string;
+  max_participants?: number;
   requirements?: IGiveawayRequirement[];
   sponsors?: {
     id: number;
   }[];
-  title?: string;
-  winners_count: number;
 }
 
 export interface IGiveawayPrizeTemplate {
@@ -171,6 +167,4 @@ export interface IChannelInfo {
   channel_url: string;
 }
 
-export interface IAvailableChannelsResponse {
-  channels: IChannelInfo[];
-}
+export type IAvailableChannelsResponse = IChannelInfo[];

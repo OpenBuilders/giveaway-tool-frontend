@@ -101,10 +101,19 @@ export default function GiveawaySetUpPage() {
       title,
       winners_count,
       duration: duration * 60,
-      prizes: prizes.map((prize) => ({
-        place: "all",
-        ...prize,
-      })),
+      prizes: prizes.map((prize, index) => {
+        // Extract new shape from stored fields
+        const titleField = prize.fields.find((f: any) => f.name === "title")?.value || "";
+        const descriptionField = prize.fields.find((f: any) => f.name === "description")?.value || "";
+        const quantityField = prize.fields.find((f: any) => f.name === "quantity")?.value || "";
+        const quantityNum = quantityField !== "" ? Number(quantityField) : undefined;
+        return {
+          place: index + 1, // optional; can be omitted if backend ignores
+          title: titleField,
+          description: descriptionField || undefined,
+          quantity: typeof quantityNum === "number" && !Number.isNaN(quantityNum) ? quantityNum : undefined,
+        };
+      }),
       requirements,
       sponsors: sponsors.map((sponsor) => ({
         id: sponsor.id,

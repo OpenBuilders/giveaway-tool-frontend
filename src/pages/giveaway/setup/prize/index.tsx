@@ -54,14 +54,15 @@ export default function PrizePage() {
     : [fallbackPrizeTemplate];
 
   useEffect(() => {
-    if (
-      selectedPrizeTemplate &&
-      fieldsData.some((field) => field.value === "")
-    ) {
+    if (!selectedPrizeTemplate) {
       setCreateButtonDisabled(true);
-    } else {
-      setCreateButtonDisabled(false);
+      return;
     }
+    // Require Title for prize creation; quantity if present must be > 0
+    const titleValue = fieldsData.find((f) => f.label === "Title")?.value || "";
+    const quantityRaw = fieldsData.find((f) => f.label === "Quantity")?.value || "";
+    const quantityOk = quantityRaw === "" || Number(quantityRaw) > 0;
+    setCreateButtonDisabled(!(titleValue.trim().length > 0 && quantityOk));
   }, [fieldsData, selectedPrizeTemplate]);
 
   // Debug-Logging
@@ -93,11 +94,27 @@ export default function PrizePage() {
                       ] === selectedPrizeTemplate,
                   ) as keyof typeof GiveawayPrizeTemplateType
                 ],
-              fields: fieldsData.map((field) => ({
-                type: field.type,
-                name: field.label.toLowerCase(),
-                value: field.value,
-              })),
+              fields: [
+                // Persist in fields so the setup page can map to the new request shape
+                {
+                  type: "text",
+                  name: "title",
+                  value:
+                    fieldsData.find((f) => f.label === "Title")?.value || "",
+                },
+                {
+                  type: "text",
+                  name: "description",
+                  value:
+                    fieldsData.find((f) => f.label === "Description")?.value || "",
+                },
+                {
+                  type: "number",
+                  name: "quantity",
+                  value:
+                    fieldsData.find((f) => f.label === "Quantity")?.value || "",
+                },
+              ],
             });
             navigate("/giveaway/setup");
           }}
@@ -142,36 +159,77 @@ export default function PrizePage() {
               />
 
               {selectedPrizeTemplate === GiveawayPrizeTemplateType.Custom && (
-                <List header="Prize Description" className="bg-section-bg">
-                  <Input
-                    rows={2}
-                    className="px-4 py-2.5 !h-[auto] !min-h-[66px] resize-none"
-                    type="textarea"
-                    placeholder="e.g. Cap with logo, 2x Concert Tickets, Meet & Greet"
-                    value={
-                      fieldsData.find((f) => f.label === "Prize Description")?.value
-                    }
-                    onChange={(value) => {
-                      setFieldsData((prev) => {
-                        const existingField = prev.find(
-                          (f) => f.label === "Prize Description",
-                        );
-                        if (existingField) {
-                          return prev.map((f) => {
-                            if (f.label === "Prize Description") {
-                              return {
-                                ...f,
-                                value,
-                              };
-                            }
-                            return f;
-                          });
-                        }
-                        return [...prev, { type: "text", value, label: "Prize Description", placeholder: "" }];
-                      });
-                    }}
-                  />
-                </List>
+                <Block gap={12}>
+                  <List header="Prize Title" className="bg-section-bg">
+                    <Input
+                      className="px-4 py-2.5"
+                      type="text"
+                      placeholder="e.g. Cap with logo"
+                      value={fieldsData.find((f) => f.label === "Title")?.value}
+                      onChange={(value) => {
+                        setFieldsData((prev) => {
+                          const existingField = prev.find((f) => f.label === "Title");
+                          if (existingField) {
+                            return prev.map((f) =>
+                              f.label === "Title" ? { ...f, value } : f,
+                            );
+                          }
+                          return [
+                            ...prev,
+                            { type: "text", value, label: "Title", placeholder: "" },
+                          ];
+                        });
+                      }}
+                    />
+                  </List>
+
+                  <List header="Description" className="bg-section-bg">
+                    <Input
+                      rows={2}
+                      className="px-4 py-2.5 !h-[auto] !min-h-[66px] resize-none"
+                      type="textarea"
+                      placeholder="Optional description"
+                      value={fieldsData.find((f) => f.label === "Description")?.value}
+                      onChange={(value) => {
+                        setFieldsData((prev) => {
+                          const existingField = prev.find((f) => f.label === "Description");
+                          if (existingField) {
+                            return prev.map((f) =>
+                              f.label === "Description" ? { ...f, value } : f,
+                            );
+                          }
+                          return [
+                            ...prev,
+                            { type: "text", value, label: "Description", placeholder: "" },
+                          ];
+                        });
+                      }}
+                    />
+                  </List>
+
+                  <List header="Quantity" className="bg-section-bg">
+                    <Input
+                      className="px-4 py-2.5"
+                      type="number"
+                      placeholder="1"
+                      value={fieldsData.find((f) => f.label === "Quantity")?.value}
+                      onChange={(value) => {
+                        setFieldsData((prev) => {
+                          const existingField = prev.find((f) => f.label === "Quantity");
+                          if (existingField) {
+                            return prev.map((f) =>
+                              f.label === "Quantity" ? { ...f, value } : f,
+                            );
+                          }
+                          return [
+                            ...prev,
+                            { type: "number", value, label: "Quantity", placeholder: "1" },
+                          ];
+                        });
+                      }}
+                    />
+                  </List>
+                </Block>
               )}
             </Block>
           ) : (

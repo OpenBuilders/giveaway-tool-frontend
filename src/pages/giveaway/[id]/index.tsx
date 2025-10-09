@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/buttons/Button";
 import { List } from "@/components/ui/list/List";
 import { ListItem } from "@/components/ui/list/ListItem";
 import { BackButton } from "@twa-dev/sdk/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { giveawayApi } from "@/api";
 import { CopyIcon } from "@/assets/icons/CopyIcon";
@@ -32,7 +32,17 @@ import { UploadButton } from "@/components/ui/buttons/UploadButton";
 import { loadPreWinnerList } from "@/api/utils.api";
 import { ArrowIcon } from "@/assets/icons/ArrowIcon";
 import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
-import { getPrizeIcon } from "@/assets/icons/helper";
+// import removed: legacy prize icon logic no longer used
+
+type PrizeLike = {
+  title?: string;
+  description?: string;
+  quantity?: number;
+  place?: number;
+  // legacy fallbacks
+  prize_type?: string;
+  fields?: unknown[];
+};
 
 const SmallDetailsCard = ({
   title,
@@ -87,7 +97,7 @@ export default function GiveawayPage() {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const setParticipantsInfoJoined = () => {
+  const setParticipantsInfoJoined = useCallback(() => {
     setResultCardData({
       id: id!,
       title: "You’re in!",
@@ -95,7 +105,7 @@ export default function GiveawayPage() {
         "Now just wait for it to end — results will be announced after the deadline.",
       logo: <StickerPlayer lottie={doneSticker} height={36} width={36} />,
     });
-  };
+  }, [id]);
 
   useEffect(() => {
     if (isAdmin) {
@@ -140,7 +150,7 @@ export default function GiveawayPage() {
     if (giveaway?.user_role === "participant") {
       setHasJoined(true);
     }
-  }, [giveaway]);
+  }, [giveaway, setParticipantsInfoJoined]);
 
   useEffect(() => {
     if (!giveaway) return;
@@ -286,7 +296,7 @@ export default function GiveawayPage() {
 
       return () => clearInterval(interval);
     }
-  }, [giveaway]);
+  }, [giveaway, setParticipantsInfoJoined]);
 
   const joinToGiveawayFetch = useMutation({
     mutationFn: ({ id }: { id: string }) => joinToGiveaway(id),
@@ -328,11 +338,11 @@ export default function GiveawayPage() {
         }}
       />
 
-      {isAdmin
-        ? false
-        : giveaway?.status === "active" &&
-          giveaway.user_role === "user" &&
-          !hasJoined ? (
+      {isAdmin ? (
+        false
+      ) : giveaway?.status === "active" &&
+        giveaway.user_role === "user" &&
+        !hasJoined ? (
         <TelegramMainButton
           text="Join Giveaway"
           onClick={() => {
@@ -466,21 +476,40 @@ export default function GiveawayPage() {
               }`}
             >
               <List header="prizes" className="grid grid-cols-2 gap-2.5">
-                {(giveaway?.prizes ?? []).map((prize, index) => (
-                  <ListItem
-                    id={index.toString()}
-                    logo={getPrizeIcon(prize.prize_type)}
-                    title={
-                      prize.prize_type.charAt(0).toUpperCase() +
+                {(giveaway?.prizes ?? []).map((prize: PrizeLike, index) => {
+                  // New API shape: { title, description?, quantity?, place? }
+                  const newTitle = prize?.title as string | undefined;
+                  const newDescription = prize?.description as
+                    | string
+                    | undefined;
+                  const newQuantity = prize?.quantity as number | undefined;
+
+                  // Backward compatibility with legacy shape to avoid crashes when viewing historical data
+                  const legacyTitle = prize?.prize_type
+                    ? prize.prize_type.charAt(0).toUpperCase() +
                       prize.prize_type.slice(1)
-                    }
-                    description={`${prize.fields.length} inputs`}
-                    onClick={() => {
-                      navigate(`/giveaway/setup/prize/${index}`);
-                    }}
-                    className="rounded-[10px] after:h-0 [&_img]:scale-75"
-                  />
-                ))}
+                    : undefined;
+                  const legacyDescription = Array.isArray(prize?.fields)
+                    ? `${prize.fields.length} inputs`
+                    : undefined;
+
+                  return (
+                    <ListItem
+                      key={index}
+                      id={index.toString()}
+                      logo="/gift.svg"
+                      title={newTitle || legacyTitle || "Prize"}
+                      description={
+                        newDescription ||
+                        (typeof newQuantity === "number" && newQuantity > 0
+                          ? `Quantity: ${newQuantity}`
+                          : legacyDescription)
+                      }
+                      className="rounded-[10px] after:h-0 [&_img]:scale-75"
+                      rightIcon={undefined}
+                    />
+                  );
+                })}
               </List>
             </div>
 

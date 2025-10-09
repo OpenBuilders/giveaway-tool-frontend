@@ -7,6 +7,6 @@ export const getUser = async () => {
 };
 
 export const getAvailableChannels = async (): Promise<IAvailableChannelsResponse> => {
-  const res = await api.get("/v1/channels/me");
+  const res = await api.get("/v1/users/me/channels");
   return res.data;
 };

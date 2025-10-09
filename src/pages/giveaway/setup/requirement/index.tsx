@@ -42,10 +42,10 @@ export default function RequirementPage() {
     string | null
   >(null);
   const [subscriptionData, setSubscriptionData] = useState<
-    IAvailableChannelsResponse["channels"]
+    IAvailableChannelsResponse
   >([]);
   const [availableChannels, setAvailableChannels] = useState<
-    IAvailableChannelsResponse["channels"]
+    IAvailableChannelsResponse
   >([]);
   const { addRequirement } = useGiveawayStore();
 
@@ -65,7 +65,6 @@ export default function RequirementPage() {
     queryKey: ["available-channels"],
     queryFn: getAvailableChannels,
     enabled: selectedRequirementType === "subscription",
-    select: (data) => data.channels,
     refetchInterval: addButtonPressed ? 5000 : false,
   });
 
@@ -193,26 +192,6 @@ export default function RequirementPage() {
                 selectedRequirementType === "boost") && (
                 <>
                   <List
-                    header="available channels"
-                    items={
-                      availableChannels.map((item, index) => ({
-                        id: index.toString(),
-                        title: item.title,
-                        logo: (
-                          <ChannelAvatar
-                            title={item.title}
-                            avatar_url={item.avatar_url}
-                          />
-                        ),
-                        rightIcon: "arrow",
-                        onClick: () => {
-                          setSubscriptionData((prev) => [...prev, item]);
-                        },
-                      })) as IListItem[]
-                    }
-                  />
-
-                  <List
                     header="channels"
                     footer="The channel or chat you’re adding must be public"
                     items={subscriptionData.map(
@@ -243,6 +222,26 @@ export default function RequirementPage() {
                       >
                         Add Channel
                       </AddButton>
+                    }
+                  />
+
+                  <List
+                    header="available channels"
+                    items={
+                      availableChannels.map((item, index) => ({
+                        id: index.toString(),
+                        title: item.title,
+                        logo: (
+                          <ChannelAvatar
+                            title={item.title}
+                            avatar_url={item.avatar_url}
+                          />
+                        ),
+                        rightIcon: "arrow",
+                        onClick: () => {
+                          setSubscriptionData((prev) => [...prev, item]);
+                        },
+                      })) as IListItem[]
                     }
                   />
                 </>

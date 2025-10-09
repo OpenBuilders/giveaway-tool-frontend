@@ -18,7 +18,12 @@ export const createGiveaway = async (
 };
 
 export const getTopGiveaways = async (): Promise<IGiveaway[]> => {
-  const res = await api.get("/v1/giveaways/top");
+  const res = await api.get("/v1/giveaways", {
+    params: {
+      limit: 100,
+      offset: 0,
+    },
+  });
   return res.data;
 };
 
