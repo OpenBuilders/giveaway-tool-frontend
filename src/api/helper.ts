@@ -49,8 +49,7 @@ api.interceptors.request.use(
       const webAppData = getWebAppData();
 
       if (webAppData) {
-        config.params = config.params || {};
-        config.params.init_data = webAppData;
+        config.headers["X-Telegram-Init-Data"] = webAppData;
       }
 
       return config;
@@ -58,7 +57,7 @@ api.interceptors.request.use(
       return Promise.reject(error);
     }
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 export default api;
