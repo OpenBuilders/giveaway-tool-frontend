@@ -18,6 +18,7 @@ interface BlockProps {
     | 18
     | 20
     | 24
+    | 28
     | 32
     | 44
     | 'auto'
@@ -35,12 +36,13 @@ interface BlockProps {
     | 18
     | 20
     | 24
+    | 28
     | 32
     | 44
     | 'auto'
   fixed?: 'top' | 'bottom'
   row?: boolean
-  gap?: 0 | 2 | 4 | 6 | 8 | 10 | 12 | 14 | 16 | 18 | 20 | 24
+  gap?: 0 | 2 | 4 | 6 | 8 | 10 | 12 | 14 | 16 | 18 | 20 | 24 | 28
   justify?: 'start' | 'center' | 'end' | 'between'
   align?: 'start' | 'center' | 'end'
   fadeIn?: boolean

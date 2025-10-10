@@ -16,7 +16,8 @@ import {
   Text,
   useToast,
   StickerPlayer,
-  DialogModal,
+    DialogModal,
+    DialogSheet,
 } from "@/components/kit";
 import { IListItem } from "@/interfaces";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -78,7 +79,8 @@ export default function GiveawayPage() {
     useQuery({
       queryKey: ["checkRequirements", id, giveaway?.user_role],
       queryFn: () => giveawayApi.checkGiveawayRequirements(String(id)),
-      enabled: !!id && giveaway?.user_role === "user",
+      enabled:
+        !!id && ["user", "participant"].includes(giveaway?.user_role ?? ""),
     });
 
   const [timeRemaining, setTimeRemaining] = useState<string>("");
@@ -88,6 +90,12 @@ export default function GiveawayPage() {
   const [showMore, setShowMore] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [hasJoined, setHasJoined] = useState(false);
+
+  const [prizeSheetState, setPrizeSheetState] = useState<{
+    opened: boolean;
+    title: string;
+    description?: string;
+  }>({ opened: false, title: "", description: undefined });
 
   const [isAdmin, setIsAdmin] = useState(giveaway?.user_role === "owner");
   const giveawayLink = `https://t.me/${
@@ -342,7 +350,7 @@ export default function GiveawayPage() {
         false
       ) : giveaway?.status === "active" &&
         giveaway.user_role === "user" &&
-        !hasJoined ? (
+        !hasJoined && !prizeSheetState.opened ? (
         <TelegramMainButton
           text="Join Giveaway"
           onClick={() => {
@@ -369,6 +377,15 @@ export default function GiveawayPage() {
           });
           setShowModal(false);
         }}
+      />
+
+      <DialogSheet
+        opened={prizeSheetState.opened}
+        onClose={() => setPrizeSheetState((s) => ({ ...s, opened: false }))}
+        icon={<img src="/gateway_gift.png" alt="gift" width={120} height={120} />}
+        title={prizeSheetState.title}
+        description={prizeSheetState.description}
+        primaryText="Understood"
       />
 
       <PageLayout>
@@ -507,6 +524,17 @@ export default function GiveawayPage() {
                       }
                       className="rounded-[10px] after:h-0 [&_img]:scale-75"
                       rightIcon={undefined}
+                      onClick={() => {
+                        setPrizeSheetState({
+                          opened: true,
+                          title: newTitle || legacyTitle || "Prize",
+                          description:
+                            newDescription ||
+                            (typeof newQuantity === "number" && newQuantity > 0
+                              ? `Quantity: ${newQuantity}`
+                              : legacyDescription),
+                        });
+                      }}
                     />
                   );
                 })}

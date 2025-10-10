@@ -20,7 +20,7 @@ export const Tabs = ({
       {categories.map((category, index) => (
         <span
           key={index}
-          className={`h-7 w-full flex items-center justify-center gap-2 text-center py-[5px] px-3 cursor-pointer transition-colors duration-200 font-medium text-sm tracking-footnote ${
+          className={`h-7 w-full flex items-center justify-center gap-2 text-center py-[5px] px-3 cursor-pointer transition-colors duration-200 font-semibold text-sm tracking-footnote ${
             (activeIndex !== undefined ? activeIndex : active) === index
               ? activeClass
               : ""

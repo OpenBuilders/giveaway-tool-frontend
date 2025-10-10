@@ -4,13 +4,14 @@ import styles from './Text.module.scss'
 
 interface TextProps {
   children: React.ReactNode | string
-  type: 'title' | 'title1' | 'text' | 'link' | 'caption' | 'caption2'
+  type: 'title' | 'title1' | 'title2' | 'text' | 'link' | 'caption' | 'caption2'
   align?: 'left' | 'center' | 'right'
-  color?: 'primary' | 'tertiary' | 'secondary' | 'accent' | 'danger'
-  weight?: 'normal' | 'medium' | 'bold'
+  color?: 'primary' | 'tertiary' | 'secondary' | 'accent' | 'danger' | 'hint'
+  weight?: 'normal' | 'medium' | 'bold' | 'semibold'
   href?: string
   as?: 'p' | 'span' | 'div' | 'a'
   uppercase?: boolean
+  className?: string
 }
 
 export const Text = ({
@@ -22,6 +23,7 @@ export const Text = ({
   href,
   as = 'p',
   uppercase,
+  className,
 }: TextProps) => {
   const Component = as
   return (
@@ -32,7 +34,8 @@ export const Text = ({
         styles[align],
         styles[color],
         styles[weight],
-        uppercase && styles.uppercase
+        uppercase && styles.uppercase,
+        className
       )}
       {...(href && { href })}
       {...(as && { as })}

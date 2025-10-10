@@ -1,4 +1,4 @@
-import { ListInput, ListInputProps } from "@/components/kit";
+import { ListInput, ListInputProps, Text } from "@/components/kit";
 import React, { useCallback, useState } from "react";
 
 interface LabeledInputProps extends ListInputProps {
@@ -9,7 +9,10 @@ interface LabeledInputProps extends ListInputProps {
 
 export const Input: React.FC<ListInputProps> = (props) => {
   return (
-    <ListInput {...props} className={`!bg-section-bg !rounded-[10px] !px-4 !h-11 ${props.className}`} />
+    <ListInput
+      {...props}
+      className={`!bg-section-bg !h-11 !rounded-[10px] !px-4 ${props.className}`}
+    />
   );
 };
 
@@ -31,15 +34,12 @@ export const LabeledInput: React.FC<LabeledInputProps> = ({
 
   return (
     <div
-      className={`
-        flex items-center justify-between relative overflow-hidden bg-section-bg rounded-[10px] px-4 h-11
-        ${containerClassName}
-      `}
+      className={`bg-section-bg relative flex h-11 items-center justify-between overflow-hidden rounded-[10px] px-4 ${containerClassName} `}
     >
       <span className="w-full">{label}</span>
 
       <div
-        className={`w-full flex justify-end ${
+        className={`flex w-full justify-end ${
           Number(value) <= 0 || !value ? "text-hint" : ""
         }`}
       >
@@ -55,22 +55,19 @@ export const LabeledInput: React.FC<LabeledInputProps> = ({
           style={{
             paddingRight: `${additionalLabelNode?.clientWidth}px`,
           }}
-          className="
-            text-right 
-            bg-transparent 
-            focus:outline-none 
-            placeholder:text-hint
-          "
+          className="placeholder:text-hint bg-transparent text-right focus:outline-none text-[17px]"
           {...rest}
         />
 
         {additionalLabel && additionalLabel.length > 0 && (
-          <span
+          <div
             ref={callbackAddLabelRef}
-            className="text-hint text-[15px] leading-5 right-5 pl-2 absolute top-1/2 transform -translate-y-1/2 pointer-events-none"
+            className="pointer-events-none absolute top-1/2 right-5 -translate-y-1/2 transform pl-2"
           >
-            {additionalLabel}
-          </span>
+            <Text type="text" color="hint" align="right" weight="normal">
+              {additionalLabel}
+            </Text>
+          </div>
         )}
       </div>
     </div>

@@ -23,6 +23,7 @@
   --quick-menu-background: rgba(255, 255, 255, 0.55);
   --quick-menu-foreground: rgba(0, 0, 0, 1);
   --button-confirm-color: rgba(47, 178, 80, 1);
+  --sheet-background: rgba(255, 255, 255, 1);
 }
 
 @theme {
@@ -52,9 +53,10 @@
   --color-section-bg: var(--tg-theme-section-bg-color, #ffffff);
   --color-section-header-text: var(
     --tg-theme-section_header_text_color,
-    #6d6d72
+    #8D8E93
   );
-  --color-section-separator: var(--tg-theme-section-separator-color, #c8c7cc);
+  --color-section-separator: var(--tg-theme-section-separator-color, #545458);
+  --color-subtitle: var(--tg-theme-subtitle-color, #8E8E93);
 
   --text-xs: 11px;
   --text-xs--line-height: 13px;
@@ -75,7 +77,7 @@
   --tracking-title: 0.38px;
   --tracking-body: -0.43px;
   --tracking-big-title: 0.38px;
-  --tracking-sm-bold: 0.44px
+  --tracking-sm-bold: 0.44px;
   --rounded-sm: 4px;
   --rounded-md: 6px;
   --rounded-lg: 9px;
@@ -111,7 +113,7 @@
   }
 
   .border-giveaway {
-    @apply after:bg-section-separator relative after:absolute after:right-0 after:bottom-0 after:h-px after:content-[''];
+    @apply after:bg-section-separator relative after:absolute after:right-0 after:bottom-0 after:h-[0.33px] after:content-[''];
   }
 
   .dropdown-menu {

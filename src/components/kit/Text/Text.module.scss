@@ -10,6 +10,12 @@
   font-style: normal;
 }
 
+.title2 {
+  font-size: 22px;
+  line-height: 28px;
+  letter-spacing: -0.26px;
+}
+
 .text {
   text-align: center;
   font-size: 17px;
@@ -20,6 +26,7 @@
 .caption {
   font-size: 13px;
   font-style: normal;
+  line-height: 18px;
 }
 
 .caption2 {
@@ -37,6 +44,10 @@
 
 .bold {
   font-weight: 700;
+}
+
+.semibold {
+  font-weight: 600;
 }
 
 .uppercase {
@@ -61,6 +72,10 @@
 
 .danger {
   color: var(--color-accentsRed);
+}
+
+.hint {
+  color: var(--color-hint);
 }
 
 .center {

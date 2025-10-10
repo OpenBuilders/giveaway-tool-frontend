@@ -1,5 +1,5 @@
 .root {
-  background-color: #000000d2;
+  background-color: rgba(0, 0, 0, 0.4);
   position: fixed;
   top: 0;
   left: 0;
@@ -27,7 +27,7 @@
   width: 100%;
   border-top-left-radius: 14px;
   border-top-right-radius: 14px;
-  background-color: var(--tgui--secondary_bg_color);
+  background-color: var(--sheet-background);
   padding: 40px 16px 44px 16px;
   z-index: 3000000;
   transform: translateY(100%);

@@ -103,15 +103,22 @@ export default function GiveawaySetUpPage() {
       duration: duration * 60,
       prizes: prizes.map((prize, index) => {
         // Extract new shape from stored fields
-        const titleField = prize.fields.find((f: any) => f.name === "title")?.value || "";
-        const descriptionField = prize.fields.find((f: any) => f.name === "description")?.value || "";
-        const quantityField = prize.fields.find((f: any) => f.name === "quantity")?.value || "";
-        const quantityNum = quantityField !== "" ? Number(quantityField) : undefined;
+        const titleField =
+          prize.fields.find((f: any) => f.name === "title")?.value || "";
+        const descriptionField =
+          prize.fields.find((f: any) => f.name === "description")?.value || "";
+        const quantityField =
+          prize.fields.find((f: any) => f.name === "quantity")?.value || "";
+        const quantityNum =
+          quantityField !== "" ? Number(quantityField) : undefined;
         return {
           place: index + 1, // optional; can be omitted if backend ignores
           title: titleField,
           description: descriptionField || undefined,
-          quantity: typeof quantityNum === "number" && !Number.isNaN(quantityNum) ? quantityNum : undefined,
+          quantity:
+            typeof quantityNum === "number" && !Number.isNaN(quantityNum)
+              ? quantityNum
+              : undefined,
         };
       }),
       requirements,
@@ -122,12 +129,17 @@ export default function GiveawaySetUpPage() {
   };
 
   useEffect(() => {
-    if (winners_count > 0 && prizes.length > 0 && title.length > 0) {
+    if (
+      winners_count > 0 &&
+      prizes.length > 0 &&
+      title.length > 0 &&
+      sponsors.length > 0
+    ) {
       setCreateButtonDisabled(false);
     } else {
       setCreateButtonDisabled(true);
     }
-  }, [winners_count, prizes, title]);
+  }, [winners_count, prizes, title, sponsors]);
 
   return (
     <>
@@ -146,7 +158,7 @@ export default function GiveawaySetUpPage() {
       />
 
       <PageLayout>
-        <Block margin="top" marginValue={44}>
+        <Block margin="top" marginValue={28}>
           <Text type="title" align="center" weight="bold">
             Set Up Giveaway
           </Text>
@@ -158,15 +170,25 @@ export default function GiveawaySetUpPage() {
             value={title}
             onChange={setTitle}
             className="w-full"
+            maxLength={100}
           />
 
           <LabeledInput
             label="Winners"
             placeholder="0"
             inputMode="numeric"
-            value={winners_count > 0 ? winners_count.toString() : undefined}
+            value={
+              winners_count > 0
+                ? winners_count.toLocaleString("en-US", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })
+                : undefined
+            }
             onChange={(value) => {
-              setWinners(parseInt(value.replace(",", "")) || 0);
+              const number = parseInt(value.replace(",", "")) || 0;
+              if (number > 999999) return;
+              setWinners(number);
             }}
             additionalLabel="users"
           />

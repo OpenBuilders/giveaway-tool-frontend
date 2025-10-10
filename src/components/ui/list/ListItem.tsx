@@ -66,13 +66,13 @@ export const ListItem = ({
 
       {rightIcon && (
         <div
-          className="flex items-center justify-center self-stretch pl-4"
+          className="flex items-center justify-center self-stretch pl-4 text-subtitle"
           onClick={() => {
             if (onActionClick)
               onActionClick({ id, logo, title, description, giveaway });
           }}
         >
-          {rightIcon === "arrow" && <ArrowIcon />}
+          {rightIcon === "arrow" && <ArrowIcon isCustomColor={true} />}
           {rightIcon === "done" && (
             <div className="bg-button-confirm-color text-text-overlay flex h-6 w-6 cursor-pointer items-center justify-center rounded-full p-1.5">
               <CheckMark />

@@ -18,7 +18,7 @@ export const AddButton = ({
       disabled={disabled}
       className={`flex items-center gap-4 w-full ${className}`}
     >
-      <CirclePlusIcon className="pl-1.5" />
+      <CirclePlusIcon  />
       <span className="text-accent-text">{children}</span>
     </button>
   );

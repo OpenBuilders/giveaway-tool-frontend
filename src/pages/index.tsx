@@ -68,6 +68,18 @@ export default function MainPage() {
   const myDeletedGiveaways =
     mappedMyGiveaways?.filter((g) => g.status === "deleted") ?? [];
 
+  const noGiveawaysYet = (
+    <div className="flex h-[45vh] items-center justify-center">
+      <Block gap={6}>
+        <Text type="title2" align="center" weight="semibold">
+          No Giveaways Yet
+        </Text>
+        <Text type="text" align="center">
+          Create one now — it’ll show up here!
+        </Text>
+      </Block>
+    </div>
+  );
   const { TabContent, TabsComponent } = useTabs({
     tabs: [
       {
@@ -84,16 +96,7 @@ export default function MainPage() {
                 isTopList
               />
             ) : (
-              <div className="flex h-[45vh] items-center justify-center">
-                <Block gap={6}>
-                  <Text type="text" align="center" weight="medium">
-                    No Giveaways Yet
-                  </Text>
-                  <Text type="caption" align="center">
-                    Create one now — it’ll show up here!
-                  </Text>
-                </Block>
-              </div>
+              noGiveawaysYet
             )}
           </>
         ),
@@ -135,16 +138,7 @@ export default function MainPage() {
                 />
               </Block>
             ) : (
-              <div className="flex h-[45vh] items-center justify-center">
-                <Block gap={6}>
-                  <Text type="text" align="center" weight="medium">
-                    No Giveaways Yet
-                  </Text>
-                  <Text type="caption" align="center">
-                    Create one now — it’ll show up here!
-                  </Text>
-                </Block>
-              </div>
+              noGiveawaysYet
             )}
           </>
         ),
@@ -183,7 +177,7 @@ export default function MainPage() {
           </Block>
         </Block>
 
-        <div className="flex h-full items-end">
+        <div className="flex h-full items-end flex-1">
           <Block padding="full" paddingValue={12} align="end">
             <Text align="center" type="caption" color="tertiary">
               This is open source contributed by independent
