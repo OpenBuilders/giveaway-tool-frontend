@@ -3,7 +3,8 @@ import { ReactNode } from "react";
 import { Sheet } from "../Sheet";
 import { Text } from "../Text";
 import styles from "./DialogSheet.module.scss";
-import { TelegramMainButton } from "../TelegramMainButton";
+import { Button } from "../Button";
+import { Block } from "../Block";
 
 interface DialogSheetProps {
   opened: boolean;
@@ -28,14 +29,6 @@ export function DialogSheet({
 }: DialogSheetProps) {
   return (
     <>
-      {opened && (
-        <TelegramMainButton
-          text={primaryText}
-          onClick={() => {
-            onPrimaryClick?.();
-          }}
-        />
-      )}
       <Sheet opened={opened} onClose={onClose}>
         <div className={styles.container}>
           {icon ? <div className={styles.headerIcon}>{icon}</div> : null}
@@ -59,6 +52,12 @@ export function DialogSheet({
               {description}
             </Text>
           ) : null}
+
+          <Block margin="top" marginValue={28}>
+              <Button type="primary" onClick={onPrimaryClick ?? onClose}>
+                {primaryText}
+              </Button>
+          </Block>
         </div>
       </Sheet>
     </>

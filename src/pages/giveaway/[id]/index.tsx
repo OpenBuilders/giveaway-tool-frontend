@@ -516,12 +516,12 @@ export default function GiveawayPage() {
                       id={index.toString()}
                       logo="/gift.svg"
                       title={newTitle || legacyTitle || "Prize"}
-                      description={
-                        newDescription ||
-                        (typeof newQuantity === "number" && newQuantity > 0
-                          ? `Quantity: ${newQuantity}`
-                          : legacyDescription)
-                      }
+                      // description={
+                      //   newDescription ||
+                      //   (typeof newQuantity === "number" && newQuantity > 0
+                      //     ? `Quantity: ${newQuantity}`
+                      //     : legacyDescription)
+                      // }
                       className="rounded-[10px] after:h-0 [&_img]:scale-75"
                       rightIcon={undefined}
                       onClick={() => {

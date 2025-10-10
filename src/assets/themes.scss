@@ -1,4 +1,4 @@
-@use 'variables' as *;
+@use 'variables'as *;
 
 html[data-theme='light'] {
   --color-backgroundSecondary: #{$palette-dark4};
@@ -49,4 +49,5 @@ html[data-theme='dark'] {
   --quick-menu-foreground: rgba(255, 255, 255, 1);
   --button-confirm-color: rgba(53, 202, 91, 1);
   --sheet-background: rgba(44, 44, 46, 1);
+  --primary-background: rgba(10, 132, 255, 1);
 }
