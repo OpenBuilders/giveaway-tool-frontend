@@ -1,7 +1,5 @@
 import { ReactNode } from "react";
 
-import { Block } from "../Block";
-import { Button } from "../Button";
 import { Sheet } from "../Sheet";
 import { Text } from "../Text";
 import styles from "./DialogSheet.module.scss";
