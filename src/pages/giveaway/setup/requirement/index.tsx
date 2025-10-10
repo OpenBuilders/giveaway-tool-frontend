@@ -109,12 +109,16 @@ export default function RequirementPage() {
   });
 
   useEffect(() => {
-    if (selectedRequirementType && subscriptionData?.length === 0) {
+    if (selectedRequirementType === "subscription" && subscriptionData?.length === 0) {
       setCreateButtonDisabled(true);
     } else {
-      setCreateButtonDisabled(false);
+      if (selectedRequirementType === "custom") {
+        setCreateButtonDisabled(!(customData.title.trim().length > 0 && customData.description.trim().length > 0));
+      } else {
+        setCreateButtonDisabled(false);
+      }
     }
-  }, [subscriptionData, selectedRequirementType]);
+  }, [subscriptionData, selectedRequirementType, customData]);
 
   useEffect(() => {
     const filteredChannels = availableChannelsData?.filter(

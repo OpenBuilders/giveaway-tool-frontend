@@ -307,11 +307,11 @@ export default function GiveawaySetUpPage() {
                   id: index.toString(),
                   logo: (
                     <ChannelAvatar
-                      title={requirement.username?.charAt(1)}
+                      title={requirement.type === "custom" ? requirement.name : requirement.name?.charAt(1)}
                       avatar_url={requirement.avatar_url}
                     />
                   ),
-                  title: `Subscribe ${requirement.username}`,
+                  title: requirement.type === "custom" ? requirement.name : `Subscribe ${requirement.name}`,
                   rightIcon: "remove",
                   onActionClick: () => {
                     removeRequirement(index);

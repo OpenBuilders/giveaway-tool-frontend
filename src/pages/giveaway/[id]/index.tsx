@@ -16,8 +16,8 @@ import {
   Text,
   useToast,
   StickerPlayer,
-    DialogModal,
-    DialogSheet,
+  DialogModal,
+  DialogSheet,
 } from "@/components/kit";
 import { IListItem } from "@/interfaces";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -350,7 +350,8 @@ export default function GiveawayPage() {
         false
       ) : giveaway?.status === "active" &&
         giveaway.user_role === "user" &&
-        !hasJoined && !prizeSheetState.opened ? (
+        !hasJoined &&
+        !prizeSheetState.opened ? (
         <TelegramMainButton
           text="Join Giveaway"
           onClick={() => {
@@ -382,7 +383,9 @@ export default function GiveawayPage() {
       <DialogSheet
         opened={prizeSheetState.opened}
         onClose={() => setPrizeSheetState((s) => ({ ...s, opened: false }))}
-        icon={<img src="/gateway_gift.png" alt="gift" width={120} height={120} />}
+        icon={
+          <img src="/gateway_gift.png" alt="gift" width={120} height={120} />
+        }
         title={prizeSheetState.title}
         description={prizeSheetState.description}
         primaryText="Understood"
@@ -550,11 +553,18 @@ export default function GiveawayPage() {
                       id: index.toString(),
                       logo: (
                         <ChannelAvatar
-                          title={requirement.username?.replace("@", "")}
-                          avatar_url={`https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`}
+                          title={
+                            requirement.type === "custom"
+                              ? requirement.name
+                              : requirement.username?.charAt(1)
+                          }
+                          avatar_url={requirement.avatar_url}
                         />
                       ),
-                      title: `Subscribe ${requirement.username}`,
+                      title:
+                        requirement.type === "custom"
+                          ? requirement.name
+                          : `Subscribe ${requirement.username}`,
                       rightIcon: "arrow",
                     }) as IListItem,
                 )}
@@ -570,7 +580,7 @@ export default function GiveawayPage() {
                       id: index.toString(),
                       logo: (
                         <ChannelAvatar
-                          title={requirement.username?.replace("@", "")}
+                          title={requirement.name?.replace("@", "")}
                           avatar_url={`https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`}
                         />
                       ),
@@ -605,7 +615,7 @@ export default function GiveawayPage() {
               />
             )}
 
-            {isAdmin && giveaway?.status === "custom" && (
+            {isAdmin && giveaway?.status === "pending" && (
               <List
                 header={`winners (${giveaway?.winners_count} users)`}
                 className="bg-section-bg"

@@ -23,7 +23,9 @@ export const getGiveawayRequirementsTemplates = async (): Promise<
 export const checkChannel = async (
   usernames: string[],
 ): Promise<IGiveawayCheckChannelResponse> => {
-  const res = await api.post("/v1/requirements/channels/check-bulk", { usernames });
+  const res = await api.post("/v1/requirements/channels/check-bulk", {
+    usernames,
+  });
   return res.data;
 };
 
@@ -54,8 +56,8 @@ export const loadPreWinnerList = async (
   giveawayId: string,
 ): Promise<{ total_ids: number; ids: string[] }> => {
   const res = await api.post(
-    "/v1/giveaways/pre-winner-list",
-    { file, giveaway_id: giveawayId },
+    `/v1/giveaways/${giveawayId}/manual-candidates`,
+    { file },
     {
       headers: {
         "Content-Type": "multipart/form-data",
