@@ -18,7 +18,7 @@ export const ListItem = ({
   onActionClick?: (item: IListItem) => void;
   className?: string;
   separator?: boolean;
-  rightIcon?: "arrow" | "done" | "remove" | React.ReactNode;
+  rightIcon?: "arrow" | "done" | "remove" | "selected" | "unselected" | React.ReactNode;
 }) => {
   return (
     <div
@@ -80,6 +80,14 @@ export const ListItem = ({
           )}
           {rightIcon === "remove" && (
             <div className="bg-destructive after:bg-section-bg relative h-6 w-6 cursor-pointer rounded-full after:absolute after:top-1/2 after:left-1/2 after:h-0.5 after:w-2.5 after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:content-['']" />
+          )}
+          {rightIcon === "selected" && (
+            <div className="bg-button text-text-overlay flex h-6 w-6 cursor-pointer items-center justify-center rounded-full p-1.5">
+              <CheckMark />
+            </div>
+          )}
+          {rightIcon === "unselected" && (
+            <div className="relative h-6 w-6 cursor-pointer rounded-full border-[1.5px] border-border-separator" />
           )}
           {typeof rightIcon !== "string" && <div className="rightSide">{rightIcon}</div>}
         </div>

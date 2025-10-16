@@ -13,6 +13,7 @@ import {
 import giftLottie from "@assets/tgs/gift.json";
 import { useEffect } from "react";
 import WebApp from "@twa-dev/sdk";
+import { ConnectWalletButton } from "@/components/ui/buttons/ConnectWalletButton";
 
 export default function MainPage() {
   const navigate = useNavigate();
@@ -161,23 +162,32 @@ export default function MainPage() {
       />
 
       <PageLayout>
-        <StickerPlayer lottie={giftLottie} height={112} width={112} />
-
-        <Block margin="top" marginValue={8}>
-          <Text type="title" align="center" weight="bold">
-            Create and Join <br /> Giveaways in Telegram
-          </Text>
+        {/* <Header /> */}
+        <Block padding="full" paddingValue={10} align="end">
+          <ConnectWalletButton />
         </Block>
 
-        <Block margin="top" marginValue={24}>
+        <Block padding="full" paddingValue={24} align="center">
+          <Block align="center">
+            <StickerPlayer lottie={giftLottie} height={112} width={112} />
+          </Block>
+
+          <Block margin="top" marginValue={8}>
+            <Text type="title" align="center" weight="bold">
+              Create and Join <br /> Giveaways in Telegram
+            </Text>
+          </Block>
+        </Block>
+
+        <Block>
           <TabsComponent />
 
-          <Block margin="top" marginValue={24}>
+          <Block margin="top" marginValue={12}>
             <TabContent />
           </Block>
         </Block>
 
-        <div className="flex h-full items-end flex-1">
+        <div className="flex h-full flex-1 items-end">
           <Block padding="full" paddingValue={12} align="end">
             <Text align="center" type="caption" color="tertiary">
               This is open source contributed by independent
@@ -187,7 +197,7 @@ export default function MainPage() {
                 type="caption"
                 href="https://tools.tg"
                 color="accent"
-                as="span"
+                as="a"
               >
                 {" "}
                 Telegram Tools

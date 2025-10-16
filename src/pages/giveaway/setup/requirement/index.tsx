@@ -25,11 +25,11 @@ import {
 } from "@/components/kit";
 import { getAvailableChannels } from "@/api/user.api";
 import { AddButton } from "@/components/ui/buttons/AddButton";
-import { goTo } from "@/utils";
 import { IListItem } from "@/interfaces";
 import { getRequirementIcon } from "@/assets/icons/helper";
 import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
 import { LabeledInput } from "@/components/ui/inputs/Input";
+import { addBotToChannelLink } from "@/utils/addBotToChannelLink";
 
 export default function RequirementPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
@@ -44,17 +44,10 @@ export default function RequirementPage() {
   const [subscriptionData, setSubscriptionData] = useState<
     IAvailableChannelsResponse
   >([]);
-  const [availableChannels, setAvailableChannels] = useState<
-    IAvailableChannelsResponse
-  >([]);
   const { addRequirement } = useGiveawayStore();
 
   const navigate = useNavigate();
   const { showToast } = useToast();
-
-  const addBotLink = `https://t.me/${
-    import.meta.env.VITE_BOT_USERNAME
-  }?startgroup=&admin=restrict_members+invite_users`;
 
   const { data: requirementTemplates } = useQuery({
     queryKey: ["requirement-templates"],
@@ -119,13 +112,6 @@ export default function RequirementPage() {
       }
     }
   }, [subscriptionData, selectedRequirementType, customData]);
-
-  useEffect(() => {
-    const filteredChannels = availableChannelsData?.filter(
-      (channel) => !subscriptionData.some((sub) => sub.id === channel.id),
-    );
-    setAvailableChannels(filteredChannels || []);
-  }, [availableChannelsData, subscriptionData]);
 
   return (
     <>
@@ -196,9 +182,9 @@ export default function RequirementPage() {
                 selectedRequirementType === "boost") && (
                 <>
                   <List
-                    header="channels"
+                    header="add from your channels"
                     footer="The channel or chat you’re adding must be public"
-                    items={subscriptionData.map(
+                    items={availableChannelsData?.map(
                       (item, index) =>
                         ({
                           id: index.toString(),
@@ -209,18 +195,22 @@ export default function RequirementPage() {
                               avatar_url={item.avatar_url}
                             />
                           ),
-                          rightIcon: "remove",
-                          onActionClick: () => {
-                            setSubscriptionData((prev) =>
-                              prev.filter((_, i) => i !== index),
-                            );
+                          rightIcon: subscriptionData.some((sub) => sub.id === item.id) ? "selected" : "unselected",
+                          onClick: () => {
+                            if (subscriptionData.some((sub) => sub.id === item.id)) {
+                              setSubscriptionData((prev) =>
+                                prev.filter((sub) => sub.id !== item.id),
+                              );
+                            } else {
+                              setSubscriptionData((prev) => [...prev, item]);
+                            }
                           },
                         }) as IListItem,
                     )}
                     addButton={
                       <AddButton
                         onClick={() => {
-                          goTo(addBotLink);
+                          addBotToChannelLink();
                           setAddButtonPressed(true);
                         }}
                       >
@@ -229,7 +219,7 @@ export default function RequirementPage() {
                     }
                   />
 
-                  <List
+                  {/* <List
                     header="available channels"
                     items={
                       availableChannels.map((item, index) => ({
@@ -247,7 +237,7 @@ export default function RequirementPage() {
                         },
                       })) as IListItem[]
                     }
-                  />
+                  /> */}
                 </>
               )}
 

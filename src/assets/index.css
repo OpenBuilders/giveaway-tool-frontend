@@ -25,6 +25,7 @@
   --button-confirm-color: rgba(47, 178, 80, 1);
   --sheet-background: rgba(255, 255, 255, 1);
   --primary-background: rgba(0, 122, 255, 1);
+  --border-separator: rgba(198, 198, 200, 1);
 }
 
 @theme {
@@ -58,6 +59,7 @@
   );
   --color-section-separator: var(--tg-theme-section-separator-color, #545458);
   --color-subtitle: var(--tg-theme-subtitle-color, #8E8E93);
+  --color-border-separator: var(--border-separator);
 
   --text-xs: 11px;
   --text-xs--line-height: 13px;

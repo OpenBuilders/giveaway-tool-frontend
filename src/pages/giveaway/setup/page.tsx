@@ -8,23 +8,25 @@ import { BackButton } from "@twa-dev/sdk/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import type { IGiveawayCreateRequest } from "@/interfaces/giveaway.interface";
-import { giveawayApi, utilsApi } from "@/api";
+import { giveawayApi } from "@/api";
 import {
   Block,
+  Button,
   PageLayout,
   TelegramMainButton,
   Text,
   useToast,
 } from "@/components/kit";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { IListItem } from "@/interfaces";
 import { getPrizeIcon } from "@/assets/icons/helper";
 import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
+import { getAvailableChannels } from "@/api/user.api";
+import { addBotToChannelLink } from "@/utils/addBotToChannelLink";
 
 export default function GiveawaySetUpPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
-  const [creatorUsername, setCreatorUsername] = useState("");
-  const [viewCreatorInput, setViewCreatorInput] = useState(false);
+  const [addButtonPressed, setAddButtonPressed] = useState(false);
 
   const {
     title,
@@ -65,25 +67,10 @@ export default function GiveawaySetUpPage() {
     },
   });
 
-  const checkChannelFetch = useMutation({
-    mutationFn: async (username: string) =>
-      await utilsApi.getChannelInfo(username),
-    onSuccess: (data) => {
-      addSponsor({
-        id: data.id,
-        title: data.title || "",
-        avatar_url: data.avatar_url,
-      });
-      setCreatorUsername("");
-      setViewCreatorInput(false);
-    },
-    onError: () => {
-      showToast({
-        message: "Channel not found",
-        type: "error",
-        time: 2000,
-      });
-    },
+  const { data: availableChannelsData } = useQuery({
+    queryKey: ["available-channels"],
+    queryFn: getAvailableChannels,
+    refetchInterval: addButtonPressed ? 5000 : false,
   });
 
   const handleClick = () => {
@@ -183,11 +170,12 @@ export default function GiveawaySetUpPage() {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 0,
                   })
-                : undefined
+                : 0
             }
             onChange={(value) => {
               const number = parseInt(value.replace(",", "")) || 0;
-              if (number > 999999) return;
+              if (number > 999999 || number < 1) return;
+
               setWinners(number);
             }}
             additionalLabel="users"
@@ -215,55 +203,39 @@ export default function GiveawaySetUpPage() {
             header="creators"
             footer="The channel or chat you’re adding must be public"
             addButton={
-              sponsors.length < 3 && (
-                <AddButton
-                  onClick={() => {
-                    setViewCreatorInput(true);
-                  }}
-                >
-                  Add Creator
-                </AddButton>
-              )
+              <AddButton
+                onClick={() => {
+                  addBotToChannelLink();
+                  setAddButtonPressed(true);
+                }}
+              >
+                Add Creator
+              </AddButton>
             }
-            beforeList={
-              sponsors.length < 3 &&
-              viewCreatorInput && (
-                <Input
-                  placeholder="@channel"
-                  value={creatorUsername}
-                  onChange={setCreatorUsername}
-                  onBlur={() => {
-                    if (creatorUsername.length === 0) return;
-                    if (
-                      sponsors.some(
-                        (sponsor) => sponsor.username === creatorUsername,
-                      )
-                    ) {
-                      showToast({
-                        message: "Creator already added",
-                        type: "error",
-                        time: 2000,
-                      });
-                      return;
-                    }
-
-                    checkChannelFetch.mutate(creatorUsername);
-                  }}
-                />
-              )
-            }
-            items={sponsors.map((sponsor, index) => ({
+            items={availableChannelsData?.map((channel, index) => ({
               id: index.toString(),
               logo: (
                 <ChannelAvatar
-                  title={sponsor.title}
-                  avatar_url={sponsor.avatar_url}
+                  title={channel.title}
+                  avatar_url={channel.avatar_url}
                 />
               ),
-              title: sponsor.title,
-              rightIcon: "remove",
-              onActionClick: () => {
-                removeSponsor(index);
+              title: channel.title || channel.username,
+              rightIcon: sponsors.some((sponsor) => sponsor.id === channel.id)
+                ? "selected"
+                : "unselected",
+              onClick: () => {
+                if (sponsors.some((sponsor) => sponsor.id === channel.id)) {
+                  removeSponsor(
+                    sponsors.findIndex((sponsor) => sponsor.id === channel.id),
+                  );
+                } else {
+                  addSponsor({
+                    id: channel.id,
+                    title: channel.title || channel.username,
+                    avatar_url: channel.avatar_url,
+                  });
+                }
               },
             }))}
           />
@@ -307,11 +279,18 @@ export default function GiveawaySetUpPage() {
                   id: index.toString(),
                   logo: (
                     <ChannelAvatar
-                      title={requirement.type === "custom" ? requirement.name : requirement.name?.charAt(1)}
+                      title={
+                        requirement.type === "custom"
+                          ? requirement.name
+                          : requirement.name?.charAt(1)
+                      }
                       avatar_url={requirement.avatar_url}
                     />
                   ),
-                  title: requirement.type === "custom" ? requirement.name : `Subscribe ${requirement.name}`,
+                  title:
+                    requirement.type === "custom"
+                      ? requirement.name
+                      : `Subscribe ${requirement.name}`,
                   rightIcon: "remove",
                   onActionClick: () => {
                     removeRequirement(index);
