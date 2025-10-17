@@ -22,31 +22,8 @@ export default function MainPage() {
     queryKey: ["my-giveaways"],
     queryFn: getMyGiveaways,
     refetchOnMount: "always",
-  });
-
-  const { data: topGiveaways } = useQuery({
-    queryKey: ["top-giveaways"],
-    queryFn: getTopGiveaways,
-    refetchOnMount: "always",
-  });
-
-  const mappedMyGiveaways = myGiveaways?.map((g) => ({
-    ...g,
-    description: undefined,
-    giveaway: {
-      isAdmin: g.user_role === "owner",
-      endsAt: g.ends_at,
-      participants: g.participants_count,
-      requirements: g.requirements,
-      winners_count: g.winners_count,
-      sponsors: g.sponsors,
-    },
-  }));
-
-  const top100Giveaways =
-    topGiveaways
-      ?.filter((g) => g.status === "active")
-      ?.map((g) => ({
+    select: (data) =>
+      data.map((g) => ({
         ...g,
         description: undefined,
         giveaway: {
@@ -57,17 +34,40 @@ export default function MainPage() {
           winners_count: g.winners_count,
           sponsors: g.sponsors,
         },
-      })) ?? [];
+      })),
+  });
+
+  const { data: topGiveaways } = useQuery({
+    queryKey: ["top-giveaways"],
+    queryFn: getTopGiveaways,
+    refetchOnMount: "always",
+    select: (data) =>
+      data
+        ?.filter((g) => g.status === "active")
+        ?.map((g) => ({
+          ...g,
+          description: undefined,
+          giveaway: {
+            isAdmin: g.user_role === "owner",
+            endsAt: g.ends_at,
+            participants: g.participants_count,
+            requirements: g.requirements,
+            winners_count: g.winners_count,
+            sponsors: g.sponsors,
+          },
+        })),
+  });
+
   const myActiveGiveaways =
-    mappedMyGiveaways?.filter((g) => g.status === "active") ?? [];
+    myGiveaways?.filter((g) => g.status === "active") ?? [];
   const myFinishedGiveaways =
-    mappedMyGiveaways?.filter(
+    myGiveaways?.filter(
       (g) => g.status === "cancelled" || g.status === "completed",
     ) ?? [];
   const myPausedGiveaways =
-    mappedMyGiveaways?.filter((g) => g.status === "paused") ?? [];
+    myGiveaways?.filter((g) => g.status === "paused") ?? [];
   const myDeletedGiveaways =
-    mappedMyGiveaways?.filter((g) => g.status === "deleted") ?? [];
+    myGiveaways?.filter((g) => g.status === "deleted") ?? [];
 
   const noGiveawaysYet = (
     <div className="flex h-[45vh] items-center justify-center">
@@ -88,9 +88,9 @@ export default function MainPage() {
         label: "TOP-100",
         content: (
           <>
-            {top100Giveaways.length > 0 ? (
+            {topGiveaways && topGiveaways?.length > 0 ? (
               <List
-                giveaways={top100Giveaways}
+                giveaways={topGiveaways}
                 onItemClick={({ id }) => {
                   navigate(`/giveaway/${id}`);
                 }}
