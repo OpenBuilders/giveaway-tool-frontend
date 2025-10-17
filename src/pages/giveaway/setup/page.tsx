@@ -7,7 +7,10 @@ import { useGiveawayStore } from "@/store/giveaway.slice";
 import { BackButton } from "@twa-dev/sdk/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import type { IGiveawayCreateRequest } from "@/interfaces/giveaway.interface";
+import type {
+  IGiveawayCreateRequest,
+  GiveawayPrizeTemplateType,
+} from "@/interfaces/giveaway.interface";
 import { giveawayApi } from "@/api";
 import {
   Block,
@@ -88,17 +91,18 @@ export default function GiveawaySetUpPage() {
       winners_count,
       duration: duration * 60,
       prizes: prizes.map((prize, index) => {
-        // Extract new shape from stored fields
-        const titleField =
-          prize.fields.find((f: any) => f.name === "title")?.value || "";
+        // Extract new shape from stored fields (kept in store for UI)
+        type PrizeField = { name?: string; value?: string } & Record<string, string>;
+        const fields = prize.fields as PrizeField[];
+
+        const titleField = fields.find((f) => (f.name ?? "") === "title")?.value || "";
         const descriptionField =
-          prize.fields.find((f: any) => f.name === "description")?.value || "";
+          fields.find((f) => (f.name ?? "") === "description")?.value || "";
         const quantityField =
-          prize.fields.find((f: any) => f.name === "quantity")?.value || "";
-        const quantityNum =
-          quantityField !== "" ? Number(quantityField) : undefined;
+          fields.find((f) => (f.name ?? "") === "quantity")?.value || "";
+        const quantityNum = quantityField !== "" ? Number(quantityField) : undefined;
         return {
-          place: index + 1, // optional; can be omitted if backend ignores
+          place: index + 1,
           title: titleField,
           description: descriptionField || undefined,
           quantity:
@@ -252,22 +256,41 @@ export default function GiveawaySetUpPage() {
               </AddButton>
             }
           >
-            {prizes.map((prize, index) => (
-              <ListItem
-                id={index.toString()}
-                logo={getPrizeIcon(prize.prize_type)}
-                title={
-                  prize.prize_type.charAt(0).toUpperCase() +
-                  prize.prize_type.slice(1)
-                }
-                description={`${prize.fields.length} inputs`}
-                onClick={() => {
-                  navigate(`/giveaway/setup/prize/${index}`);
-                }}
-                className="rounded-[10px] after:h-0 [&_img]:scale-75"
-                rightIcon={undefined}
-              />
-            ))}
+            {prizes.map((prize, index) => {
+              type PrizeField = { name?: string; value?: string } & Record<string, string>;
+              const typeValue = (prize as Partial<typeof prize>)?.prize_type as
+                | string
+                | undefined;
+
+              const fields = prize.fields as PrizeField[];
+              const titleValue =
+                (fields.find((f) => (f.name ?? "") === "title")?.value || "").trim();
+
+              const safeTitle =
+                typeof typeValue === "string" && typeValue.length > 0
+                  ? typeValue.charAt(0).toUpperCase() + typeValue.slice(1)
+                  : titleValue || "Prize";
+
+              const inputsCount = Array.isArray(prize.fields)
+                ? prize.fields.length
+                : 0;
+
+              return (
+                <ListItem
+                  id={index.toString()}
+                  logo={getPrizeIcon(
+                    ((typeValue as GiveawayPrizeTemplateType) || "custom")
+                  )}
+                  title={safeTitle}
+                  description={`${inputsCount} inputs`}
+                  // onClick={() => {
+                  //   navigate(`/giveaway/setup/prize/${index}`);
+                  // }}
+                  className="rounded-[10px] after:h-0 [&_img]:scale-75"
+                  rightIcon={undefined}
+                />
+              );
+            })}
           </List>
 
           <List
