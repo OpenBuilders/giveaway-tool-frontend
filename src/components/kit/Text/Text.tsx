@@ -4,7 +4,7 @@ import styles from './Text.module.scss'
 
 interface TextProps {
   children: React.ReactNode | string
-  type: 'title' | 'title1' | 'title2' | 'text' | 'link' | 'caption' | 'caption2'
+  type: 'title' | 'title1' | 'title2' | 'text' | 'link' | 'caption' | 'caption2' | 'subheadline1'
   align?: 'left' | 'center' | 'right'
   color?: 'primary' | 'tertiary' | 'secondary' | 'accent' | 'danger' | 'hint'
   weight?: 'normal' | 'medium' | 'bold' | 'semibold'

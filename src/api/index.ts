@@ -1,17 +1,27 @@
 import api from "./helper";
 
 export const generateTonProofPayload = async () => {
-  const res = await api.post(`/v1/user/tonproof/payload`);
+  const res = await api.post(`/v1/users/tonproof/payload`);
   return res.data;
 };
 
-export const verifyTonProof = async (data: {
-  proof: any;
-  address: any;
-  publicKey: any;
-  walletStateInit: any;
-}) => {
-  const res = await api.post(`/v1/user/tonproof/verify`, data);
+export type TonProofDomain = { lengthBytes: number; value: string };
+
+export type TonProofData = {
+  timestamp: number;
+  domain: TonProofDomain;
+  signature: string;
+  payload: string;
+};
+
+export type VerifyTonProofRequest = {
+  proof: TonProofData;
+  address: string;
+  network: "-239" | "-1";
+};
+
+export const verifyTonProof = async (data: VerifyTonProofRequest) => {
+  const res = await api.post(`/v1/users/tonproof/verify`, data);
   return res.data;
 };
 

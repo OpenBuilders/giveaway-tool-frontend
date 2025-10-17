@@ -5,6 +5,7 @@ import {
   useTonConnectUI,
 } from "@tonconnect/ui-react";
 import useWallet from "@/hooks/useWallet";
+import { Text } from "@/components/kit";
 
 export const ConnectWalletButton = ({
   className = "",
@@ -40,23 +41,14 @@ export const ConnectWalletButton = ({
           );
         }
       } else {
-        return <span>Connect wallet</span>;
+        return <Text type="subheadline1" color="primary" weight="semibold">Connect Wallet</Text>;
       }
-    }
-  };
-
-  const bgColor = () => {
-    if (userFriendlyAddress) {
-      if (isHeader) return "bg-plain_bg";
-      return "bg-destructive_bg/15";
-    } else {
-      return "bg-button";
     }
   };
 
   return (
     <Button
-      className={`flex items-center justify-center gap-2.5 !rounded-3xl px-3 py-2 text-[15px] leading-5 font-medium ${bgColor()} ${className}`}
+      className={`flex items-center justify-center gap-2.5 !rounded-[30px] !px-2.5 !py-[5px] bg-sheet-background ${className}`}
       onClick={() => {
         if (!connectionRestored || !userFriendlyAddress) {
           connectWallet();

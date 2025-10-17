@@ -162,9 +162,10 @@ export default function MainPage() {
       />
 
       <PageLayout>
-        {/* <Header /> */}
         <Block padding="full" paddingValue={10} align="end">
-          <ConnectWalletButton />
+          <div>
+            <ConnectWalletButton />
+          </div>
         </Block>
 
         <Block padding="full" paddingValue={24} align="center">
