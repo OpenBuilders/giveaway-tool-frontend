@@ -14,6 +14,10 @@ export const ChannelAvatar = ({
         <img
           src={avatar_url}
           className="absolute top-0 left-0 z-10 h-full w-full object-cover"
+          alt={title}
+          onError={(e) => {
+            e.currentTarget.src = "/gateway_gift.png";
+          }}
         />
       )}
 
@@ -21,7 +25,7 @@ export const ChannelAvatar = ({
         style={{
           background: `linear-gradient(#FF845E,#D45246)`,
         }}
-        className={`absolute top-0 left-0 flex h-full w-full items-center justify-center font-bold rounded-full text-white ${className}`}
+        className={`absolute top-0 left-0 flex h-full w-full items-center justify-center rounded-full font-bold text-white ${className}`}
       >
         {title?.charAt(0).toUpperCase()}
       </div>
