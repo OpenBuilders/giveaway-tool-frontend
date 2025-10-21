@@ -5,9 +5,11 @@ export const GiveawayAvatar = ({
   avatarUrls,
   isMini,
 }: {
-  avatarUrls?: string[];
+  avatarUrls?: (string | undefined)[];
   isMini?: boolean;
 }) => {
+  const fallback = "/gateway_gift.png";
+
   const getSize = useCallback(() => {
     if (isMini) {
       switch (avatarUrls?.length) {
@@ -30,10 +32,10 @@ export const GiveawayAvatar = ({
       return (
         <div className="relative flex h-10 w-10">
           <div className="border-section-bg absolute -top-[3px] -left-[3px] overflow-hidden rounded-full border-[3px]">
-            <Image src={avatarUrls[0]} size={getSize()} />
+            <Image src={avatarUrls[0] || fallback} size={getSize()} />
           </div>
           <div className="border-section-bg absolute -right-[3px] -bottom-[3px] overflow-hidden rounded-full border-[3px]">
-            <Image src={avatarUrls[1]} size={getSize()} />
+            <Image src={avatarUrls[1] || fallback} size={getSize()} />
           </div>
         </div>
       );
@@ -41,14 +43,14 @@ export const GiveawayAvatar = ({
       return (
         <div className="relative flex h-10 w-10">
           <div className="border-section-bg absolute -top-[3px] -left-[3px] overflow-hidden rounded-full border-[3px]">
-            <Image src={avatarUrls[0]} size={getSize()} />
+            <Image src={avatarUrls[0] || fallback} size={getSize()} />
           </div>
           <div className="border-section-bg absolute -top-[3px] -right-[3px] overflow-hidden rounded-full border-[3px]">
-            <Image src={avatarUrls[1]} size={getSize()} />
+            <Image src={avatarUrls[1] || fallback} size={getSize()} />
           </div>
           <div className="absolute -bottom-[3px] flex w-full justify-center">
             <div className="border-section-bg overflow-hidden rounded-full border-[3px]">
-              <Image src={avatarUrls[2]} size={getSize()} />
+              <Image src={avatarUrls[2] || fallback} size={getSize()} />
             </div>
           </div>
         </div>
@@ -63,7 +65,7 @@ export const GiveawayAvatar = ({
           key={index}
           className="border-bg relative overflow-hidden rounded-full border-[3px]"
         >
-          <Image src={url} size={getSize()} />
+          <Image src={url ?? fallback} size={getSize()} />
         </div>
       ))}
     </div>

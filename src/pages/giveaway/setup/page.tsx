@@ -21,7 +21,7 @@ import {
 } from "@/components/kit";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { IListItem } from "@/interfaces";
-import { getPrizeIcon } from "@/assets/icons/helper";
+import { getPrizeIcon, getRequirementIcon } from "@/assets/icons/helper";
 import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
 import { getAvailableChannels } from "@/api/user.api";
 import { addBotToChannelLink } from "@/utils/addBotToChannelLink";
@@ -92,15 +92,20 @@ export default function GiveawaySetUpPage() {
       duration: duration * 60,
       prizes: prizes.map((prize, index) => {
         // Extract new shape from stored fields (kept in store for UI)
-        type PrizeField = { name?: string; value?: string } & Record<string, string>;
+        type PrizeField = { name?: string; value?: string } & Record<
+          string,
+          string
+        >;
         const fields = prize.fields as PrizeField[];
 
-        const titleField = fields.find((f) => (f.name ?? "") === "title")?.value || "";
+        const titleField =
+          fields.find((f) => (f.name ?? "") === "title")?.value || "";
         const descriptionField =
           fields.find((f) => (f.name ?? "") === "description")?.value || "";
         const quantityField =
           fields.find((f) => (f.name ?? "") === "quantity")?.value || "";
-        const quantityNum = quantityField !== "" ? Number(quantityField) : undefined;
+        const quantityNum =
+          quantityField !== "" ? Number(quantityField) : undefined;
         return {
           place: index + 1,
           title: titleField,
@@ -257,14 +262,18 @@ export default function GiveawaySetUpPage() {
             }
           >
             {prizes.map((prize, index) => {
-              type PrizeField = { name?: string; value?: string } & Record<string, string>;
+              type PrizeField = { name?: string; value?: string } & Record<
+                string,
+                string
+              >;
               const typeValue = (prize as Partial<typeof prize>)?.prize_type as
                 | string
                 | undefined;
 
               const fields = prize.fields as PrizeField[];
-              const titleValue =
-                (fields.find((f) => (f.name ?? "") === "title")?.value || "").trim();
+              const titleValue = (
+                fields.find((f) => (f.name ?? "") === "title")?.value || ""
+              ).trim();
 
               const safeTitle =
                 typeof typeValue === "string" && typeValue.length > 0
@@ -279,7 +288,7 @@ export default function GiveawaySetUpPage() {
                 <ListItem
                   id={index.toString()}
                   logo={getPrizeIcon(
-                    ((typeValue as GiveawayPrizeTemplateType) || "custom")
+                    (typeValue as GiveawayPrizeTemplateType) || "custom",
                   )}
                   title={safeTitle}
                   description={`${inputsCount} inputs`}
@@ -299,7 +308,7 @@ export default function GiveawaySetUpPage() {
               (requirement, index) =>
                 ({
                   id: index.toString(),
-                  logo: (
+                  logo: ["subscription", "boost"].includes(requirement.type) ? (
                     <ChannelAvatar
                       title={
                         requirement.type === "custom"
@@ -308,11 +317,20 @@ export default function GiveawaySetUpPage() {
                       }
                       avatar_url={requirement.avatar_url}
                     />
+                  ) : (
+                    getRequirementIcon(requirement.type)
                   ),
                   title:
                     requirement.type === "custom"
                       ? requirement.name
-                      : `Subscribe ${requirement.name}`,
+                      : requirement.type === "subscription" ||
+                          requirement.type === "boost"
+                        ? `Subscribe ${requirement.username}`
+                        : requirement.type === "holdton"
+                          ? `Hold ${requirement.amount} TON`
+                          : requirement.type === "holdjetton"
+                            ? `Hold ${requirement.amount} tokens`
+                            : String(requirement.type),
                   rightIcon: "remove",
                   onActionClick: () => {
                     removeRequirement(index);

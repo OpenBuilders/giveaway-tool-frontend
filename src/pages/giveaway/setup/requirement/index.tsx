@@ -29,6 +29,7 @@ import { IListItem } from "@/interfaces";
 import { getRequirementIcon } from "@/assets/icons/helper";
 import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
 import { LabeledInput } from "@/components/ui/inputs/Input";
+import { SearchInput } from "@/components/ui/inputs/SearchInput";
 import { addBotToChannelLink } from "@/utils/addBotToChannelLink";
 
 export default function RequirementPage() {
@@ -38,12 +39,21 @@ export default function RequirementPage() {
     title: "",
     description: "",
   });
+  const [holdTonAmount, setHoldTonAmount] = useState<string>("");
+  const [holdJetton, setHoldJetton] = useState<{
+    address: string;
+    amount: string;
+  }>({
+    address: "",
+    amount: "",
+  });
   const [selectedRequirementType, setSelectedRequirementType] = useState<
     string | null
   >(null);
-  const [subscriptionData, setSubscriptionData] = useState<
-    IAvailableChannelsResponse
-  >([]);
+  const [subscriptionData, setSubscriptionData] =
+    useState<IAvailableChannelsResponse>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const { addRequirement } = useGiveawayStore();
 
   const navigate = useNavigate();
@@ -57,7 +67,9 @@ export default function RequirementPage() {
   const { data: availableChannelsData } = useQuery({
     queryKey: ["available-channels"],
     queryFn: getAvailableChannels,
-    enabled: selectedRequirementType === "subscription",
+    enabled:
+      selectedRequirementType === "subscription" ||
+      selectedRequirementType === "boost",
     refetchInterval: addButtonPressed ? 5000 : false,
   });
 
@@ -102,16 +114,37 @@ export default function RequirementPage() {
   });
 
   useEffect(() => {
-    if (selectedRequirementType === "subscription" && subscriptionData?.length === 0) {
+    if (
+      selectedRequirementType === "subscription" &&
+      subscriptionData?.length === 0
+    ) {
       setCreateButtonDisabled(true);
     } else {
       if (selectedRequirementType === "custom") {
-        setCreateButtonDisabled(!(customData.title.trim().length > 0 && customData.description.trim().length > 0));
+        setCreateButtonDisabled(
+          !(
+            customData.title.trim().length > 0 &&
+            customData.description.trim().length > 0
+          ),
+        );
+      } else if (selectedRequirementType === "holdton") {
+        const n = Number(holdTonAmount.replace(/,/g, ""));
+        setCreateButtonDisabled(!(n > 0));
+      } else if (selectedRequirementType === "holdjetton") {
+        const n = Number(holdJetton.amount.replace(/,/g, ""));
+        const addrOk = holdJetton.address.trim().length > 0;
+        setCreateButtonDisabled(!(addrOk && n > 0));
       } else {
         setCreateButtonDisabled(false);
       }
     }
-  }, [subscriptionData, selectedRequirementType, customData]);
+  }, [
+    subscriptionData,
+    selectedRequirementType,
+    customData,
+    holdTonAmount,
+    holdJetton,
+  ]);
 
   return (
     <>
@@ -139,6 +172,24 @@ export default function RequirementPage() {
                 name: customData.title,
                 description: customData.description,
               });
+            } else if (selectedRequirementType === "holdton") {
+              const amount = Number(holdTonAmount.replace(/,/g, ""));
+              if (amount > 0) {
+                addRequirement({
+                  type: "holdton",
+                  amount,
+                });
+              }
+            } else if (selectedRequirementType === "holdjetton") {
+              const amount = Number(holdJetton.amount.replace(/,/g, ""));
+              const address = holdJetton.address.trim();
+              if (address && amount > 0) {
+                addRequirement({
+                  type: "holdjetton",
+                  address,
+                  amount,
+                });
+              }
             }
 
             navigate("/giveaway/setup");
@@ -174,6 +225,8 @@ export default function RequirementPage() {
                   onChange={(value) => {
                     setSelectedRequirementType(String(value));
                     setSubscriptionData([]);
+                    setHoldTonAmount("");
+                    setHoldJetton({ address: "", amount: "" });
                   }}
                 />
               </List>
@@ -195,9 +248,15 @@ export default function RequirementPage() {
                               avatar_url={item.avatar_url}
                             />
                           ),
-                          rightIcon: subscriptionData.some((sub) => sub.id === item.id) ? "selected" : "unselected",
+                          rightIcon: subscriptionData.some(
+                            (sub) => sub.id === item.id,
+                          )
+                            ? "selected"
+                            : "unselected",
                           onClick: () => {
-                            if (subscriptionData.some((sub) => sub.id === item.id)) {
+                            if (
+                              subscriptionData.some((sub) => sub.id === item.id)
+                            ) {
                               setSubscriptionData((prev) =>
                                 prev.filter((sub) => sub.id !== item.id),
                               );
@@ -219,26 +278,119 @@ export default function RequirementPage() {
                     }
                   />
 
-                  {/* <List
-                    header="available channels"
-                    items={
-                      availableChannels.map((item, index) => ({
-                        id: index.toString(),
-                        title: item.title,
-                        logo: (
-                          <ChannelAvatar
-                            title={item.title}
-                            avatar_url={item.avatar_url}
-                          />
-                        ),
-                        rightIcon: "arrow",
-                        onClick: () => {
-                          setSubscriptionData((prev) => [...prev, item]);
-                        },
-                      })) as IListItem[]
-                    }
-                  /> */}
+                  <Block gap={10}>
+                    <List header="or find via search">
+                      <SearchInput
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        onSearch={async () => {
+                          if (!searchQuery.trim()) return;
+                          const query = searchQuery.trim().replace(/^@/, "");
+                          console.log(query);
+                          // try {
+                          //   setIsSearching(true);
+                          //   const res = await getChannelInfo(query);
+                          //   setSearchResults(res ? [res] : []);
+                          // } catch {
+                          //   setSearchResults([]);
+                          // } finally {
+                          //   setIsSearching(false);
+                          // }
+                        }}
+                        placeholder="Search..."
+                      />
+                    </List>
+
+                    <List
+                      items={availableChannelsData
+                        ?.filter((item) =>
+                          searchQuery.trim().length
+                            ? (item.title || "")
+                                .toLowerCase()
+                                .includes(searchQuery.trim().toLowerCase()) ||
+                              (item.username || "")
+                                .toLowerCase()
+                                .includes(searchQuery.trim().toLowerCase())
+                            : true,
+                        )
+                        .map(
+                          (item, index) =>
+                            ({
+                              id: `search-${index}`,
+                              title: item.title,
+                              logo: (
+                                <ChannelAvatar
+                                  title={item.title}
+                                  avatar_url={item.avatar_url}
+                                />
+                              ),
+                              rightIcon: subscriptionData.some(
+                                (sub) => sub.id === item.id,
+                              )
+                                ? "selected"
+                                : "unselected",
+                              onClick: () => {
+                                if (
+                                  subscriptionData.some(
+                                    (sub) => sub.id === item.id,
+                                  )
+                                ) {
+                                  setSubscriptionData((prev) =>
+                                    prev.filter((sub) => sub.id !== item.id),
+                                  );
+                                } else {
+                                  setSubscriptionData((prev) => [
+                                    ...prev,
+                                    item,
+                                  ]);
+                                }
+                              },
+                            }) as IListItem,
+                        )}
+                    />
+                  </Block>
                 </>
+              )}
+
+              {selectedRequirementType === "holdton" && (
+                <List>
+                  <LabeledInput
+                    containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
+                    label="Amount"
+                    placeholder="0"
+                    inputMode="decimal"
+                    value={holdTonAmount}
+                    onChange={(value) => {
+                      setHoldTonAmount(value);
+                    }}
+                    additionalLabel="TON"
+                  />
+                </List>
+              )}
+
+              {selectedRequirementType === "holdjetton" && (
+                <List>
+                  <LabeledInput
+                    containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
+                    label="Token Contract"
+                    placeholder="EQC..."
+                    value={holdJetton.address}
+                    onChange={(value) => {
+                      setHoldJetton((prev) => ({ ...prev, address: value }));
+                    }}
+                  />
+                  <LabeledInput
+                    containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
+                    label="Amount"
+                    placeholder="0"
+                    inputMode="decimal"
+                    value={holdJetton.amount}
+                    onChange={(value) => {
+                      setHoldJetton((prev) => ({ ...prev, amount: value }));
+                    }}
+                    additionalLabel="tokens"
+                  />
+                </List>
               )}
 
               {selectedRequirementType === "custom" && (

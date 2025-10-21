@@ -1,6 +1,5 @@
-import { CheckMark } from "@/assets/icons/CheckMarkIcon";
 import { SelectIcon } from "@/assets/icons/SelectIcon";
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 
 interface Option {
   value: string | number;
@@ -24,80 +23,49 @@ export const Select: React.FC<SelectProps> = ({
   className = "",
   type = "default",
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const onClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
-  }, []);
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const raw = e.target.value;
+    const matched = options.find((opt) => String(opt.value) === raw);
+    onChange(matched ? matched.value : raw);
+    setIsOpen(false);
+  };
 
   const selectedOption = options.find((o) => o.value === selectedValue);
+  const [isOpen, setIsOpen] = React.useState(false);
 
   return (
-    <div
-      ref={ref}
-      className={`inline-flex flex-col items-end static ${className}`}
-    >
-      <button
-        type="button"
-        onClick={() => setIsOpen((v) => !v)}
+    <div className={`inline-flex flex-col items-end static ${className}`}>
+      <div
         className="
           flex items-center justify-between relative overflow-hidden bg-section-bg rounded-[10px] px-4 w-full h-11
         "
       >
         <span>{label}</span>
         <div
-          className={`py-[5px] rounded-lg ${
-            type === "default"
-              ? "bg-tertiary-fill-bg"
-              : "flex gap-2 items-center"
-          } ${
-            type !== "withIcon" && "px-3"
-          }`}
+          className={`relative inline-flex items-center gap-2 py-[5px] rounded-lg ${
+            type === "default" ? "bg-tertiary-fill-bg" : ""
+          } ${type !== "withIcon" && "px-3"}`}
         >
-          <span
-            className={`${
-              (isOpen || type === "withIcon") && "text-accent-text"
-            } transition-all duration-100`}
-          >
+          <span className={`${isOpen || type === "withIcon" ? "text-accent-text" : ""} transition-all duration-100`}>
             {selectedOption?.label}
           </span>
-
           {type === "withIcon" && <SelectIcon />}
-        </div>
-      </button>
 
-      {isOpen && (
-        <ul
-          className="
-            absolute w-full max-w-[250px] mt-[50px]
-            max-h-60 overflow-auto z-10 dropdown-menu
-          "
-        >
-          {options.map((opt) => (
-            <li
-              key={opt.value}
-              onClick={() => {
-                onChange(opt.value);
-                setIsOpen(false);
-              }}
-              className="
-                px-4 cursor-pointer h-11 
-                flex justify-between items-center text-accent-text
-              "
-            >
-              <span className="text-text">{opt.label}</span>
-              {opt.value === selectedValue && <CheckMark />}
-            </li>
-          ))}
-        </ul>
-      )}
+          <select
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            value={String(selectedValue)}
+            onChange={handleChange}
+            onFocus={() => setIsOpen(true)}
+            onBlur={() => setIsOpen(false)}
+          >
+            {options.map((opt) => (
+              <option key={opt.value} value={String(opt.value)}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
     </div>
   );
 };

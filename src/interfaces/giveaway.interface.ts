@@ -11,7 +11,7 @@
 // }
 
 export type GiveawayPrizeTemplateType = "custom";
-export type GiveawayRequirementType = "subscription" | "boost" | "custom";
+export type GiveawayRequirementType = "subscription" | "boost" | "custom" | "holdton" | "holdjetton";
 export type GiveawayStatus =
   | "active"
   | "cancelled"
@@ -39,6 +39,9 @@ export interface IGiveawayRequirement {
   username?: string;
   avatar_url?: string;
   description?: string;
+  // For hold requirements
+  amount?: number; // required for holdton and holdjetton
+  address?: string; // jetton master address for holdjetton
 }
 
 export interface IGiveawayWinners {

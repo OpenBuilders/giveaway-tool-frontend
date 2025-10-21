@@ -61,6 +61,7 @@
   --color-subtitle: var(--tg-theme-subtitle-color, #8E8E93);
   --color-border-separator: var(--border-separator);
   --color-sheet-background: var(--sheet-background);
+  --color-primary-background: var(--primary-background);
 
   --text-xs: 11px;
   --text-xs--line-height: 13px;

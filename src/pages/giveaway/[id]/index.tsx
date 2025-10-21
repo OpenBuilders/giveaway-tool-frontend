@@ -33,6 +33,7 @@ import { UploadButton } from "@/components/ui/buttons/UploadButton";
 import { loadPreWinnerList } from "@/api/utils.api";
 import { ArrowIcon } from "@/assets/icons/ArrowIcon";
 import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
+import { getRequirementIcon } from "@/assets/icons/helper";
 // import removed: legacy prize icon logic no longer used
 
 type PrizeLike = {
@@ -398,10 +399,8 @@ export default function GiveawayPage() {
           <GiveawayAvatar
             avatarUrls={
               giveaway?.sponsors && giveaway?.sponsors?.length > 0
-                ? giveaway?.sponsors?.map((sponsor) =>
-                    String(sponsor.avatar_url),
-                  )
-                : ["/gift.svg"]
+                ? giveaway?.sponsors?.map((sponsor) => sponsor.avatar_url)
+                : ["/gateway_gift.png"]
             }
           />
 
@@ -551,16 +550,12 @@ export default function GiveawayPage() {
                   (requirement, index) =>
                     ({
                       id: index.toString(),
-                      logo: (
+                      logo: ["subscription", "boost"].includes(requirement.type) ? (
                         <ChannelAvatar
-                          title={
-                            requirement.type === "custom"
-                              ? requirement.name
-                              : requirement.username?.charAt(1)
-                          }
+                          title={requirement.name?.charAt(1)}
                           avatar_url={requirement.avatar_url}
                         />
-                      ),
+                      ) : getRequirementIcon(requirement.type),
                       title:
                         requirement.type === "custom"
                           ? requirement.name

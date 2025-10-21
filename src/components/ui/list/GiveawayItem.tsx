@@ -68,7 +68,11 @@ export const GiveawayItem = ({
       case 3:
         return <img src="/top3.svg" alt="" />;
       default:
-        return <Text type="caption2" weight="medium">{number}</Text>;
+        return (
+          <Text type="caption2" weight="medium">
+            {number}
+          </Text>
+        );
     }
   }, [number]);
 
@@ -95,10 +99,8 @@ export const GiveawayItem = ({
           <GiveawayAvatar
             avatarUrls={
               giveaway?.sponsors && giveaway?.sponsors.length > 0
-                ? giveaway?.sponsors.map((sponsor) =>
-                    String(sponsor.avatar_url),
-                  )
-                : [String(logo)]
+                ? giveaway?.sponsors.map((sponsor) => sponsor.avatar_url || undefined)
+                : logo ? [String(logo)] : [undefined]
             }
             isMini
           />
