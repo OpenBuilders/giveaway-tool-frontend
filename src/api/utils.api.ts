@@ -3,6 +3,7 @@ import {
   IGiveawayRequirementTemplate,
   IGiveawayCheckChannelResponse,
   IChannelInfo,
+  IUserPreviewCheckWinnerResponse,
 } from "@/interfaces/giveaway.interface";
 import api from "./helper";
 
@@ -36,11 +37,11 @@ export const getChannelInfo = async (
   return res.data;
 };
 
-export const parseUserId = async (
+export const loadPreviewWinnerList = async (
   file: File,
-): Promise<{ total_ids: number; ids: string[] }> => {
+): Promise<IUserPreviewCheckWinnerResponse> => {
   const res = await api.post(
-    "/v1/giveaways/parse-ids",
+    "/v1/giveaways/manual-candidates/preview",
     { file },
     {
       headers: {
@@ -54,7 +55,7 @@ export const parseUserId = async (
 export const loadPreWinnerList = async (
   file: File,
   giveawayId: string,
-): Promise<{ total_ids: number; ids: string[] }> => {
+): Promise<IUserPreviewCheckWinnerResponse> => {
   const res = await api.post(
     `/v1/giveaways/${giveawayId}/manual-candidates`,
     { file },
@@ -63,6 +64,24 @@ export const loadPreWinnerList = async (
         "Content-Type": "multipart/form-data",
       },
     },
+  );
+  return res.data;
+};
+
+export const getLoadedWinnersList = async (
+  giveawayId: string,
+): Promise<IUserPreviewCheckWinnerResponse> => {
+  const res = await api.get(
+    `/v1/giveaways/${giveawayId}/list-loaded-winners`,
+  );
+  return res.data;
+};
+
+export const clearLoadedWinners = async (
+  giveawayId: string,
+): Promise<void> => {
+  const res = await api.delete(
+    `/v1/giveaways/${giveawayId}/loaded-winners`,
   );
   return res.data;
 };

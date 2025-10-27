@@ -41,3 +41,11 @@ export const checkGiveawayRequirements = async (id: string): Promise<IGiveawayCh
   const res = await api.get(`/v1/giveaways/${id}/check-requirements`);
   return res.data;
 };
+
+export const updateGiveawayStatus = async (
+  id: string,
+  status: "completed" | "active" | "paused" | "cancelled" | "pending",
+) => {
+  const res = await api.patch(`/v1/giveaways/${id}/status`, { status });
+  return res.data;
+};

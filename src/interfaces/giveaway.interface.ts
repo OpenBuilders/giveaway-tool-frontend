@@ -11,7 +11,13 @@
 // }
 
 export type GiveawayPrizeTemplateType = "custom";
-export type GiveawayRequirementType = "subscription" | "boost" | "custom" | "holdton" | "holdjetton" | "connectwallet";
+export type GiveawayRequirementType =
+  | "subscription"
+  | "boost"
+  | "custom"
+  | "holdton"
+  | "holdjetton"
+  | "connectwallet";
 export type GiveawayStatus =
   | "active"
   | "cancelled"
@@ -177,3 +183,27 @@ export interface IChannelInfo {
 }
 
 export type IAvailableChannelsResponse = IChannelInfo[];
+
+// type previewItem struct {
+//   UserID    int64  `json:"user_id"`
+//   Username  string `json:"username"`
+//   Name      string `json:"name"`
+//   AvatarURL string `json:"avatar_url"`
+//   Source    string `json:"source"`
+// }
+
+export interface IUserPreviewCheckWinner {
+  user_id: number;
+  username?: string;
+  name: string;
+  avatar_url: string;
+  source: string;
+  prizes: {
+    title: string;
+    description?: string;
+  }[];
+}
+
+export interface IUserPreviewCheckWinnerResponse {
+  results: IUserPreviewCheckWinner[];
+}

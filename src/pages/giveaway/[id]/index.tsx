@@ -20,8 +20,8 @@ import {
   DialogSheet,
 } from "@/components/kit";
 import { IListItem } from "@/interfaces";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { joinToGiveaway } from "@/api/giveaway.api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { joinToGiveaway, updateGiveawayStatus } from "@/api/giveaway.api";
 
 import doneSticker from "@/assets/tgs/DoneSticker.json";
 import winnerCupSticker from "@/assets/tgs/WinnerCupSticker.json";
@@ -30,13 +30,15 @@ import congratsSticker from "@/assets/tgs/CongratsSticker.json";
 import { goTo } from "@/utils";
 import { GiveawayAvatar } from "@/components/ui/GiveawayAvatar";
 import { UploadButton } from "@/components/ui/buttons/UploadButton";
-import { loadPreWinnerList } from "@/api/utils.api";
+import { loadPreWinnerList, getLoadedWinnersList, clearLoadedWinners } from "@/api/utils.api";
 import { ArrowIcon } from "@/assets/icons/ArrowIcon";
 import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
 import { getRequirementIcon, getRequirementTitle } from "@/assets/icons/helper";
 // import removed: legacy prize icon logic no longer used
 import { useIsConnectionRestored, useTonAddress } from "@tonconnect/ui-react";
 import useWallet from "@/hooks/useWallet";
+import { IUserPreviewCheckWinner } from "@/interfaces/giveaway.interface";
+import { CancelButton } from "@/components/ui/buttons/CancelButton";
 
 type PrizeLike = {
   title?: string;
@@ -67,6 +69,7 @@ const SmallDetailsCard = ({
 
 export default function GiveawayPage() {
   const { id } = useParams();
+  const queryClient = useQueryClient();
 
   // const [checkingRequirements, setCheckingRequirements] = useState<{
   //   [key: string]: boolean;
@@ -93,6 +96,9 @@ export default function GiveawayPage() {
   const [showMore, setShowMore] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [hasJoined, setHasJoined] = useState(false);
+  const [preWinnerList, setPreWinnerList] = useState<
+    IUserPreviewCheckWinner[] | null
+  >(null);
 
   const [prizeSheetState, setPrizeSheetState] = useState<{
     opened: boolean;
@@ -317,6 +323,18 @@ export default function GiveawayPage() {
     (r) => r.type === "holdton" || r.type === "holdjetton",
   );
 
+  const { data: loadedWinnersData } = useQuery({
+    queryKey: ["loadedWinners", id, giveaway?.status, isAdmin],
+    queryFn: () => getLoadedWinnersList(String(id)),
+    enabled: !!id && giveaway?.status === "pending" && !!isAdmin,
+  });
+
+  useEffect(() => {
+    if (loadedWinnersData?.results) {
+      setPreWinnerList(loadedWinnersData.results);
+    }
+  }, [loadedWinnersData]);
+
   const joinToGiveawayFetch = useMutation({
     mutationFn: ({ id }: { id: string }) => joinToGiveaway(id),
     onSuccess: () => {
@@ -342,10 +360,41 @@ export default function GiveawayPage() {
     mutationFn: ({ file, giveawayId }: { file: File; giveawayId: string }) =>
       loadPreWinnerList(file, giveawayId),
     onSuccess: (data) => {
-      console.log(data);
+      if (data.results.length > 0) {
+        setPreWinnerList(data.results);
+      } else {
+        showToast({
+          message: "No winners found in the list",
+          type: "error",
+          time: 2000,
+        });
+      }
     },
-    onError: (err) => {
-      console.error(err);
+    onError: () => {
+      showToast({
+        message: "Failed to load winners list",
+        type: "error",
+        time: 2000,
+      });
+    },
+  });
+
+  const finishGiveawayMutation = useMutation({
+    mutationFn: () => updateGiveawayStatus(String(id), "completed"),
+    onSuccess: () => {
+      showToast({
+        message: "Giveaway finished",
+        type: "success",
+        time: 2000,
+      });
+      queryClient.invalidateQueries({ queryKey: ["giveaway", id] });
+    },
+    onError: () => {
+      showToast({
+        message: "Failed to finish giveaway",
+        type: "error",
+        time: 2000,
+      });
     },
   });
 
@@ -381,13 +430,25 @@ export default function GiveawayPage() {
           setShowModal(false);
         }}
         onDelete={() => {
-          loadPreWinnerListFetch.reset();
-          showToast({
-            message: "You removed uploaded winners list",
-            type: "success",
-            time: 2000,
-          });
-          setShowModal(false);
+          if (!id) return;
+          clearLoadedWinners(String(id))
+            .then(() => {
+              loadPreWinnerListFetch.reset();
+              setPreWinnerList(null);
+              showToast({
+                message: "You removed uploaded winners list",
+                type: "success",
+                time: 2000,
+              });
+            })
+            .catch(() => {
+              showToast({
+                message: "Failed to remove winners list",
+                type: "error",
+                time: 2000,
+              });
+            })
+            .finally(() => setShowModal(false));
         }}
       />
 
@@ -574,7 +635,7 @@ export default function GiveawayPage() {
                 items={[
                   ...(hasHoldRequirement
                     ? [
-                        ({
+                        {
                           id: "wallet-connect",
                           logo: getRequirementIcon({ type: "connectwallet" }),
                           title: getRequirementTitle({ type: "connectwallet" }),
@@ -587,20 +648,16 @@ export default function GiveawayPage() {
                               }, 3000);
                             }
                           },
-                        }) as IListItem,
+                        } as IListItem,
                       ]
                     : []),
                   ...(checkRequirements?.results ?? []).map(
                     (requirement, index) =>
                       ({
                         id: index.toString(),
-                        // logo: (
-                        //   <ChannelAvatar
-                        //     title={requirement.name?.replace("@", "")}
-                        //     avatar_url={`https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`}
-                        //   />
-                        // ),
-                        logo: getRequirementIcon(requirement),
+                        logo: getRequirementIcon(requirement, {
+                          isChannel: true,
+                        }),
                         title: getRequirementTitle(requirement),
                         rightIcon:
                           requirement.status === "success" ? "done" : "arrow",
@@ -633,7 +690,7 @@ export default function GiveawayPage() {
                   description="Upload your list before the results are finalized. Supported formats: .txt"
                 />
 
-                {loadPreWinnerListFetch.isSuccess ? (
+                {preWinnerList && preWinnerList.length > 0 ? (
                   <button
                     type="button"
                     className={`text-destructive w-full cursor-pointer px-4 py-2.5 text-left`}
@@ -664,45 +721,41 @@ export default function GiveawayPage() {
                   />
                 )}
 
-                {loadPreWinnerListFetch.data &&
-                  loadPreWinnerListFetch.data.ids.length > 0 &&
-                  loadPreWinnerListFetch.data.ids
-                    .slice(
-                      0,
-                      showMore ? loadPreWinnerListFetch.data.ids.length : 10,
-                    )
-                    .map((id, index) => (
+                {preWinnerList &&
+                  preWinnerList.length > 0 &&
+                  preWinnerList
+                    .slice(0, showMore ? preWinnerList.length : 10)
+                    .map((item, index) => (
                       <ListItem
                         id={index.toString()}
-                        title={id}
-                        logo="/gift.svg"
-                        rightIcon={index + 1}
-                        className="[&_.rightSide]:text-hint"
-                        separator={
-                          index < loadPreWinnerListFetch.data?.ids.length - 1
+                        title={
+                          item.name || item.username || item.user_id.toString()
                         }
+                        logo={item.avatar_url || "/gift.svg"}
+                        rightIcon={item?.prizes?.[0].title || ""}
+                        className="[&_.rightSide]:text-hint"
+                        separator={index < preWinnerList.length - 1}
                       />
                     ))}
 
-                {loadPreWinnerListFetch.data &&
-                  loadPreWinnerListFetch.data?.total_ids >= 10 && (
-                    <button
-                      type="button"
-                      className="text-accent-text flex cursor-pointer items-center px-4 py-2.5 text-left"
-                      onClick={() => {
-                        setShowMore((prev) => !prev);
-                      }}
+                {preWinnerList && preWinnerList.length >= 10 && (
+                  <button
+                    type="button"
+                    className="text-accent-text flex cursor-pointer items-center px-4 py-2.5 text-left"
+                    onClick={() => {
+                      setShowMore((prev) => !prev);
+                    }}
+                  >
+                    <div
+                      className={`text-accent-text flex w-10 items-center justify-center [&_svg]:scale-125 ${
+                        showMore ? "rotate-270" : "rotate-90"
+                      }`}
                     >
-                      <div
-                        className={`text-accent-text flex w-10 items-center justify-center [&_svg]:scale-125 ${
-                          showMore ? "rotate-270" : "rotate-90"
-                        }`}
-                      >
-                        <ArrowIcon isCustomColor />
-                      </div>
-                      {showMore ? "Show Less" : "Show More"}
-                    </button>
-                  )}
+                      <ArrowIcon isCustomColor />
+                    </div>
+                    {showMore ? "Show Less" : "Show More"}
+                  </button>
+                )}
               </List>
             )}
 
@@ -762,6 +815,22 @@ export default function GiveawayPage() {
                     }) as IListItem,
                 )}
               />
+            )}
+
+            {isAdmin && giveaway?.status === "pending" && (
+              <div
+                className={`bg-section-bg border-giveaway flex max-h-[44px] w-full items-center justify-between px-4 py-2 rounded-[10px]`}
+              >
+                <CancelButton
+                  disabled={
+                    !(preWinnerList && preWinnerList.length > 0) ||
+                    finishGiveawayMutation.isPending
+                  }
+                  onClick={() => finishGiveawayMutation.mutate()}
+                >
+                  Cancel Giveaway
+                </CancelButton>
+              </div>
             )}
           </Block>
         </Block>

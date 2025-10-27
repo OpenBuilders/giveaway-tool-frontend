@@ -12,7 +12,24 @@ import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
 import { ConnectWalletIcon } from "./requirements/ConnectWalletIcon";
 import { toTon } from "@/utils/toTon";
 
-export const getRequirementIcon = (requirement: IGiveawayRequirement) => {
+export const getRequirementIcon = (
+  requirement: IGiveawayRequirement,
+  { isChannel }: { isChannel?: boolean } = {},
+) => {
+  if (isChannel) {
+    return (
+      <ChannelAvatar
+        title={
+          requirement.name?.replace("@", "") ||
+          requirement.username?.replace("@", "")
+        }
+        avatar_url={
+          requirement?.avatar_url ||
+          `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
+        }
+      />
+    );
+  }
   switch (requirement.type) {
     case "subscription":
       return <SubscribeIcon />;
@@ -24,7 +41,14 @@ export const getRequirementIcon = (requirement: IGiveawayRequirement) => {
       return <HoldTonIcon />;
     case "holdjetton":
       if (requirement.jetton_image) {
-        return <img src={requirement.jetton_image} alt={requirement?.jetton_symbol || "Jetton"} width={40} height={40} />;
+        return (
+          <img
+            src={requirement.jetton_image}
+            alt={requirement?.jetton_symbol || "Jetton"}
+            width={40}
+            height={40}
+          />
+        );
       }
       return <HoldJettonIcon />;
     case "connectwallet":

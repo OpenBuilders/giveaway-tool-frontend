@@ -18,7 +18,7 @@ export const ListItem = ({
   onActionClick?: (item: IListItem) => void;
   className?: string;
   separator?: boolean;
-  rightIcon?: "arrow" | "done" | "remove" | "selected" | "unselected" | React.ReactNode;
+  rightIcon?: "arrow" | "done" | "remove" | "selected" | "unselected" | string | React.ReactNode;
 }) => {
   return (
     <div
@@ -89,7 +89,7 @@ export const ListItem = ({
           {rightIcon === "unselected" && (
             <div className="relative h-6 w-6 cursor-pointer rounded-full border-[1.5px] border-border-separator" />
           )}
-          {typeof rightIcon !== "string" && <div className="rightSide">{rightIcon}</div>}
+          {!["arrow", "done", "remove", "selected", "unselected"].includes(rightIcon as string) && <div className="rightSide">{rightIcon}</div>}
         </div>
       )}
     </div>
