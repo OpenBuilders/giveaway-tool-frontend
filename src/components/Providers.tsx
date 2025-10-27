@@ -38,8 +38,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <ThemeProvider>
           <TonConnectUIProvider
             manifestUrl={`${
-              import.meta.env.VITE_APP_URL ||
-              "https://dodo-regular-alpaca.ngrok-free.app"
+              import.meta.env.VITE_APP_URL
             }/tonconnect-manifest.json`}
           >
             <VerifyTonProvider />
