@@ -21,7 +21,11 @@ import {
 } from "@/components/kit";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { IListItem } from "@/interfaces";
-import { getPrizeIcon, getRequirementIcon } from "@/assets/icons/helper";
+import {
+  getPrizeIcon,
+  getRequirementIcon,
+  getRequirementTitle,
+} from "@/assets/icons/helper";
 import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
 import { getAvailableChannels } from "@/api/user.api";
 import { addBotToChannelLink } from "@/utils/addBotToChannelLink";
@@ -116,7 +120,26 @@ export default function GiveawaySetUpPage() {
               : undefined,
         };
       }),
-      requirements,
+      requirements: requirements.map((req) => {
+        if (req.type === "holdton") {
+          const amountTon = typeof req.amount === "number" ? req.amount : 0;
+          const tonMinBalanceNano = Math.round(amountTon * 1e9);
+          return {
+            ...req,
+            ton_min_balance_nano: tonMinBalanceNano,
+          };
+        }
+
+        if (req.type === "holdjetton") {
+          return {
+            ...req,
+            jetton_address: req.address,
+            jetton_min_amount: req.amount,
+          };
+        }
+
+        return req;
+      }),
       sponsors: sponsors.map((sponsor) => ({
         id: sponsor.id,
       })),
@@ -308,29 +331,8 @@ export default function GiveawaySetUpPage() {
               (requirement, index) =>
                 ({
                   id: index.toString(),
-                  logo: ["subscription", "boost"].includes(requirement.type) ? (
-                    <ChannelAvatar
-                      title={
-                        requirement.type === "custom"
-                          ? requirement.name
-                          : requirement.name?.charAt(1)
-                      }
-                      avatar_url={requirement.avatar_url}
-                    />
-                  ) : (
-                    getRequirementIcon(requirement.type)
-                  ),
-                  title:
-                    requirement.type === "custom"
-                      ? requirement.name
-                      : requirement.type === "subscription" ||
-                          requirement.type === "boost"
-                        ? `Subscribe ${requirement.username}`
-                        : requirement.type === "holdton"
-                          ? `Hold ${requirement.amount} TON`
-                          : requirement.type === "holdjetton"
-                            ? `Hold ${requirement.amount} tokens`
-                            : String(requirement.type),
+                  logo: getRequirementIcon(requirement),
+                  title: getRequirementTitle(requirement),
                   rightIcon: "remove",
                   onActionClick: () => {
                     removeRequirement(index);

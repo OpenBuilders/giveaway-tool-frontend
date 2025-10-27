@@ -11,7 +11,7 @@
 // }
 
 export type GiveawayPrizeTemplateType = "custom";
-export type GiveawayRequirementType = "subscription" | "boost" | "custom" | "holdton" | "holdjetton";
+export type GiveawayRequirementType = "subscription" | "boost" | "custom" | "holdton" | "holdjetton" | "connectwallet";
 export type GiveawayStatus =
   | "active"
   | "cancelled"
@@ -42,6 +42,12 @@ export interface IGiveawayRequirement {
   // For hold requirements
   amount?: number; // required for holdton and holdjetton
   address?: string; // jetton master address for holdjetton
+  // Backend payload fields
+  ton_min_balance_nano?: number; // for holdton (amount in nanoTON)
+  jetton_address?: string; // for holdjetton (token master address)
+  jetton_min_amount?: number; // for holdjetton (amount in smallest units)
+  jetton_image?: string; // for holdjetton (image url)
+  jetton_symbol?: string; // for holdjetton (name of the token)
 }
 
 export interface IGiveawayWinners {

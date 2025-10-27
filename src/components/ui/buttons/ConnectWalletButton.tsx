@@ -27,7 +27,7 @@ export const ConnectWalletButton = ({
       if (userFriendlyAddress) {
         if (isHeader) {
           return (
-            <span className="text-gray-200">
+            <span>
               {userFriendlyAddress?.substr(0, 2) +
                 "..." +
                 userFriendlyAddress?.substr(-2)}
@@ -35,9 +35,7 @@ export const ConnectWalletButton = ({
           );
         } else {
           return (
-            <div className="text-destructive_text flex items-center justify-center gap-4">
-              <span>Disconnect</span>
-            </div>
+            <Text type="subheadline1" color="primary" weight="semibold">Disconnect</Text>
           );
         }
       } else {

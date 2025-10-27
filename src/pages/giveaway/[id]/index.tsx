@@ -33,8 +33,10 @@ import { UploadButton } from "@/components/ui/buttons/UploadButton";
 import { loadPreWinnerList } from "@/api/utils.api";
 import { ArrowIcon } from "@/assets/icons/ArrowIcon";
 import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
-import { getRequirementIcon } from "@/assets/icons/helper";
+import { getRequirementIcon, getRequirementTitle } from "@/assets/icons/helper";
 // import removed: legacy prize icon logic no longer used
+import { useIsConnectionRestored, useTonAddress } from "@tonconnect/ui-react";
+import useWallet from "@/hooks/useWallet";
 
 type PrizeLike = {
   title?: string;
@@ -105,6 +107,10 @@ export default function GiveawayPage() {
 
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { connectWallet } = useWallet();
+  const userFriendlyAddress = useTonAddress();
+  const connectionRestored = useIsConnectionRestored();
+  const walletConnected = !!userFriendlyAddress && connectionRestored;
 
   const setParticipantsInfoJoined = useCallback(() => {
     setResultCardData({
@@ -306,6 +312,10 @@ export default function GiveawayPage() {
       return () => clearInterval(interval);
     }
   }, [giveaway, setParticipantsInfoJoined]);
+
+  const hasHoldRequirement = (giveaway?.requirements ?? []).some(
+    (r) => r.type === "holdton" || r.type === "holdjetton",
+  );
 
   const joinToGiveawayFetch = useMutation({
     mutationFn: ({ id }: { id: string }) => joinToGiveaway(id),
@@ -550,16 +560,8 @@ export default function GiveawayPage() {
                   (requirement, index) =>
                     ({
                       id: index.toString(),
-                      logo: ["subscription", "boost"].includes(requirement.type) ? (
-                        <ChannelAvatar
-                          title={requirement.name?.charAt(1)}
-                          avatar_url={requirement.avatar_url}
-                        />
-                      ) : getRequirementIcon(requirement.type),
-                      title:
-                        requirement.type === "custom"
-                          ? requirement.name
-                          : `Subscribe ${requirement.username}`,
+                      logo: getRequirementIcon(requirement),
+                      title: getRequirementTitle(requirement),
                       rightIcon: "arrow",
                     }) as IListItem,
                 )}
@@ -569,44 +571,54 @@ export default function GiveawayPage() {
             {giveaway?.status === "active" && !isAdmin && (
               <List
                 header="joining requirements"
-                items={(checkRequirements?.results ?? []).map(
-                  (requirement, index) =>
-                    ({
-                      id: index.toString(),
-                      logo: (
-                        <ChannelAvatar
-                          title={requirement.name?.replace("@", "")}
-                          avatar_url={`https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`}
-                        />
-                      ),
-                      title: requirement.name,
-                      rightIcon:
-                        requirement.status === "success" ? "done" : "arrow",
-                      onClick: () => {
-                        if (requirement.type === "subscription") {
-                          // setCheckingRequirements((prev) => ({
-                          //   ...prev,
-                          //   [index.toString()]: true,
-                          // }));
-
-                          if (requirement.username) {
-                            goTo(`https://t.me/${requirement.username}`);
+                items={[
+                  ...(hasHoldRequirement
+                    ? [
+                        ({
+                          id: "wallet-connect",
+                          logo: getRequirementIcon({ type: "connectwallet" }),
+                          title: getRequirementTitle({ type: "connectwallet" }),
+                          rightIcon: walletConnected ? "done" : "arrow",
+                          onClick: () => {
+                            if (!walletConnected) {
+                              connectWallet();
+                              setTimeout(() => {
+                                refetchCheckRequirements();
+                              }, 3000);
+                            }
+                          },
+                        }) as IListItem,
+                      ]
+                    : []),
+                  ...(checkRequirements?.results ?? []).map(
+                    (requirement, index) =>
+                      ({
+                        id: index.toString(),
+                        // logo: (
+                        //   <ChannelAvatar
+                        //     title={requirement.name?.replace("@", "")}
+                        //     avatar_url={`https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`}
+                        //   />
+                        // ),
+                        logo: getRequirementIcon(requirement),
+                        title: getRequirementTitle(requirement),
+                        rightIcon:
+                          requirement.status === "success" ? "done" : "arrow",
+                        onClick: () => {
+                          if (requirement.type === "subscription") {
+                            if (requirement.username) {
+                              goTo(`https://t.me/${requirement.username}`);
+                            }
+                            setTimeout(() => {
+                              refetchCheckRequirements().finally(() => {
+                                // noop
+                              });
+                            }, 3000);
                           }
-                          setTimeout(() => {
-                            refetchCheckRequirements().finally(() => {
-                              // setCheckingRequirements((prev) => ({
-                              //   ...prev,
-                              //   [index.toString()]: false,
-                              // }));
-                            });
-                          }, 3000);
-                        }
-                      },
-                    }) as IListItem,
-                )}
-                onItemClick={() => {
-                  refetchCheckRequirements();
-                }}
+                        },
+                      }) as IListItem,
+                  ),
+                ]}
               />
             )}
 

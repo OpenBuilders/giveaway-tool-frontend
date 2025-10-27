@@ -1,7 +1,7 @@
 import api from "./helper";
 
 export const generateTonProofPayload = async () => {
-  const res = await api.post(`/v1/users/tonproof/payload`);
+  const res = await api.get(`/v1/ton-proof/generatePayload`);
   return res.data;
 };
 
@@ -21,7 +21,7 @@ export type VerifyTonProofRequest = {
 };
 
 export const verifyTonProof = async (data: VerifyTonProofRequest) => {
-  const res = await api.post(`/v1/users/tonproof/verify`, data);
+  const res = await api.post(`/v1/ton-proof/checkProof`, data);
   return res.data;
 };
 

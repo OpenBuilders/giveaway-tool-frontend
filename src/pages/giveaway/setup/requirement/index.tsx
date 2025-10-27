@@ -429,7 +429,7 @@ export default function RequirementPage() {
                   key={template.id}
                   id={template.id}
                   title={template.name}
-                  logo={getRequirementIcon(template.type)}
+                  logo={getRequirementIcon(template)}
                   onClick={() => {
                     setSelectedRequirementType(template.type);
                   }}

@@ -1,6 +1,6 @@
 import {
   GiveawayPrizeTemplateType,
-  GiveawayRequirementType,
+  IGiveawayRequirement,
 } from "@/interfaces/giveaway.interface";
 import { SubscribeIcon } from "./requirements/SubscribeIcon";
 import { CustomIcon } from "./prizes/CustomIcon";
@@ -8,9 +8,12 @@ import { BoostIcon } from "./requirements/BoostIcon";
 import { WhiteListIcon } from "./requirements/WhiteListIcon";
 import { HoldTonIcon } from "./requirements/HoldTonIcon";
 import { HoldJettonIcon } from "./requirements/HoldJettonIcon";
+import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
+import { ConnectWalletIcon } from "./requirements/ConnectWalletIcon";
+import { toTon } from "@/utils/toTon";
 
-export const getRequirementIcon = (type: GiveawayRequirementType) => {
-  switch (type) {
+export const getRequirementIcon = (requirement: IGiveawayRequirement) => {
+  switch (requirement.type) {
     case "subscription":
       return <SubscribeIcon />;
     case "boost":
@@ -20,9 +23,42 @@ export const getRequirementIcon = (type: GiveawayRequirementType) => {
     case "holdton":
       return <HoldTonIcon />;
     case "holdjetton":
+      if (requirement.jetton_image) {
+        return <img src={requirement.jetton_image} alt={requirement?.jetton_symbol || "Jetton"} width={40} height={40} />;
+      }
       return <HoldJettonIcon />;
+    case "connectwallet":
+      return <ConnectWalletIcon />;
     default:
-      return null;
+      return (
+        <ChannelAvatar
+          title={
+            requirement.type === "custom"
+              ? requirement.name
+              : requirement.name?.charAt(1)
+          }
+          avatar_url={requirement.avatar_url}
+        />
+      );
+  }
+};
+
+export const getRequirementTitle = (requirement: IGiveawayRequirement) => {
+  switch (requirement.type) {
+    case "custom":
+      return requirement.name;
+    case "subscription":
+      return `Subscribe ${requirement.username}`;
+    case "boost":
+      return `Boost ${requirement.username}`;
+    case "holdton":
+      return `Hold ${requirement.ton_min_balance_nano ? toTon(requirement.ton_min_balance_nano) : requirement.amount} TON`;
+    case "holdjetton":
+      return `Hold ${requirement.jetton_min_amount || requirement.amount} ${"$" + requirement.jetton_symbol || "tokens"}`;
+    case "connectwallet":
+      return "Connect Wallet";
+    default:
+      return String(requirement.type);
   }
 };
 

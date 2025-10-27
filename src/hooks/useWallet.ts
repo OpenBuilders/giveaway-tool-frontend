@@ -10,10 +10,10 @@ export default function useWallet() {
     mutationFn: () => {
       return generateTonProofPayload();
     },
-    onSuccess: ({ payload }) => {
+    onSuccess: ({ ton_proof }) => {
       tonConnectUI.setConnectRequestParameters({
         state: "ready",
-        value: { tonProof: payload },
+        value: { tonProof: ton_proof?.payload },
       });
       tonConnectUI.openModal();
     },

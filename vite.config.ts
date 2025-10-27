@@ -21,10 +21,10 @@ export default defineConfig({
       include: ["events"],
     }),
   ],
-  // server: {
-  //   port: 3000,
-  //   allowedHosts: ['dodo-regular-alpaca.ngrok-free.app']
-  // },
+  server: {
+    // port: 3000,
+    allowedHosts: ['dodo-regular-alpaca.ngrok-free.app']
+  },
   build: {
     chunkSizeWarningLimit: 400,
     cssMinify: true,
