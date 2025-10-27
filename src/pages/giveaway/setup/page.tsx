@@ -243,7 +243,8 @@ export default function GiveawaySetUpPage() {
                 Add Creator
               </AddButton>
             }
-            items={availableChannelsData?.map((channel, index) => ({
+            items={Array.isArray(availableChannelsData)
+              ? availableChannelsData.map((channel, index) => ({
               id: index.toString(),
               logo: (
                 <ChannelAvatar
@@ -268,7 +269,8 @@ export default function GiveawaySetUpPage() {
                   });
                 }
               },
-            }))}
+            }))
+              : []}
           />
 
           <List

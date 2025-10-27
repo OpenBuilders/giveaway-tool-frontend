@@ -237,7 +237,7 @@ export default function RequirementPage() {
                   <List
                     header="add from your channels"
                     footer="The channel or chat you’re adding must be public"
-                    items={availableChannelsData?.map(
+                    items={(Array.isArray(availableChannelsData) ? availableChannelsData : [])?.map(
                       (item, index) =>
                         ({
                           id: index.toString(),
@@ -302,7 +302,7 @@ export default function RequirementPage() {
                     </List>
 
                     <List
-                      items={availableChannelsData
+                      items={(Array.isArray(availableChannelsData) ? availableChannelsData : [])
                         ?.filter((item) =>
                           searchQuery.trim().length
                             ? (item.title || "")
