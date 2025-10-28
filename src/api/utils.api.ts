@@ -85,3 +85,18 @@ export const clearLoadedWinners = async (
   );
   return res.data;
 };
+
+// Jetton metadata
+export interface IJettonMetadataResponse {
+  address: string;
+  decimals: number;
+  symbol: string;
+  image?: string;
+}
+
+export const getJettonMetadata = async (
+  address: string,
+): Promise<IJettonMetadataResponse> => {
+  const res = await api.get(`/v1/jettons/${address}/metadata`);
+  return res.data;
+};

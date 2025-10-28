@@ -6,6 +6,7 @@ import { useNavigate } from "react-router";
 import {
   checkChannel,
   getGiveawayRequirementsTemplates,
+  getJettonMetadata,
 } from "@/api/utils.api";
 import { ListItem } from "@/components/ui/list/ListItem";
 import { Select } from "@/components/ui/inputs/SelectInput";
@@ -31,6 +32,8 @@ import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
 import { LabeledInput } from "@/components/ui/inputs/Input";
 import { SearchInput } from "@/components/ui/inputs/SearchInput";
 import { addBotToChannelLink } from "@/utils/addBotToChannelLink";
+import { JETTON_TEMPLATES } from "@/utils/jettonTemplates";
+// import { collapseAddress } from "@/utils/collapseAddress";
 
 export default function RequirementPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
@@ -71,6 +74,28 @@ export default function RequirementPage() {
       selectedRequirementType === "subscription" ||
       selectedRequirementType === "boost",
     refetchInterval: addButtonPressed ? 5000 : false,
+  });
+
+  const addHoldJettonWithMetadata = useMutation({
+    mutationFn: ({ address }: { address: string; amount: number }) =>
+      getJettonMetadata(address),
+    onSuccess: (meta, variables) => {
+      const { address, amount } = variables as {
+        address: string;
+        amount: number;
+      };
+      addRequirement({
+        type: "holdjetton",
+        address,
+        amount,
+        jetton_symbol: meta.symbol,
+        jetton_image: meta.image,
+      });
+      navigate("/giveaway/setup");
+    },
+    onError: () => {
+      showToast({ message: "Token is invalid", type: "error", time: 2000 });
+    },
   });
 
   const checkBotExistInChannelsFetch = useMutation({
@@ -150,7 +175,14 @@ export default function RequirementPage() {
     <>
       <BackButton
         onClick={() => {
-          navigate(-1);
+          if (selectedRequirementType) {
+            setSelectedRequirementType(null);
+            setSubscriptionData([]);
+            setHoldTonAmount("");
+            setHoldJetton({ address: "", amount: "" });
+          } else {
+            navigate(-1);
+          }
         }}
       />
       {selectedRequirementType && (
@@ -179,25 +211,43 @@ export default function RequirementPage() {
                   type: "holdton",
                   amount,
                 });
+              } else {
+                showToast({ message: "Amount is invalid", type: "error", time: 2000 });
               }
             } else if (selectedRequirementType === "holdjetton") {
               const amount = Number(holdJetton.amount.replace(/,/g, ""));
               const address = holdJetton.address.trim();
               if (address && amount > 0) {
-                addRequirement({
-                  type: "holdjetton",
-                  address,
-                  amount,
-                });
+                const tpl = JETTON_TEMPLATES.find((t) => t.address === address);
+                if (tpl) {
+                  addRequirement({
+                    type: "holdjetton",
+                    address,
+                    amount,
+                    jetton_symbol: tpl.symbol,
+                    jetton_image: tpl.image,
+                  });
+                  navigate("/giveaway/setup");
+                } else {
+                  addHoldJettonWithMetadata.mutate({ address, amount });
+                  return; // navigate happens in onSuccess
+                }
+              } else {
+                showToast({ message: "All fields are required", type: "error", time: 2000 });
               }
             }
 
             navigate("/giveaway/setup");
           }}
           disabled={
-            createButtonDisabled || checkBotExistInChannelsFetch.isPending
+            createButtonDisabled ||
+            checkBotExistInChannelsFetch.isPending ||
+            addHoldJettonWithMetadata.isPending
           }
-          loading={checkBotExistInChannelsFetch.isPending}
+          loading={
+            checkBotExistInChannelsFetch.isPending ||
+            addHoldJettonWithMetadata.isPending
+          }
         />
       )}
 
@@ -211,25 +261,23 @@ export default function RequirementPage() {
         <Block margin="top" marginValue={44}>
           {selectedRequirementType ? (
             <Block gap={24}>
-              <List>
-                <Select
-                  label="Type"
-                  type="withIcon"
-                  options={
-                    requirementTemplates?.map((template) => ({
-                      value: template.type,
-                      label: template.name,
-                    })) || []
-                  }
-                  selectedValue={String(selectedRequirementType)}
-                  onChange={(value) => {
-                    setSelectedRequirementType(String(value));
-                    setSubscriptionData([]);
-                    setHoldTonAmount("");
-                    setHoldJetton({ address: "", amount: "" });
-                  }}
-                />
-              </List>
+              <Select
+                label="Type"
+                type="withIcon"
+                options={
+                  requirementTemplates?.map((template) => ({
+                    value: template.type,
+                    label: template.name,
+                  })) || []
+                }
+                selectedValue={String(selectedRequirementType)}
+                onChange={(value) => {
+                  setSelectedRequirementType(String(value));
+                  setSubscriptionData([]);
+                  setHoldTonAmount("");
+                  setHoldJetton({ address: "", amount: "" });
+                }}
+              />
 
               {(selectedRequirementType === "subscription" ||
                 selectedRequirementType === "boost") && (
@@ -237,7 +285,10 @@ export default function RequirementPage() {
                   <List
                     header="add from your channels"
                     footer="The channel or chat you’re adding must be public"
-                    items={(Array.isArray(availableChannelsData) ? availableChannelsData : [])?.map(
+                    items={(Array.isArray(availableChannelsData)
+                      ? availableChannelsData
+                      : []
+                    )?.map(
                       (item, index) =>
                         ({
                           id: index.toString(),
@@ -302,7 +353,10 @@ export default function RequirementPage() {
                     </List>
 
                     <List
-                      items={(Array.isArray(availableChannelsData) ? availableChannelsData : [])
+                      items={(Array.isArray(availableChannelsData)
+                        ? availableChannelsData
+                        : []
+                      )
                         ?.filter((item) =>
                           searchQuery.trim().length
                             ? (item.title || "")
@@ -369,28 +423,55 @@ export default function RequirementPage() {
               )}
 
               {selectedRequirementType === "holdjetton" && (
-                <List>
-                  <LabeledInput
-                    containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
-                    label="Token Contract"
-                    placeholder="EQC..."
-                    value={holdJetton.address}
-                    onChange={(value) => {
-                      setHoldJetton((prev) => ({ ...prev, address: value }));
-                    }}
-                  />
-                  <LabeledInput
-                    containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
-                    label="Amount"
-                    placeholder="0"
-                    inputMode="decimal"
-                    value={holdJetton.amount}
-                    onChange={(value) => {
-                      setHoldJetton((prev) => ({ ...prev, amount: value }));
-                    }}
-                    additionalLabel="tokens"
-                  />
-                </List>
+                <Block gap={24}>
+                  <List>
+                    <LabeledInput
+                      containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
+                      label="Token Contract"
+                      placeholder="EQC..."
+                      value={holdJetton.address}
+                      onChange={(value) => {
+                        setHoldJetton((prev) => ({ ...prev, address: value }));
+                      }}
+                    />
+                    <LabeledInput
+                      containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
+                      label="Amount"
+                      placeholder="0"
+                      inputMode="decimal"
+                      value={holdJetton.amount}
+                      onChange={(value) => {
+                        setHoldJetton((prev) => ({ ...prev, amount: value }));
+                      }}
+                      additionalLabel="tokens"
+                    />
+                  </List>
+
+                  {/* Templates under the address input */}
+                  {Array.isArray(JETTON_TEMPLATES) &&
+                    JETTON_TEMPLATES.length > 0 && (
+                      <List
+                        header="or choose a template"
+                        items={
+                          JETTON_TEMPLATES.map((t) => ({
+                            id: t.id,
+                            title: t.name,
+                            logo: t.image,
+                            rightIcon:
+                              holdJetton.address === t.address
+                                ? "selected"
+                                : "unselected",
+                            onClick: () => {
+                              setHoldJetton((prev) => ({
+                                ...prev,
+                                address: t.address,
+                              }));
+                            },
+                          })) as IListItem[]
+                        }
+                      ></List>
+                    )}
+                </Block>
               )}
 
               {selectedRequirementType === "custom" && (
