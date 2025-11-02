@@ -22,10 +22,10 @@ export const getGiveawayRequirementsTemplates = async (): Promise<
 };
 
 export const checkChannel = async (
-  usernames: string[],
+  channel_ids: string[],
 ): Promise<IGiveawayCheckChannelResponse> => {
   const res = await api.post("/v1/requirements/channels/check-bulk", {
-    usernames,
+    channel_ids,
   });
   return res.data;
 };

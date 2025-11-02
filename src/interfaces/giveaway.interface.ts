@@ -67,7 +67,7 @@ export interface IGiveawayCreator {
   title: string;
   username?: string;
   avatar_url?: string;
-  channel_url?: string;
+  url?: string;
 }
 
 export interface IGiveaway {
@@ -139,7 +139,7 @@ export interface IGiveawayRequirementTemplate {
 
 export interface IGiveawayCheckChannelResponse {
   results: {
-    username: string;
+    username?: string;
     ok: boolean;
     error?: string;
     channel: {
@@ -147,6 +147,7 @@ export interface IGiveawayCheckChannelResponse {
       type: string;
       title: string;
       username: string;
+      avatar_url: string;
     };
     bot_status: {
       status: string;
@@ -178,7 +179,7 @@ export interface IChannelInfo {
   id: number;
   title?: string;
   username: string;
-  avatar_url: string;
+  avatar_url?: string;
   channel_url: string;
 }
 

@@ -58,6 +58,13 @@ export const Image = ({ src, size, borderRadius, fallback }: ImageProps) => {
       width={size}
       height={size}
       className={cn(borderRadius && styles[`border-radius-${borderRadius}`])}
+      onError={(e) => {
+        if (fallback) {
+          e.currentTarget.src = fallback;
+        } else {
+          e.currentTarget.src = '';
+        }
+      }}
     />
   )
 }

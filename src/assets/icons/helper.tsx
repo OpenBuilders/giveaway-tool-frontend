@@ -25,15 +25,44 @@ export const getRequirementIcon = (
         }
         avatar_url={
           requirement?.avatar_url ||
-          `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
+          // `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
+          `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
         }
       />
     );
   }
   switch (requirement.type) {
     case "subscription":
+      if (requirement.avatar_url)
+        return (
+          <ChannelAvatar
+            title={
+              requirement.name?.replace("@", "") ||
+              requirement.username?.replace("@", "")
+            }
+            avatar_url={
+              requirement?.avatar_url ||
+              // `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
+              `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
+            }
+          />
+        );
       return <SubscribeIcon />;
     case "boost":
+      if (requirement.avatar_url)
+        return (
+          <ChannelAvatar
+            title={
+              requirement.name?.replace("@", "") ||
+              requirement.username?.replace("@", "")
+            }
+            avatar_url={
+              requirement?.avatar_url ||
+              // `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
+              `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
+            }
+          />
+        );
       return <BoostIcon />;
     case "custom":
       return <WhiteListIcon />;

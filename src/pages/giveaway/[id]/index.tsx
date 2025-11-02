@@ -666,6 +666,9 @@ export default function GiveawayPage() {
                             if (requirement.username) {
                               goTo(`https://t.me/${requirement.username}`);
                             }
+                            // if (requirement.chat_info.channel_url) {
+                            //   goTo(requirement.chat_info.channel_url);
+                            // }
                             setTimeout(() => {
                               refetchCheckRequirements().finally(() => {
                                 // noop
@@ -810,7 +813,7 @@ export default function GiveawayPage() {
                       title: sponsor.username,
                       rightIcon: "arrow",
                       onClick: () => {
-                        if (sponsor.channel_url) goTo(sponsor.channel_url);
+                        if (sponsor.url) goTo(sponsor.url);
                       },
                     }) as IListItem,
                 )}

@@ -41,9 +41,18 @@ export const useGiveawayStore = create<IGiveaway & IGiveawayActions>()(
 
       setRequirements: (requirements) => set({ requirements }),
       addRequirement: (requirement: IGiveawayRequirement) =>
-        set((state) => ({
-          requirements: [...state.requirements, requirement],
-        })),
+        set((state) => {
+          if (
+            state.requirements.some((r) => r.username === requirement.username || r.avatar_url === requirement.avatar_url)
+          ) {
+            return {
+              requirements: state.requirements,
+            };
+          }
+          return {
+            requirements: [...state.requirements, requirement],
+          };
+        }),
       removeRequirement: (index) =>
         set((state) => {
           const newRequirements = [...state.requirements];

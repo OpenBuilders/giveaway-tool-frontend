@@ -105,7 +105,9 @@ export const SearchInput: React.FC<SearchInputProps> = ({
             aria-label="Search"
             className="text-text-overlay bg-primary-background rounded-[30px] px-2.5 py-[5px]"
             onClick={() => {
-              onChange("");
+              if (onSearch) {
+                onSearch(value.trim());
+              }
             }}
           >
             <Text type="subheadline1" color="overlay" weight="semibold">

@@ -56,6 +56,7 @@ export default function RequirementPage() {
   const [subscriptionData, setSubscriptionData] =
     useState<IAvailableChannelsResponse>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [appliedSearchQuery, setAppliedSearchQuery] = useState("");
 
   const { addRequirement } = useGiveawayStore();
 
@@ -99,7 +100,7 @@ export default function RequirementPage() {
   });
 
   const checkBotExistInChannelsFetch = useMutation({
-    mutationFn: (usernames: string[]) => checkChannel(usernames),
+    mutationFn: (channel_ids: string[]) => checkChannel(channel_ids),
     onSuccess: (data: IGiveawayCheckChannelResponse) => {
       if (
         data.results.every(
@@ -194,7 +195,7 @@ export default function RequirementPage() {
               selectedRequirementType === "boost"
             ) {
               checkBotExistInChannelsFetch.mutate(
-                subscriptionData.map((sub) => sub.username || "@testadsd"),
+                subscriptionData.map((sub) => sub.id.toString()),
               );
 
               return;
@@ -212,7 +213,11 @@ export default function RequirementPage() {
                   amount,
                 });
               } else {
-                showToast({ message: "Amount is invalid", type: "error", time: 2000 });
+                showToast({
+                  message: "Amount is invalid",
+                  type: "error",
+                  time: 2000,
+                });
               }
             } else if (selectedRequirementType === "holdjetton") {
               const amount = Number(holdJetton.amount.replace(/,/g, ""));
@@ -233,7 +238,11 @@ export default function RequirementPage() {
                   return; // navigate happens in onSuccess
                 }
               } else {
-                showToast({ message: "All fields are required", type: "error", time: 2000 });
+                showToast({
+                  message: "All fields are required",
+                  type: "error",
+                  time: 2000,
+                });
               }
             }
 
@@ -334,9 +343,11 @@ export default function RequirementPage() {
                       <SearchInput
                         value={searchQuery}
                         onChange={setSearchQuery}
-                        onSearch={async () => {
-                          if (!searchQuery.trim()) return;
-                          const query = searchQuery.trim().replace(/^@/, "");
+                        onSearch={async (value) => {
+                          const current = (value ?? searchQuery).trim();
+                          if (!current) return;
+                          const query = current.replace(/^@/, "");
+                          setAppliedSearchQuery(query);
                           console.log(query);
                           // try {
                           //   setIsSearching(true);
@@ -352,56 +363,57 @@ export default function RequirementPage() {
                       />
                     </List>
 
-                    <List
-                      items={(Array.isArray(availableChannelsData)
-                        ? availableChannelsData
-                        : []
-                      )
-                        ?.filter((item) =>
-                          searchQuery.trim().length
-                            ? (item.title || "")
+                    {appliedSearchQuery.trim().length > 0 && (
+                      <List
+                        items={(Array.isArray(availableChannelsData)
+                          ? availableChannelsData
+                          : []
+                        )
+                          ?.filter(
+                            (item) =>
+                              (item.title || "")
                                 .toLowerCase()
-                                .includes(searchQuery.trim().toLowerCase()) ||
+                                .includes(appliedSearchQuery.toLowerCase()) ||
                               (item.username || "")
                                 .toLowerCase()
-                                .includes(searchQuery.trim().toLowerCase())
-                            : true,
-                        )
-                        .map(
-                          (item, index) =>
-                            ({
-                              id: `search-${index}`,
-                              title: item.title,
-                              logo: (
-                                <ChannelAvatar
-                                  title={item.title}
-                                  avatar_url={item.avatar_url}
-                                />
-                              ),
-                              rightIcon: subscriptionData.some(
-                                (sub) => sub.id === item.id,
-                              )
-                                ? "selected"
-                                : "unselected",
-                              onClick: () => {
-                                if (
-                                  subscriptionData.some(
-                                    (sub) => sub.id === item.id,
-                                  )
-                                ) {
-                                  setSubscriptionData((prev) =>
-                                    prev.filter((sub) => sub.id !== item.id),
-                                  );
-                                } else {
-                                  setSubscriptionData((prev) => [
-                                    ...prev,
-                                    item,
-                                  ]);
-                                }
-                              },
-                            }) as IListItem,
-                        )}
-                    />
+                                .includes(appliedSearchQuery.toLowerCase()),
+                          )
+                          .map(
+                            (item, index) =>
+                              ({
+                                id: `search-${index}`,
+                                title: item.title,
+                                logo: (
+                                  <ChannelAvatar
+                                    title={item.title}
+                                    avatar_url={item.avatar_url}
+                                  />
+                                ),
+                                rightIcon: subscriptionData.some(
+                                  (sub) => sub.id === item.id,
+                                )
+                                  ? "selected"
+                                  : "unselected",
+                                onClick: () => {
+                                  if (
+                                    subscriptionData.some(
+                                      (sub) => sub.id === item.id,
+                                    )
+                                  ) {
+                                    setSubscriptionData((prev) =>
+                                      prev.filter((sub) => sub.id !== item.id),
+                                    );
+                                  } else {
+                                    setSubscriptionData((prev) => [
+                                      ...prev,
+                                      item,
+                                    ]);
+                                  }
+                                },
+                              }) as IListItem,
+                          )}
+                      />
+                    )}
                   </Block>
                 </>
               )}

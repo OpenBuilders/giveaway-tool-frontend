@@ -15,6 +15,9 @@ export const ChannelAvatar = ({
           src={avatar_url}
           className="absolute top-0 left-0 z-10 h-full w-full object-cover"
           alt={title}
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
         />
       )}
 
