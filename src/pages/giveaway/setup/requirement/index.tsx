@@ -113,6 +113,13 @@ export default function RequirementPage() {
             type: selectedRequirementType as IGiveawayRequirement["type"],
             username: channel.username,
             avatar_url: channel.avatar_url,
+            channel: {
+              id: channel.id,
+              title: channel.title as string,
+              username: channel.username,
+              avatar_url: channel.avatar_url as string,
+              url: channel.url,
+            },
           }),
         );
 

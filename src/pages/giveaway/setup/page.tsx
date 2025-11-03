@@ -121,6 +121,14 @@ export default function GiveawaySetUpPage() {
         };
       }),
       requirements: requirements.map((req) => {
+        if (req.type === "subscription" || req.type === "boost") {
+          return {
+            type: req.type,
+            channel_id: req.channel?.id,
+            channel_username: req.channel?.username,
+          };
+        }
+
         if (req.type === "holdton") {
           const amountTon = typeof req.amount === "number" ? req.amount : 0;
           const tonMinBalanceNano = Math.round(amountTon * 1e9);
@@ -243,34 +251,42 @@ export default function GiveawaySetUpPage() {
                 Add Creator
               </AddButton>
             }
-            items={Array.isArray(availableChannelsData)
-              ? availableChannelsData.map((channel, index) => ({
-              id: index.toString(),
-              logo: (
-                <ChannelAvatar
-                  title={channel.title}
-                  avatar_url={channel.avatar_url}
-                />
-              ),
-              title: channel.title || channel.username,
-              rightIcon: sponsors.some((sponsor) => sponsor.id === channel.id)
-                ? "selected"
-                : "unselected",
-              onClick: () => {
-                if (sponsors.some((sponsor) => sponsor.id === channel.id)) {
-                  removeSponsor(
-                    sponsors.findIndex((sponsor) => sponsor.id === channel.id),
-                  );
-                } else {
-                  addSponsor({
-                    id: channel.id,
-                    title: channel.title || channel.username,
-                    avatar_url: channel.avatar_url,
-                  });
-                }
-              },
-            }))
-              : []}
+            items={
+              Array.isArray(availableChannelsData)
+                ? availableChannelsData.map((channel, index) => ({
+                    id: index.toString(),
+                    logo: (
+                      <ChannelAvatar
+                        title={channel.title}
+                        avatar_url={channel.avatar_url}
+                      />
+                    ),
+                    title: (channel.title || channel.username) as string,
+                    rightIcon: sponsors.some(
+                      (sponsor) => sponsor.id === channel.id,
+                    )
+                      ? "selected"
+                      : "unselected",
+                    onClick: () => {
+                      if (
+                        sponsors.some((sponsor) => sponsor.id === channel.id)
+                      ) {
+                        removeSponsor(
+                          sponsors.findIndex(
+                            (sponsor) => sponsor.id === channel.id,
+                          ),
+                        );
+                      } else {
+                        addSponsor({
+                          id: channel.id,
+                          title: (channel.title || channel.username) as string,
+                          avatar_url: channel.avatar_url,
+                        });
+                      }
+                    },
+                  }))
+                : []
+            }
           />
 
           <List

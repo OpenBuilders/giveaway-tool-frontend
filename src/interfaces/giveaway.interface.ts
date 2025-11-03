@@ -54,6 +54,15 @@ export interface IGiveawayRequirement {
   jetton_min_amount?: number; // for holdjetton (amount in smallest units)
   jetton_image?: string; // for holdjetton (image url)
   jetton_symbol?: string; // for holdjetton (name of the token)
+  url?: string;
+
+  channel?: {
+    id: number;
+    title: string;
+    username?: string;
+    avatar_url: string;
+    url?: string;
+  };
 }
 
 export interface IGiveawayWinners {
@@ -165,6 +174,7 @@ export interface IGiveawayCheckRequirementsResponse {
     status: "failed" | "success";
     error?: string;
     link?: string; // URL to redirect users to (Telegram channel/chat)
+    url?: string;
     chat_info: {
       title: string;
       username: string;
@@ -178,9 +188,10 @@ export interface IGiveawayCheckRequirementsResponse {
 export interface IChannelInfo {
   id: number;
   title?: string;
-  username: string;
+  username?: string;
   avatar_url?: string;
-  channel_url: string;
+  channel_url?: string;
+  url?: string;
 }
 
 export type IAvailableChannelsResponse = IChannelInfo[];

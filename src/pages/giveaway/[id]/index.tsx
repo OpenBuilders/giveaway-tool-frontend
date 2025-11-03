@@ -30,7 +30,11 @@ import congratsSticker from "@/assets/tgs/CongratsSticker.json";
 import { goTo } from "@/utils";
 import { GiveawayAvatar } from "@/components/ui/GiveawayAvatar";
 import { UploadButton } from "@/components/ui/buttons/UploadButton";
-import { loadPreWinnerList, getLoadedWinnersList, clearLoadedWinners } from "@/api/utils.api";
+import {
+  loadPreWinnerList,
+  getLoadedWinnersList,
+  clearLoadedWinners,
+} from "@/api/utils.api";
 import { ArrowIcon } from "@/assets/icons/ArrowIcon";
 import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
 import { getRequirementIcon, getRequirementTitle } from "@/assets/icons/helper";
@@ -624,6 +628,14 @@ export default function GiveawayPage() {
                       logo: getRequirementIcon(requirement),
                       title: getRequirementTitle(requirement),
                       rightIcon: "arrow",
+                      onClick: () => {
+                        if (requirement.username) {
+                          goTo(`https://t.me/${requirement.username}`);
+                        }
+                        if (requirement.url) {
+                          goTo(requirement.url);
+                        }
+                      },
                     }) as IListItem,
                 )}
               />
@@ -666,9 +678,9 @@ export default function GiveawayPage() {
                             if (requirement.username) {
                               goTo(`https://t.me/${requirement.username}`);
                             }
-                            // if (requirement.chat_info.channel_url) {
-                            //   goTo(requirement.chat_info.channel_url);
-                            // }
+                            if (requirement.url) {
+                              goTo(requirement.url);
+                            }
                             setTimeout(() => {
                               refetchCheckRequirements().finally(() => {
                                 // noop
@@ -810,7 +822,7 @@ export default function GiveawayPage() {
                           avatar_url={sponsor.avatar_url}
                         />
                       ),
-                      title: sponsor.username,
+                      title: sponsor.username || sponsor.title,
                       rightIcon: "arrow",
                       onClick: () => {
                         if (sponsor.url) goTo(sponsor.url);
@@ -822,7 +834,7 @@ export default function GiveawayPage() {
 
             {isAdmin && giveaway?.status === "pending" && (
               <div
-                className={`bg-section-bg border-giveaway flex max-h-[44px] w-full items-center justify-between px-4 py-2 rounded-[10px]`}
+                className={`bg-section-bg border-giveaway flex max-h-[44px] w-full items-center justify-between rounded-[10px] px-4 py-2`}
               >
                 <CancelButton
                   disabled={

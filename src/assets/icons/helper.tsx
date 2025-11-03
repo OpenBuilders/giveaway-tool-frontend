@@ -97,13 +97,14 @@ export const getRequirementIcon = (
 };
 
 export const getRequirementTitle = (requirement: IGiveawayRequirement) => {
+  console.log(requirement)
   switch (requirement.type) {
     case "custom":
       return requirement.name;
     case "subscription":
-      return `Subscribe ${requirement.username}`;
+      return `Subscribe ${requirement.username || requirement.channel?.title || requirement.name}`;
     case "boost":
-      return `Boost ${requirement.username}`;
+      return `Boost ${requirement.username || requirement.channel?.title || requirement.name}`;
     case "holdton":
       return `Hold ${requirement.ton_min_balance_nano ? toTon(requirement.ton_min_balance_nano) : requirement.amount} TON`;
     case "holdjetton":
