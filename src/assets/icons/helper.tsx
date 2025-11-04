@@ -21,10 +21,13 @@ export const getRequirementIcon = (
       <ChannelAvatar
         title={
           requirement.name?.replace("@", "") ||
-          requirement.username?.replace("@", "")
+          requirement.username?.replace("@", "") ||
+          requirement?.chat_info?.title ||
+          requirement?.channel?.title
         }
         avatar_url={
           requirement?.avatar_url ||
+          requirement?.chat_info?.avatar_url ||
           // `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
           `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
         }
@@ -42,6 +45,7 @@ export const getRequirementIcon = (
             }
             avatar_url={
               requirement?.avatar_url ||
+              requirement?.chat_info?.avatar_url ||
               // `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
               `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
             }
@@ -58,6 +62,7 @@ export const getRequirementIcon = (
             }
             avatar_url={
               requirement?.avatar_url ||
+              requirement?.chat_info?.avatar_url ||
               // `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
               `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
             }
@@ -97,7 +102,7 @@ export const getRequirementIcon = (
 };
 
 export const getRequirementTitle = (requirement: IGiveawayRequirement) => {
-  console.log(requirement)
+  console.log(requirement);
   switch (requirement.type) {
     case "custom":
       return requirement.name;

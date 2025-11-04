@@ -56,13 +56,8 @@ export interface IGiveawayRequirement {
   jetton_symbol?: string; // for holdjetton (name of the token)
   url?: string;
 
-  channel?: {
-    id: number;
-    title: string;
-    username?: string;
-    avatar_url: string;
-    url?: string;
-  };
+  channel?: IChannelInfo;
+  chat_info?: IChannelInfo;
 }
 
 export interface IGiveawayWinners {
@@ -180,13 +175,14 @@ export interface IGiveawayCheckRequirementsResponse {
       username: string;
       type: string;
       avatar_url: string;
+      url?: string;
     };
   }[];
   all_met: boolean;
 }
 
 export interface IChannelInfo {
-  id: number;
+  id?: number;
   title?: string;
   username?: string;
   avatar_url?: string;
