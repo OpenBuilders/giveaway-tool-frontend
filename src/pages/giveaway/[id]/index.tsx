@@ -41,10 +41,7 @@ import { getRequirementIcon, getRequirementTitle } from "@/assets/icons/helper";
 // import removed: legacy prize icon logic no longer used
 import { useIsConnectionRestored, useTonAddress } from "@tonconnect/ui-react";
 import useWallet from "@/hooks/useWallet";
-import {
-  GiveawayRequirementType,
-  IUserPreviewCheckWinner,
-} from "@/interfaces/giveaway.interface";
+import { IUserPreviewCheckWinner } from "@/interfaces/giveaway.interface";
 import { CancelButton } from "@/components/ui/buttons/CancelButton";
 
 type PrizeLike = {
@@ -670,22 +667,9 @@ export default function GiveawayPage() {
                     (requirement, index) =>
                       ({
                         id: index.toString(),
-                        logo: getRequirementIcon(
-                          {
-                            ...requirement,
-                            type: requirement.type as GiveawayRequirementType,
-                            username: requirement.username,
-                            avatar_url: requirement.chat_info?.avatar_url,
-                            chat_info: {
-                              title: requirement.chat_info.title,
-                              username: requirement.chat_info.username,
-                              avatar_url: requirement.chat_info.avatar_url,
-                            },
-                          },
-                          {
-                            isChannel: true,
-                          },
-                        ),
+                        logo: getRequirementIcon(requirement, {
+                          isChannel: true,
+                        }),
                         title: getRequirementTitle(requirement),
                         rightIcon:
                           requirement.status === "success" ? "done" : "arrow",

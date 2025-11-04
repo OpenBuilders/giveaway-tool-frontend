@@ -278,7 +278,7 @@ export default function GiveawaySetUpPage() {
                         );
                       } else {
                         addSponsor({
-                          id: channel.id,
+                          id: channel.id || 0,
                           title: (channel.title || channel.username) as string,
                           avatar_url: channel.avatar_url,
                         });

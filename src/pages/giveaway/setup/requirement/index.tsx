@@ -202,7 +202,7 @@ export default function RequirementPage() {
               selectedRequirementType === "boost"
             ) {
               checkBotExistInChannelsFetch.mutate(
-                subscriptionData.map((sub) => sub.id.toString()),
+                subscriptionData.map((sub) => sub.id?.toString() || ""),
               );
 
               return;
