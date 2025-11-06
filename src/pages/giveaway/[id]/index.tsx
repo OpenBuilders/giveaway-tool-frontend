@@ -692,9 +692,7 @@ export default function GiveawayPage() {
                     (requirement, index) =>
                       ({
                         id: index.toString(),
-                        logo: getRequirementIcon(requirement, {
-                          isChannel: true,
-                        }),
+                        logo: getRequirementIcon(requirement),
                         title: getRequirementTitle(requirement),
                         rightIcon:
                           requirement.status === "success" ? "done" : "arrow",
