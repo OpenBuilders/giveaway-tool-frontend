@@ -10,7 +10,9 @@ const webApp = window.Telegram?.WebApp
 
 export const ThemeProvider = ({ children }: Props) => {
   const lightTgTheme = webApp.colorScheme === 'light'
+  console.log(webApp.colorScheme)
 
+  console.log(!lightTgTheme)
   const [darkTheme, setDarkTheme] = useState(!lightTgTheme)
 
   const toggleThemeHandler = () => {
