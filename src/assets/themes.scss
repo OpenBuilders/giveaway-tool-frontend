@@ -3,10 +3,10 @@
 html[data-theme='light'] {
   --color-backgroundSecondary: #{$palette-dark4};
   --color-backgroundTertiary: #{$palette-white100};
-  --color-backgroundPrimary: var(--tg-theme-section_bg_color, #FFFFFF);
-  --color-textIconsPrimary: var(--tg-theme-text-color, #000000);
-  --color-textIconsSecondary: var(--tg-theme-hint-color, #8E8E93);
-  --color-textIconsTertiary: var(--tg-theme-hint-color, #8E8E93);
+  --color-backgroundPrimary: var(--no-tg-theme-section_bg_color, #FFFFFF);
+  --color-textIconsPrimary: var(--no-tg-theme-text-color, #000000);
+  --color-textIconsSecondary: var(--no-tg-theme-hint-color, #8E8E93);
+  --color-textIconsTertiary: var(--no-tg-theme-hint-color, #8E8E93);
   --color-textIconsBlack: #{$palette-dark100};
   --color-textIconsWhite: #{$palette-white100};
   --color-appliedSeparator: #{$palette-transparentDark8};
@@ -22,10 +22,10 @@ html[data-theme='light'] {
 html[data-theme='dark'] {
   --color-backgroundSecondary: #{$palette-dark90};
   --color-backgroundTertiary: #{$palette-dark85};
-  --color-backgroundPrimary: var(--tg-theme-section_bg_color, #FFFFFF);
-  --color-textIconsPrimary: var(--tg-theme-text-color, #000000);
-  --color-textIconsSecondary: var(--tg-theme-hint-color, #8E8E93);
-  --color-textIconsTertiary: var(--tg-theme-hint-color, #8E8E93);
+  --color-backgroundPrimary: var(--no-tg-theme-section_bg_color, #FFFFFF);
+  --color-textIconsPrimary: var(--no-tg-theme-text-color, #000000);
+  --color-textIconsSecondary: var(--no-tg-theme-hint-color, #8E8E93);
+  --color-textIconsTertiary: var(--no-tg-theme-hint-color, #8E8E93);
   --color-textIconsBlack: #{$palette-dark100};
   --color-textIconsWhite: #{$palette-white100};
   --color-appliedSeparator: #{$palette-transparentWhite8};
