@@ -76,7 +76,7 @@ export const UiLoader = ({ children }: { children: React.ReactNode }) => {
       <div
         className={`
           ${modalClassName}
-          transition-opacity duration-300
+          transition-opacity duration-300 text-text-overlay
           ${showLoader ? "opacity-100" : "opacity-0"}
         `}
       >

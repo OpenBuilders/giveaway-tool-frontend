@@ -2,6 +2,7 @@ import cn from "classnames";
 import React, { ChangeEvent } from "react";
 
 import styles from "./ListInput.module.scss";
+import { useToast } from "../Toast";
 
 export interface ListInputProps {
   textColor?: "primary" | "secondary" | "tertiary";
@@ -62,9 +63,19 @@ export const ListInput: React.FC<ListInputProps> = ({
   onBlur,
   rows,
 }) => {
+  const { showToast } = useToast();
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (onChange) {
-      onChange(e.target.value);
+      if (maxLength && e.target.value.length >= maxLength) {
+        showToast({
+          message: `Maximum ${maxLength} characters`,
+          type: "error",
+          time: 2000,
+        });
+      }
+      const next = maxLength && e.target.value.length > maxLength ? e.target.value.slice(0, maxLength) : e.target.value;
+      onChange(next);
     }
   };
 

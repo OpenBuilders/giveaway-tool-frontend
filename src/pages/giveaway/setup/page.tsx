@@ -29,6 +29,7 @@ import {
 import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
 import { getAvailableChannels } from "@/api/user.api";
 import { addBotToChannelLink } from "@/utils/addBotToChannelLink";
+import { MAX_GIVEAWAY_TITLE_LENGTH } from "@/utils";
 
 export default function GiveawaySetUpPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
@@ -196,7 +197,7 @@ export default function GiveawaySetUpPage() {
             value={title}
             onChange={setTitle}
             className="w-full"
-            maxLength={100}
+            maxLength={MAX_GIVEAWAY_TITLE_LENGTH}
           />
 
           <LabeledInput

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { WinnerCup } from "@/assets/icons/WinnerCup";
+// import { WinnerCup } from "@/assets/icons/WinnerCup";
 import { Block, Text } from "@/components/kit";
 import { GiveawayAvatar } from "../GiveawayAvatar";
 import type { IListItem } from "@/interfaces";
@@ -95,23 +95,41 @@ export const GiveawayItem = ({
       }}
     >
       {(logo || giveaway?.sponsors) && (
-        <div className="mr-2.5">
+        <div className="mr-2.5 flex-shrink-0">
           <GiveawayAvatar
-            avatarUrls={
+            // avatarUrls={
+            //   giveaway?.sponsors && giveaway?.sponsors.length > 0
+            //     ? giveaway?.sponsors.map((sponsor) => sponsor.avatar_url || undefined)
+            //     : logo ? [String(logo)] : [undefined]
+            // }
+
+            avatars={
               giveaway?.sponsors && giveaway?.sponsors.length > 0
-                ? giveaway?.sponsors.map((sponsor) => sponsor.avatar_url || undefined)
-                : logo ? [String(logo)] : [undefined]
+                ? giveaway?.sponsors.map((sponsor) => ({
+                    title: sponsor.title,
+                    avatar_url: sponsor.avatar_url as string,
+                  }))
+                : logo
+                  ? [
+                      {
+                        title: title,
+                        avatar_url: logo as string,
+                      },
+                    ]
+                  : undefined
             }
             isMini
           />
         </div>
       )}
 
-      <div className="flex w-full flex-col items-start">
-        <div className="flex w-full items-center justify-between">
-          <div className={`flex flex-col ${giveaway ? "pb-2.5" : ""}`}>
-            <div className="flex items-center gap-1.5">
-              <span className="tracking-body font-medium">{title}</span>
+      <div className="flex flex-1 min-w-0 flex-col items-start">
+        <div className="flex w-full items-center justify-between gap-2">
+          <div className={`flex flex-1 min-w-0 flex-col ${giveaway ? "pb-2.5" : ""}`}>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="overflow-hidden font-medium text-ellipsis whitespace-nowrap">
+                {title}
+              </span>
               {/* {giveaway?.isAdmin && <AdminBadge />} */}
             </div>
 
@@ -127,7 +145,7 @@ export const GiveawayItem = ({
           </div>
 
           {number && (
-            <div className="bg-bg flex h-6 w-6 items-center justify-center rounded-full">
+            <div className="bg-bg flex h-6 w-6 flex-shrink-0 aspect-square items-center justify-center rounded-full">
               {getPlaceNumber()}
             </div>
           )}
@@ -135,10 +153,11 @@ export const GiveawayItem = ({
 
         <Block row gap={8}>
           <div className="bg-tertiary-fill-bg flex items-center gap-1 rounded-[10px] px-1.5 py-1">
-            <WinnerCup />
+            {/* <WinnerCup /> */}
 
             <Text type="caption" weight="medium">
-              {giveaway?.winners_count} winners
+              {/* {giveaway?.winners_count} winners */}
+              {giveaway?.participants} participants
             </Text>
           </div>
         </Block>

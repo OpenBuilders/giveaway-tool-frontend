@@ -111,6 +111,7 @@ export default function RequirementPage() {
         const requirementData: IGiveawayRequirement[] = subscriptionData.map(
           (channel) => ({
             type: selectedRequirementType as IGiveawayRequirement["type"],
+            name: channel.title,
             username: channel.username,
             avatar_url: channel.avatar_url,
             channel: {
@@ -499,6 +500,7 @@ export default function RequirementPage() {
                     containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
                     label="Title"
                     placeholder="Title"
+                    maxLength={30}
                     value={customData.title}
                     onChange={(value) => {
                       setCustomData((prev) => ({
@@ -511,6 +513,7 @@ export default function RequirementPage() {
                     containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
                     label="Description"
                     placeholder="Description"
+                    maxLength={300}
                     value={customData.description}
                     onChange={(value) => {
                       setCustomData((prev) => ({

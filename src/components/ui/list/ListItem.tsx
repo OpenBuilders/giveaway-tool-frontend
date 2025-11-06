@@ -18,7 +18,14 @@ export const ListItem = ({
   onActionClick?: (item: IListItem) => void;
   className?: string;
   separator?: boolean;
-  rightIcon?: "arrow" | "done" | "remove" | "selected" | "unselected" | string | React.ReactNode;
+  rightIcon?:
+    | "arrow"
+    | "done"
+    | "remove"
+    | "selected"
+    | "unselected"
+    | string
+    | React.ReactNode;
 }) => {
   return (
     <div
@@ -31,31 +38,25 @@ export const ListItem = ({
         if (onClick) onClick({ id, logo, title, description, giveaway });
       }}
     >
-      <div className="flex items-center gap-2.5">
+      <div className="flex w-full items-center gap-2.5 max-w-full min-w-0">
         {logo && (
           <div
-            className={`overflow-hidden rounded-full ${
-              typeof logo === "string" ? "w-10 h-10" : ""
+            className={`aspect-square min-h-10 min-w-10 overflow-hidden rounded-full ${
+              typeof logo === "string" ? "h-10 w-10" : ""
             }`}
           >
             {typeof logo === "string" ? (
-              <img
-                src={logo}
-                alt="giveaway logo"
-                className="object-cover"
-              />
+              <img src={logo} alt="giveaway logo" className="object-cover" />
             ) : (
               logo
             )}
           </div>
         )}
-        <div className="flex w-fit flex-col items-start">
-          <div className="flex flex-col">
-            <div className="flex items-center gap-1.5">
-              <span className="tracking-body font-medium">{title}</span>
-            </div>
-          </div>
-  
+        <div className="flex flex-col items-start w-full min-w-0">
+          <span className="font-medium w-full overflow-hidden text-ellipsis whitespace-nowrap">
+            {title}
+          </span>
+
           {description && (
             <span className="description text-hint text-sm-max tracking-subheadline">
               {description}
@@ -66,7 +67,7 @@ export const ListItem = ({
 
       {rightIcon && (
         <div
-          className="flex items-center justify-center self-stretch pl-4 text-subtitle"
+          className="text-subtitle flex items-center justify-center self-stretch pl-4"
           onClick={() => {
             if (onActionClick)
               onActionClick({ id, logo, title, description, giveaway });
@@ -87,9 +88,11 @@ export const ListItem = ({
             </div>
           )}
           {rightIcon === "unselected" && (
-            <div className="relative h-6 w-6 cursor-pointer rounded-full border-[1.5px] border-border-separator" />
+            <div className="border-border-separator relative h-6 w-6 cursor-pointer rounded-full border-[1.5px]" />
           )}
-          {!["arrow", "done", "remove", "selected", "unselected"].includes(rightIcon as string) && <div className="rightSide">{rightIcon}</div>}
+          {!["arrow", "done", "remove", "selected", "unselected"].includes(
+            rightIcon as string,
+          ) && <div className="rightSide">{rightIcon}</div>}
         </div>
       )}
     </div>

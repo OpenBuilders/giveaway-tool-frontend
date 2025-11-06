@@ -1,7 +1,11 @@
 .root {
   // height: 100vh;
   width: 100%;
-  padding: 0 16px 16px 16px;
+  padding-top: calc(var(--tg-safe-area-inset-top) + var(--tg-content-safe-area-inset-top));
+  // padding: 0 16px 16px 16px;
+  padding-bottom: 16px;
+  padding-left: 16px;
+  padding-right: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;

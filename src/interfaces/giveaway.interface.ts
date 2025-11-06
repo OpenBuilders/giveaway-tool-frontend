@@ -164,6 +164,7 @@ export interface IGiveawayCheckRequirementsResponse {
   giveaway_id: string;
   results: {
     name: string;
+    description?: string;
     type: GiveawayRequirementType;
     username: string;
     status: "failed" | "success";

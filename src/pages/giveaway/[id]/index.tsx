@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/buttons/Button";
 import { List } from "@/components/ui/list/List";
 import { ListItem } from "@/components/ui/list/ListItem";
 import { BackButton } from "@twa-dev/sdk/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { giveawayApi } from "@/api";
 import { CopyIcon } from "@/assets/icons/CopyIcon";
@@ -43,6 +43,7 @@ import { useIsConnectionRestored, useTonAddress } from "@tonconnect/ui-react";
 import useWallet from "@/hooks/useWallet";
 import { IUserPreviewCheckWinner } from "@/interfaces/giveaway.interface";
 import { CancelButton } from "@/components/ui/buttons/CancelButton";
+import { WhiteListIcon } from "@/assets/icons/requirements/WhiteListIcon";
 
 type PrizeLike = {
   title?: string;
@@ -109,6 +110,11 @@ export default function GiveawayPage() {
     title: string;
     description?: string;
   }>({ opened: false, title: "", description: undefined });
+  const [customReqSheetState, setCustomReqSheetState] = useState<{
+    opened: boolean;
+    title: string;
+    description?: string;
+  }>({ opened: false, title: "", description: undefined });
 
   const [isAdmin, setIsAdmin] = useState(giveaway?.user_role === "owner");
   const giveawayLink = `https://t.me/${
@@ -121,6 +127,15 @@ export default function GiveawayPage() {
   const userFriendlyAddress = useTonAddress();
   const connectionRestored = useIsConnectionRestored();
   const walletConnected = !!userFriendlyAddress && connectionRestored;
+
+  const giveawaySponsors = useMemo(() => {
+    return giveaway?.sponsors && giveaway?.sponsors.length > 0
+      ? giveaway?.sponsors.map((sponsor) => ({
+          title: sponsor.title,
+          avatar_url: sponsor.avatar_url as string,
+        }))
+      : undefined;
+  }, [giveaway]);
 
   const setParticipantsInfoJoined = useCallback(() => {
     setResultCardData({
@@ -281,47 +296,47 @@ export default function GiveawayPage() {
       default:
         setTimeRemaining("Ended");
     }
-
-    if (giveaway?.ends_at) {
-      const endTime = new Date(giveaway.ends_at).getTime();
-
-      const updateTimer = () => {
-        const now = Date.now();
-        const timeDiff = Math.max(0, endTime - now);
-
-        if (timeDiff <= 0) {
-          setTimeRemaining("00:00");
-          return;
-        }
-
-        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor(
-          (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-        );
-        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-
-        if (days > 0) {
-          setTimeRemaining(
-            `${days}:${hours.toString().padStart(2, "0")}:${minutes
-              .toString()
-              .padStart(2, "0")}`,
-          );
-        } else {
-          setTimeRemaining(
-            `${hours.toString().padStart(2, "0")}:${minutes
-              .toString()
-              .padStart(2, "0")}`,
-          );
-        }
-      };
-
-      updateTimer();
-
-      const interval = setInterval(updateTimer, 60000);
-
-      return () => clearInterval(interval);
-    }
   }, [giveaway, setParticipantsInfoJoined]);
+
+  const updateTimer = useCallback(() => {
+    const now = Date.now();
+    const timeDiff = Math.max(
+      0,
+      giveaway?.ends_at ? new Date(giveaway?.ends_at).getTime() - now : 0,
+    );
+
+    if (timeDiff <= 0) {
+      setTimeRemaining("00:00");
+      return;
+    }
+
+    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(
+      (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+    );
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+    if (days > 0) {
+      setTimeRemaining(
+        `${days}:${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`,
+      );
+    } else {
+      setTimeRemaining(
+        `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`,
+      );
+    }
+  }, [giveaway?.ends_at]);
+
+  useEffect(() => {
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [updateTimer]);
 
   const hasHoldRequirement = (giveaway?.requirements ?? []).some(
     (r) => r.type === "holdton" || r.type === "holdjetton",
@@ -467,17 +482,20 @@ export default function GiveawayPage() {
         primaryText="Understood"
       />
 
+      <DialogSheet
+        opened={customReqSheetState.opened}
+        onClose={() => setCustomReqSheetState((s) => ({ ...s, opened: false }))}
+        icon={<WhiteListIcon />}
+        title={customReqSheetState.title}
+        description={customReqSheetState.description}
+        primaryText="Understood"
+      />
+
       <PageLayout>
         <>
           {!alreadyViewed && <ConfettiAnimation active />}
 
-          <GiveawayAvatar
-            avatarUrls={
-              giveaway?.sponsors && giveaway?.sponsors?.length > 0
-                ? giveaway?.sponsors?.map((sponsor) => sponsor.avatar_url)
-                : ["/gateway_gift.png"]
-            }
-          />
+          <GiveawayAvatar avatars={giveawaySponsors} />
 
           <Block margin="top" marginValue={8}>
             <Text type="title" align="center" weight="bold">
@@ -545,7 +563,7 @@ export default function GiveawayPage() {
               />
             )}
 
-            <div className="grid w-full grid-cols-3 gap-2.5">
+            <div className="grid w-full grid-cols-2 gap-2.5">
               <SmallDetailsCard
                 title="winners"
                 value={giveaway?.winners_count}
@@ -554,10 +572,10 @@ export default function GiveawayPage() {
                 title="joined"
                 value={giveaway?.participants_count}
               />
-              <SmallDetailsCard
+              {/* <SmallDetailsCard
                 title="prize count"
                 value={giveaway?.prizes.length}
-              />
+              /> */}
             </div>
           </Block>
         </Block>
@@ -635,6 +653,13 @@ export default function GiveawayPage() {
                         if (requirement.url) {
                           goTo(requirement.url);
                         }
+                        if (requirement.type === "custom") {
+                          setCustomReqSheetState({
+                            opened: true,
+                            title: requirement.name || "",
+                            description: requirement.description || "",
+                          });
+                        }
                       },
                     }) as IListItem,
                 )}
@@ -693,6 +718,13 @@ export default function GiveawayPage() {
                                 // noop
                               });
                             }, 3000);
+                          }
+                          if (requirement.type === "custom") {
+                            setCustomReqSheetState({
+                              opened: true,
+                              title: requirement.name,
+                              description: requirement.description || "",
+                            });
                           }
                         },
                       }) as IListItem,

@@ -4,6 +4,7 @@ import { VerifyTonProvider } from "./VerifyTonProvider.tsx";
 import { UiLoader } from "./UiLoader.tsx";
 import { ToastProvider } from "./kit/Toast/Toast.tsx";
 import { ThemeProvider } from "../context/ThemeProvider/ThemeProvider.tsx";
+import { TonConnectMainButtonManager } from "./TonConnectMainButtonManager.tsx";
 
 function makeQueryClient() {
   return new QueryClient({
@@ -42,6 +43,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             }/tonconnect-manifest.json`}
           >
             <VerifyTonProvider />
+            <TonConnectMainButtonManager />
             <UiLoader>{children}</UiLoader>
           </TonConnectUIProvider>
         </ThemeProvider>

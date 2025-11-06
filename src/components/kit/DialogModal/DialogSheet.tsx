@@ -31,7 +31,7 @@ export function DialogSheet({
     <>
       <Sheet opened={opened} onClose={onClose}>
         <div className={styles.container}>
-          {icon ? <div className={styles.headerIcon}>{icon}</div> : null}
+          {icon ? <div className={styles.headerIcon + " [&>svg]:w-full [&>svg]:h-full"}>{icon}</div> : null}
 
           <Text
             type="title1"

@@ -9,13 +9,9 @@ import { ListItem } from "@/components/ui/list/ListItem";
 import { Select } from "@/components/ui/inputs/SelectInput";
 import { useGiveawayStore } from "@/store/giveaway.slice";
 import { GiveawayPrizeTemplateType } from "@/interfaces/giveaway.interface";
-import {
-  Block,
-  Text,
-  PageLayout,
-  TelegramMainButton,
-} from "@/components/kit";
+import { Block, Text, PageLayout, TelegramMainButton } from "@/components/kit";
 import { getPrizeIcon } from "@/assets/icons/helper";
+import { MAX_PRIZE_TITLE_LENGTH } from "@/utils";
 
 // Fallback prize template for when API is not available
 const fallbackPrizeTemplate = {
@@ -41,7 +37,11 @@ export default function PrizePage() {
 
   const navigate = useNavigate();
 
-  const { data: prizeTemplatesData, error, isLoading } = useQuery({
+  const {
+    data: prizeTemplatesData,
+    error,
+    isLoading,
+  } = useQuery({
     queryKey: ["prize-templates"],
     queryFn: getGiveawayPrizeTemplates,
     retry: 3,
@@ -49,28 +49,26 @@ export default function PrizePage() {
   });
 
   // Use fallback if API fails or returns no data
-  const availableTemplates = prizeTemplatesData && prizeTemplatesData.length > 0 
-    ? prizeTemplatesData 
-    : [fallbackPrizeTemplate];
+  const availableTemplates =
+    prizeTemplatesData && prizeTemplatesData.length > 0
+      ? prizeTemplatesData
+      : [fallbackPrizeTemplate];
 
   useEffect(() => {
     if (!selectedPrizeTemplate) {
       setCreateButtonDisabled(true);
       return;
     }
-    // Require Title for prize creation; quantity if present must be > 0
+    // Require Title for prize creation; quantity if present must be > 0; title must be <= 20 chars
     const titleValue = fieldsData.find((f) => f.label === "Title")?.value || "";
-    const quantityRaw = fieldsData.find((f) => f.label === "Quantity")?.value || "";
+    const quantityRaw =
+      fieldsData.find((f) => f.label === "Quantity")?.value || "";
     const quantityOk = quantityRaw === "" || Number(quantityRaw) > 0;
-    setCreateButtonDisabled(!(titleValue.trim().length > 0 && quantityOk));
+    const titleOk =
+      titleValue.trim().length > 0 &&
+      titleValue.length <= MAX_PRIZE_TITLE_LENGTH;
+    setCreateButtonDisabled(!(titleOk && quantityOk));
   }, [fieldsData, selectedPrizeTemplate]);
-
-  // Debug-Logging
-  console.log("Prize Templates Data:", prizeTemplatesData);
-  console.log("Error:", error);
-  console.log("Loading:", isLoading);
-  console.log("API URL:", import.meta.env.VITE_API_URL);
-  console.log("Available Templates:", availableTemplates);
 
   return (
     <>
@@ -106,7 +104,8 @@ export default function PrizePage() {
                   type: "text",
                   name: "description",
                   value:
-                    fieldsData.find((f) => f.label === "Description")?.value || "",
+                    fieldsData.find((f) => f.label === "Description")?.value ||
+                    "",
                 },
                 {
                   type: "number",
@@ -130,7 +129,9 @@ export default function PrizePage() {
         <Block margin="top" marginValue={44}>
           {isLoading ? (
             <Block>
-              <Text type="text" align="center">Loading prize templates...</Text>
+              <Text type="text" align="center">
+                Loading prize templates...
+              </Text>
             </Block>
           ) : error ? (
             <Block>
@@ -165,10 +166,13 @@ export default function PrizePage() {
                       className="px-4 py-2.5"
                       type="text"
                       placeholder="e.g. Cap with logo"
+                      maxLength={MAX_PRIZE_TITLE_LENGTH}
                       value={fieldsData.find((f) => f.label === "Title")?.value}
                       onChange={(value) => {
                         setFieldsData((prev) => {
-                          const existingField = prev.find((f) => f.label === "Title");
+                          const existingField = prev.find(
+                            (f) => f.label === "Title",
+                          );
                           if (existingField) {
                             return prev.map((f) =>
                               f.label === "Title" ? { ...f, value } : f,
@@ -176,7 +180,12 @@ export default function PrizePage() {
                           }
                           return [
                             ...prev,
-                            { type: "text", value, label: "Title", placeholder: "" },
+                            {
+                              type: "text",
+                              value,
+                              label: "Title",
+                              placeholder: "",
+                            },
                           ];
                         });
                       }}
@@ -186,13 +195,17 @@ export default function PrizePage() {
                   <List header="Description" className="bg-section-bg">
                     <Input
                       rows={2}
-                      className="px-4 py-2.5 !h-[auto] !min-h-[66px] resize-none"
+                      className="!h-[auto] !min-h-[66px] resize-none px-4 py-2.5"
                       type="textarea"
                       placeholder="Optional description"
-                      value={fieldsData.find((f) => f.label === "Description")?.value}
+                      value={
+                        fieldsData.find((f) => f.label === "Description")?.value
+                      }
                       onChange={(value) => {
                         setFieldsData((prev) => {
-                          const existingField = prev.find((f) => f.label === "Description");
+                          const existingField = prev.find(
+                            (f) => f.label === "Description",
+                          );
                           if (existingField) {
                             return prev.map((f) =>
                               f.label === "Description" ? { ...f, value } : f,
@@ -200,7 +213,12 @@ export default function PrizePage() {
                           }
                           return [
                             ...prev,
-                            { type: "text", value, label: "Description", placeholder: "" },
+                            {
+                              type: "text",
+                              value,
+                              label: "Description",
+                              placeholder: "",
+                            },
                           ];
                         });
                       }}
@@ -212,10 +230,14 @@ export default function PrizePage() {
                       className="px-4 py-2.5"
                       type="number"
                       placeholder="1"
-                      value={fieldsData.find((f) => f.label === "Quantity")?.value}
+                      value={
+                        fieldsData.find((f) => f.label === "Quantity")?.value
+                      }
                       onChange={(value) => {
                         setFieldsData((prev) => {
-                          const existingField = prev.find((f) => f.label === "Quantity");
+                          const existingField = prev.find(
+                            (f) => f.label === "Quantity",
+                          );
                           if (existingField) {
                             return prev.map((f) =>
                               f.label === "Quantity" ? { ...f, value } : f,
@@ -223,7 +245,12 @@ export default function PrizePage() {
                           }
                           return [
                             ...prev,
-                            { type: "number", value, label: "Quantity", placeholder: "1" },
+                            {
+                              type: "number",
+                              value,
+                              label: "Quantity",
+                              placeholder: "1",
+                            },
                           ];
                         });
                       }}

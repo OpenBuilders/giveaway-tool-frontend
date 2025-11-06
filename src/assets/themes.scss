@@ -17,12 +17,14 @@ html[data-theme='light'] {
   --color-backgroundBlack: #{$palette-dark100};
   --color-backgroundWhite: #{$palette-white100};
   --color-input: #{$palette-transparentWhite80};
+  
+  --color-bg: var(--no-tg-theme-secondary-bg-color, #efeff4);
 }
 
 html[data-theme='dark'] {
   --color-backgroundSecondary: #{$palette-dark90};
   --color-backgroundTertiary: #{$palette-dark85};
-  --color-backgroundPrimary: var(--no-tg-theme-section_bg_color, #FFFFFF);
+  --color-backgroundPrimary: var(--no-tg-theme-section_bg_color, #1C1C1E);
   --color-textIconsPrimary: var(--no-tg-theme-text-color, #FFFFFF);
   --color-textIconsSecondary: var(--no-tg-theme-hint-color, #8E8E93);
   --color-textIconsTertiary: var(--no-tg-theme-hint-color, #8E8E93);

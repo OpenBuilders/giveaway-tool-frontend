@@ -44,7 +44,28 @@ export const TelegramMainButton = memo(
         webApp.MainButton.offClick(onClick)
         webApp.MainButton.hide()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
+
+    // Listen for TON Connect modal close event to restore button state
+    useEffect(() => {
+      if (!webApp?.MainButton) return
+
+      const handleModalClosed = () => {
+        if (isVisible && text) {
+          webApp.MainButton.show()
+          if (!disabled && !loading) {
+            webApp.MainButton.enable()
+          }
+        }
+      }
+
+      window.addEventListener('tonconnect-modal-closed', handleModalClosed)
+      
+      return () => {
+        window.removeEventListener('tonconnect-modal-closed', handleModalClosed)
+      }
+    }, [webApp, isVisible, text, disabled, loading])
 
     useEffect(() => {
       if (!webApp?.MainButton) return
@@ -66,6 +87,7 @@ export const TelegramMainButton = memo(
       } else {
         webApp.MainButton.hideProgress()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [disabled, loading, text])
 
     useEffect(() => {
@@ -78,6 +100,7 @@ export const TelegramMainButton = memo(
           }
         }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [onClick])
 
     if (
