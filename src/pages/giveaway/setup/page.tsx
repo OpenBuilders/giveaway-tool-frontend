@@ -30,6 +30,7 @@ import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
 import { getAvailableChannels } from "@/api/user.api";
 import { addBotToChannelLink } from "@/utils/addBotToChannelLink";
 import { MAX_GIVEAWAY_TITLE_LENGTH } from "@/utils";
+import { AxiosError } from "axios";
 
 export default function GiveawaySetUpPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
@@ -65,9 +66,11 @@ export default function GiveawaySetUpPage() {
       navigate(`/giveaway/${data.id}`);
       reset();
     },
-    onError: () => {
+    onError: (
+      error: AxiosError & { response: { data: { error: string } } },
+    ) => {
       showToast({
-        message: "Can't create giveaway (",
+        message: error.response?.data?.error || "Can't create giveaway",
         type: "error",
         time: 2000,
       });
@@ -77,7 +80,7 @@ export default function GiveawaySetUpPage() {
   const { data: availableChannelsData } = useQuery({
     queryKey: ["available-channels"],
     queryFn: getAvailableChannels,
-    refetchInterval: addButtonPressed ? 5000 : false,
+    refetchInterval: addButtonPressed ? 2000 : false,
   });
 
   const handleClick = () => {

@@ -34,7 +34,7 @@ export const UiLoader = ({ children }: { children: React.ReactNode }) => {
   const [renderModal, setRenderModal] = useState(!user);
 
   const modalClassName =
-    "fixed z-[99999999] top-0 left-0 w-screen h-screen flex justify-center items-center";
+    "fixed z-[99999999] top-0 left-0 w-screen h-screen flex justify-center items-center text-text";
 
   // trigger user-load
   useEffect(() => {

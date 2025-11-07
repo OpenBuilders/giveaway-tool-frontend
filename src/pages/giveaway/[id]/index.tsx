@@ -333,10 +333,12 @@ export default function GiveawayPage() {
   }, [giveaway?.ends_at]);
 
   useEffect(() => {
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
-    return () => clearInterval(interval);
-  }, [updateTimer]);
+    if (giveaway?.status === "active") {
+      updateTimer();
+      const interval = setInterval(updateTimer, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [updateTimer, giveaway?.status]);
 
   const hasHoldRequirement = (giveaway?.requirements ?? []).some(
     (r) => r.type === "holdton" || r.type === "holdjetton",

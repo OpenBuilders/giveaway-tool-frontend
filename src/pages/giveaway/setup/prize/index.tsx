@@ -9,7 +9,7 @@ import { ListItem } from "@/components/ui/list/ListItem";
 import { Select } from "@/components/ui/inputs/SelectInput";
 import { useGiveawayStore } from "@/store/giveaway.slice";
 import { GiveawayPrizeTemplateType } from "@/interfaces/giveaway.interface";
-import { Block, Text, PageLayout, TelegramMainButton } from "@/components/kit";
+import { Block, Text, PageLayout, TelegramMainButton, useToast } from "@/components/kit";
 import { getPrizeIcon } from "@/assets/icons/helper";
 import { MAX_PRIZE_TITLE_LENGTH } from "@/utils";
 
@@ -34,6 +34,7 @@ export default function PrizePage() {
     }[]
   >([]);
   const { addPrize } = useGiveawayStore();
+  const { showToast } = useToast();
 
   const navigate = useNavigate();
 
@@ -82,6 +83,15 @@ export default function PrizePage() {
           text="Add Prize"
           disabled={createButtonDisabled}
           onClick={() => {
+            if (fieldsData.find((f) => f.label === "Title")?.value === "") {
+              showToast({
+                message: "Title is required",
+                type: "error",
+                time: 2000,
+              });
+              return;
+            }
+
             addPrize({
               prize_type:
                 GiveawayPrizeTemplateType[
