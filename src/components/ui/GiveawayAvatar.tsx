@@ -69,7 +69,7 @@ export const GiveawayAvatar = memo(({
           </div>
         </div>
       );
-    } else if (avatars?.length === 3) {
+    } else if (avatars?.length >= 3) {
       return (
         <div className="relative flex h-10 w-10">
           <div className="border-section-bg absolute -top-[3px] -left-[3px] overflow-hidden rounded-full border-[3px]">

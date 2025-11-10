@@ -62,8 +62,11 @@ export interface IGiveawayRequirement {
 
 export interface IGiveawayWinners {
   user_id: number;
-  username: string;
+  username?: string;
+  name: string;
+  avatar_url?: string;
   place: number;
+  prizes: { title: string; description?: string }[];
 }
 
 export interface IGiveawayCreator {

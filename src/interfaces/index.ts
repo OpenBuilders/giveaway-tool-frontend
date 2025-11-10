@@ -22,6 +22,6 @@ export interface IListItem {
   };
   winner?: {
     isWinner: boolean;
-    place: number;
+    place: string | number;
   };
 }

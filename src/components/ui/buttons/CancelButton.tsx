@@ -18,7 +18,7 @@ export const CancelButton = ({
       disabled={disabled}
       className={`flex items-center gap-4 w-full text-destructive disabled:opacity-70 disabled:cursor-not-allowed ${className}`}
     >
-      <CirclePlusIcon isCustomColor />
+      <CirclePlusIcon isCustomColor className="rotate-45" />
       <span>{children}</span>
     </button>
   );

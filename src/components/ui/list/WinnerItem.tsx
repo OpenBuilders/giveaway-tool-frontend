@@ -13,9 +13,10 @@ export const WinnerItem = ({
   className?: string;
   separator?: boolean;
 }) => {
+  console.log(winner);
   return (
     <div
-      className={`py-[11px] px-4 items-start flex bg-section-bg w-full justify-between border-giveaway ${
+      className={`py-[11px] px-4 items-center flex bg-section-bg w-full justify-between ${
         logo ? "after:left-[65px]" : "after:left-[16px]"
       } ${!separator ? "after:hidden" : ""} ${className}`}
       onClick={() => {

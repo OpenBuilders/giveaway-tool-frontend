@@ -33,7 +33,7 @@ export const List = ({
   const addButtonClass =
     "bg-section-bg border-giveaway flex max-h-[44px] w-full items-center justify-between px-4 py-2";
 
-  if (!items?.length && !giveaways?.length && !children && !addButton)
+  if (!items?.length && !giveaways?.length && !winners?.length && !children && !addButton)
     return null;
 
   return (
@@ -51,7 +51,7 @@ export const List = ({
           giveaways && !addButton ? "gap-3" : ""
         } ${className}`}
       >
-        {!children && (items || giveaways) ? (
+        {!children && (items || giveaways || winners) ? (
           <>
             {items?.map((item, index) => (
               <ListItem

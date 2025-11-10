@@ -52,7 +52,7 @@
   --color-destructive: var(--no-tg-theme-destructive_text_color, #ff3b30);
   --color-button: var(--no-tg-theme-button-color, #007aff);
   --color-button-text: var(--no-tg-theme-button-text-color, #ffffff);
-  --color-section-bg: var(--no-tg-theme-section-bg-color, #efeff4);
+  --color-section-bg: var(--no-tg-theme-section-bg-color, #FFFFFF);
   --color-section-header-text: var(
     --no-tg-theme-section_header_text_color,
     #8d8e93

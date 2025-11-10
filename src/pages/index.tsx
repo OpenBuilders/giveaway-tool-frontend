@@ -64,6 +64,8 @@ export default function MainPage() {
     myGiveaways?.filter(
       (g) => g.status === "cancelled" || g.status === "completed",
     ) ?? [];
+  const myPendingGiveaways =
+    myGiveaways?.filter((g) => g.status === "pending") ?? [];
   const myPausedGiveaways =
     myGiveaways?.filter((g) => g.status === "paused") ?? [];
   const myDeletedGiveaways =
@@ -109,6 +111,13 @@ export default function MainPage() {
           <>
             {myActiveGiveaways.length > 0 || myFinishedGiveaways.length > 0 ? (
               <Block gap={24}>
+                <List
+                  header="pending"
+                  giveaways={myPendingGiveaways}
+                  onItemClick={({ id }) => {
+                    navigate(`/giveaway/${id}`);
+                  }}
+                />
                 <List
                   header="active"
                   giveaways={myActiveGiveaways}

@@ -5,6 +5,7 @@ import { BackButton } from "@twa-dev/sdk/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { giveawayApi } from "@/api";
+import api from "@/api/helper";
 import { CopyIcon } from "@/assets/icons/CopyIcon";
 import { ForwardIcon } from "@/assets/icons/ForwardIcon";
 import WebApp from "@twa-dev/sdk";
@@ -44,6 +45,8 @@ import useWallet from "@/hooks/useWallet";
 import { IUserPreviewCheckWinner } from "@/interfaces/giveaway.interface";
 import { CancelButton } from "@/components/ui/buttons/CancelButton";
 import { WhiteListIcon } from "@/assets/icons/requirements/WhiteListIcon";
+import { AxiosError } from "axios";
+import { DownloadIcon } from "@/assets/icons/DownloadIcon";
 
 type PrizeLike = {
   title?: string;
@@ -344,6 +347,58 @@ export default function GiveawayPage() {
     (r) => r.type === "holdton" || r.type === "holdjetton",
   );
 
+  const downloadResultsCsv = async () => {
+    const filename = `giveaway_${id}_winners.csv`;
+    const giveawayId = String(id);
+
+    try {
+      // Step 1: get one-time public export link (authorized)
+      const linkResponse = await api.get<{ url: string; expires_in: number }>(
+        `/v1/giveaways/${giveawayId}/export-link`,
+      );
+      const publicUrl = linkResponse.data.url;
+
+      const webApp = window?.Telegram?.WebApp;
+      // Prefer Telegram native downloader when available
+      if (webApp && typeof webApp.downloadFile === "function") {
+        try {
+          webApp.downloadFile({
+            url: publicUrl,
+            file_name: filename,
+          });
+          return;
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      // Try opening external browser via Telegram
+      if (webApp && typeof webApp.openLink === "function") {
+        try {
+          webApp.openLink(publicUrl, { try_browser: true });
+          return;
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      // Default browser behavior: anchor navigation with download hint
+      const link = document.createElement("a");
+      link.href = publicUrl;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error(error);
+      showToast({
+        message: "Failed to download results",
+        type: "error",
+        time: 2000,
+      });
+    }
+  };
+
   const { data: loadedWinnersData } = useQuery({
     queryKey: ["loadedWinners", id, giveaway?.status, isAdmin],
     queryFn: () => getLoadedWinnersList(String(id)),
@@ -364,6 +419,8 @@ export default function GiveawayPage() {
         type: "success",
         time: 2000,
       });
+
+      queryClient.invalidateQueries({ queryKey: ["giveaway", id] });
 
       setParticipantsInfoJoined();
       setHasJoined(true);
@@ -391,9 +448,9 @@ export default function GiveawayPage() {
         });
       }
     },
-    onError: () => {
+    onError: (error: AxiosError<{ error: string }>) => {
       showToast({
-        message: "Failed to load winners list",
+        message: error.response?.data?.error || "Failed to load winners list",
         type: "error",
         time: 2000,
       });
@@ -432,7 +489,8 @@ export default function GiveawayPage() {
       ) : giveaway?.status === "active" &&
         giveaway.user_role === "user" &&
         !hasJoined &&
-        !prizeSheetState.opened ? (
+        !prizeSheetState.opened &&
+        !customReqSheetState.opened ? (
         <TelegramMainButton
           text="Join Giveaway"
           onClick={() => {
@@ -649,11 +707,11 @@ export default function GiveawayPage() {
                       title: getRequirementTitle(requirement),
                       rightIcon: "arrow",
                       onClick: () => {
-                        if (requirement.username) {
-                          goTo(`https://t.me/${requirement.username}`);
-                        }
                         if (requirement.url) {
                           goTo(requirement.url);
+                        }
+                        if (requirement.username) {
+                          goTo(`https://t.me/${requirement.username}`);
                         }
                         if (requirement.type === "custom") {
                           setCustomReqSheetState({
@@ -718,6 +776,14 @@ export default function GiveawayPage() {
                                 // noop
                               });
                             }, 3000);
+                          }
+                          if (requirement.type === "boost") {
+                            if (requirement.url) {
+                              goTo(requirement.url);
+                            }
+                            if (requirement.username) {
+                              goTo(`https://t.me/${requirement.username}`);
+                            }
                           }
                           if (requirement.type === "custom") {
                             setCustomReqSheetState({
@@ -813,7 +879,7 @@ export default function GiveawayPage() {
               </List>
             )}
 
-            {giveaway?.winners && giveaway?.winners.length > 0 && (
+            {giveaway && giveaway.winners && giveaway.winners.length > 0 && (
               <List
                 header={`winners (${giveaway?.winners.length} users)`}
                 beforeList={
@@ -832,13 +898,15 @@ export default function GiveawayPage() {
                   )
                 }
                 winners={giveaway?.winners?.map(
-                  (winner, index) =>
+                  (winner) =>
                     ({
-                      id: index.toString(),
-                      logo: "/gift.svg",
-                      title: winner.username,
+                      id: winner.user_id.toString(),
+                      logo: winner.avatar_url || "/gift.svg",
+                      title: winner.name || winner.username,
                       winner: {
-                        place: winner.place,
+                        place: winner.prizes
+                          ?.map((prize) => prize.title)
+                          ?.join(", "),
                         isWinner:
                           WebApp.initDataUnsafe.user?.id === winner.user_id,
                       },
@@ -884,6 +952,20 @@ export default function GiveawayPage() {
                 >
                   Cancel Giveaway
                 </CancelButton>
+              </div>
+            )}
+            {isAdmin && giveaway?.status === "completed" && (
+              <div
+                className={`bg-section-bg border-giveaway flex max-h-[44px] w-full items-center justify-between rounded-[10px] px-4 py-2`}
+              >
+                <button
+                  type="button"
+                  onClick={downloadResultsCsv}
+                  className={`text-link flex w-full items-center gap-4 disabled:cursor-not-allowed disabled:opacity-70`}
+                >
+                  <DownloadIcon isCustomColor className="rotate-180" />
+                  <span>Download results</span>
+                </button>
               </div>
             )}
           </Block>
