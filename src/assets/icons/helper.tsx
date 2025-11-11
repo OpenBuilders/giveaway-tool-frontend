@@ -34,42 +34,46 @@ export const getRequirementIcon = (
       />
     );
   }
+
+  const avatarUrl =
+    requirement?.avatar_url ||
+    requirement?.channel?.avatar_url ||
+    requirement?.chat_info?.avatar_url;
+
+  const title =
+    requirement.name?.replace("@", "") ||
+    requirement.username?.replace("@", "") ||
+    requirement.channel?.title ||
+    requirement?.chat_info?.title;
+
   switch (requirement.type) {
     case "subscription":
-      if (requirement.avatar_url)
+      if (avatarUrl)
         return (
           <ChannelAvatar
-            title={
-              requirement.name?.replace("@", "") ||
-              requirement.username?.replace("@", "") ||
-              requirement.channel?.title
-            }
+            title={title}
             avatar_url={
-              requirement?.avatar_url ||
-              requirement?.chat_info?.avatar_url ||
+              avatarUrl// ||
+              // `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
               // `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
-              `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
             }
           />
         );
       return <SubscribeIcon />;
     case "boost":
-      // if (requirement.avatar_url)
-      //   return (
-      //     <ChannelAvatar
-      //       title={
-      //         requirement.name?.replace("@", "") ||
-      //         requirement.username?.replace("@", "") ||
-      //         requirement.channel?.title
-      //       }
-      //       avatar_url={
-      //         requirement?.avatar_url ||
-      //         requirement?.chat_info?.avatar_url ||
-      //         // `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
-      //         `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
-      //       }
-      //     />
-      //   );
+      if (avatarUrl)
+        return (
+          <ChannelAvatar
+            title={
+              title
+            }
+            avatar_url={
+              avatarUrl// ||
+              // `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
+              // `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
+            }
+          />
+        );
       return <BoostIcon />;
     case "custom":
       return <WhiteListIcon />;
@@ -97,7 +101,7 @@ export const getRequirementIcon = (
               ? requirement.name
               : requirement.name?.charAt(1)
           }
-          avatar_url={requirement.avatar_url}
+          avatar_url={avatarUrl}
         />
       );
   }
