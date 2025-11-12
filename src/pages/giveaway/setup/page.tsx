@@ -213,11 +213,11 @@ export default function GiveawaySetUpPage() {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 0,
                   })
-                : 0
+                : undefined
             }
             onChange={(value) => {
               const number = parseInt(value.replace(",", "")) || 0;
-              if (number > 999999 || number < 1) return;
+              if (number > 999999 || number < 1) setWinners(NaN);
 
               setWinners(number);
             }}
@@ -337,9 +337,9 @@ export default function GiveawaySetUpPage() {
                   )}
                   title={safeTitle}
                   description={`${inputsCount} inputs`}
-                  // onClick={() => {
-                  //   navigate(`/giveaway/setup/prize/${index}`);
-                  // }}
+                  onClick={() => {
+                    navigate(`/giveaway/setup/prize/${index}`);
+                  }}
                   className="rounded-[10px] after:h-0 [&_img]:scale-75"
                   rightIcon={undefined}
                 />

@@ -5,6 +5,7 @@ import { WinnerItem } from "./WinnerItem";
 
 interface ListProps {
   header?: string;
+  headerRight?: React.ReactNode;
   items?: IListItem[];
   giveaways?: IListItem[];
   winners?: IListItem[];
@@ -19,6 +20,7 @@ interface ListProps {
 
 export const List = ({
   header,
+  headerRight,
   footer,
   beforeList,
   items,
@@ -33,15 +35,24 @@ export const List = ({
   const addButtonClass =
     "bg-section-bg border-giveaway flex max-h-[44px] w-full items-center justify-between px-4 py-2";
 
-  if (!items?.length && !giveaways?.length && !winners?.length && !children && !addButton)
+  if (
+    !items?.length &&
+    !giveaways?.length &&
+    !winners?.length &&
+    !children &&
+    !addButton
+  )
     return null;
 
   return (
     <div className="flex w-full flex-col items-start">
-      {header && (
-        <p className="text-section-header-text tracking-footnote px-4 py-[5px] text-sm uppercase">
-          {header}
-        </p>
+      {(header || headerRight) && (
+        <div className="flex w-full items-center justify-between">
+          <p className="text-section-header-text tracking-footnote px-4 py-[5px] text-sm uppercase">
+            {header}
+          </p>
+          {headerRight && headerRight}
+        </div>
       )}
 
       {beforeList && <div className="mb-2.5 w-full">{beforeList}</div>}

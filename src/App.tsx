@@ -14,7 +14,7 @@ function App() {
   useEffect(() => {
     document.documentElement.setAttribute(
       "data-theme",
-      darkTheme ? "dark" : "light"
+      darkTheme ? "dark" : "light",
       // "light"
     );
 
@@ -31,7 +31,12 @@ function App() {
 
   useEffect(() => {
     webApp.disableVerticalSwipes();
-  }, []);
+    try {
+      webApp.requestWriteAccess();
+    } catch (error) {
+      console.error("Failed to request write access:", error);
+    }
+  }, [webApp]);
 
   return (
     <BrowserRouter>
@@ -47,6 +52,7 @@ function App() {
             <Route index element={<GiveawaySetUpPage />} />
 
             <Route path="prize" element={<PrizePage />} />
+            <Route path="prize/:id" element={<PrizePage />} />
             <Route path="requirement" element={<RequirementPage />} />
           </Route>
         </Route>

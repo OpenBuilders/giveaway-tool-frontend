@@ -46,7 +46,7 @@ import { IUserPreviewCheckWinner } from "@/interfaces/giveaway.interface";
 import { CancelButton } from "@/components/ui/buttons/CancelButton";
 import { WhiteListIcon } from "@/assets/icons/requirements/WhiteListIcon";
 import { AxiosError } from "axios";
-import { DownloadIcon } from "@/assets/icons/DownloadIcon";
+import { WinnerItem } from "@/components/ui/list/WinnerItem";
 
 type PrizeLike = {
   title?: string;
@@ -882,18 +882,49 @@ export default function GiveawayPage() {
             {giveaway && giveaway.winners && giveaway.winners.length > 0 && (
               <List
                 header={`winners (${giveaway?.winners.length} users)`}
+                headerRight={
+                  isAdmin &&
+                  giveaway?.status === "completed" && (
+                    // <div
+                    //   className={`bg-section-bg border-giveaway flex max-h-[44px] w-full items-center justify-between rounded-[10px] px-4 py-2`}
+                    // >
+                    //   <button
+                    //     type="button"
+                    //     onClick={downloadResultsCsv}
+                    //     className={`text-link flex w-full items-center gap-4 disabled:cursor-not-allowed disabled:opacity-70`}
+                    //   >
+                    //     <DownloadIcon isCustomColor className="rotate-180" />
+                    //     <span>Download results</span>
+                    //   </button>
+                    // </div>
+                    <button
+                      type="button"
+                      onClick={downloadResultsCsv}
+                      className={`text-link uppercase flex items-center cursor-pointer disabled:cursor-not-allowed disabled:opacity-70`}
+                    >
+                      <Text type="caption" color="accent">Download</Text>
+                    </button>
+                  )
+                }
                 beforeList={
                   giveaway.user_role === "winner" && (
-                    <ListItem
+                    <WinnerItem
+                      className="rounded-[10px]"
                       id="1"
                       title="You"
                       logo={WebApp.initDataUnsafe.user?.photo_url}
-                      rightIcon={
-                        giveaway.winners.findIndex(
-                          (winner) =>
-                            winner.user_id === WebApp.initDataUnsafe.user?.id,
-                        ) + 1
-                      }
+                      winner={{
+                        place:
+                          giveaway.winners
+                            .find(
+                              (winner) =>
+                                winner.user_id ===
+                                WebApp.initDataUnsafe.user?.id,
+                            )
+                            ?.prizes?.map((prize) => prize.title)
+                            ?.join(", ") || "",
+                        isWinner: true,
+                      }}
                     />
                   )
                 }
@@ -952,20 +983,6 @@ export default function GiveawayPage() {
                 >
                   Cancel Giveaway
                 </CancelButton>
-              </div>
-            )}
-            {isAdmin && giveaway?.status === "completed" && (
-              <div
-                className={`bg-section-bg border-giveaway flex max-h-[44px] w-full items-center justify-between rounded-[10px] px-4 py-2`}
-              >
-                <button
-                  type="button"
-                  onClick={downloadResultsCsv}
-                  className={`text-link flex w-full items-center gap-4 disabled:cursor-not-allowed disabled:opacity-70`}
-                >
-                  <DownloadIcon isCustomColor className="rotate-180" />
-                  <span>Download results</span>
-                </button>
               </div>
             )}
           </Block>

@@ -16,7 +16,7 @@ export const WinnerItem = ({
   console.log(winner);
   return (
     <div
-      className={`py-[11px] px-4 items-center flex bg-section-bg w-full justify-between ${
+      className={`py-[5px] px-4 items-center flex bg-section-bg w-full justify-between ${
         logo ? "after:left-[65px]" : "after:left-[16px]"
       } ${!separator ? "after:hidden" : ""} ${className}`}
       onClick={() => {
@@ -25,7 +25,7 @@ export const WinnerItem = ({
     >
       {logo && (
         <div className={`mr-2.5 overflow-hidden ${
-          typeof logo === "string" ? "bg-black rounded-full aspect-square max-w-9" : ""
+          typeof logo === "string" ? "bg-black rounded-full aspect-square max-w-10 max-h-10 min-w-10 min-h-10" : ""
         }`}>
           {typeof logo === "string" ? (
             <img src={logo} alt="giveaway logo" />

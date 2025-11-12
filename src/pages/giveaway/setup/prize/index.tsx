@@ -3,7 +3,7 @@ import { List } from "@/components/ui/list/List";
 import { useQuery } from "@tanstack/react-query";
 import { BackButton } from "@twa-dev/sdk/react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { getGiveawayPrizeTemplates } from "@/api/utils.api";
 import { ListItem } from "@/components/ui/list/ListItem";
 import { Select } from "@/components/ui/inputs/SelectInput";
@@ -33,10 +33,13 @@ export default function PrizePage() {
       value: string;
     }[]
   >([]);
-  const { addPrize } = useGiveawayStore();
+  const { addPrize, updatePrize, prizes } = useGiveawayStore();
   const { showToast } = useToast();
 
   const navigate = useNavigate();
+  const { id } = useParams();
+  const editIndex = Number.isFinite(Number(id)) ? Number(id) : null;
+  const isEditMode = editIndex !== null && editIndex >= 0 && editIndex < (prizes?.length ?? 0);
 
   const {
     data: prizeTemplatesData,
@@ -54,6 +57,66 @@ export default function PrizePage() {
     prizeTemplatesData && prizeTemplatesData.length > 0
       ? prizeTemplatesData
       : [fallbackPrizeTemplate];
+
+  // Prefill for edit mode
+  useEffect(() => {
+    if (!isEditMode) return;
+    const existingPrize = prizes[editIndex!];
+    if (!existingPrize) return;
+
+    // Determine selected template from existing prize
+    const templateFromPrize = existingPrize.prize_type || GiveawayPrizeTemplateType.Custom;
+    setSelectedPrizeTemplate(String(templateFromPrize));
+
+    // Map stored fields (with names) to UI fieldsData (with labels)
+    const nameToLabel: Record<string, string> = {
+      title: "Title",
+      description: "Description",
+      quantity: "Quantity",
+    };
+    const typeByLabel: Record<string, string> = {
+      Title: "text",
+      Description: "text",
+      Quantity: "number",
+    };
+    const prefilled = (existingPrize.fields || [])
+      .map((field) => {
+        const name = (field as unknown as { name?: string }).name;
+        const value = (field as unknown as { value?: string }).value ?? "";
+        if (!name || !(name in nameToLabel)) return null;
+        const label = nameToLabel[name];
+        return {
+          type: typeByLabel[label],
+          label,
+          placeholder: label === "Quantity" ? "1" : "",
+          value,
+        };
+      })
+      .filter(Boolean) as {
+      type: string;
+      label: string;
+      placeholder: string;
+      value: string;
+    }[];
+
+    // Ensure all expected fields exist (keep current value if not present)
+    const ensureField = (label: "Title" | "Description" | "Quantity") => {
+      const existing = prefilled.find((f) => f.label === label);
+      if (existing) return existing;
+      return {
+        type: label === "Quantity" ? "number" : "text",
+        label,
+        placeholder: label === "Quantity" ? "1" : "",
+        value: "",
+      };
+    };
+    const finalPrefill = [
+      ensureField("Title"),
+      ensureField("Description"),
+      ensureField("Quantity"),
+    ];
+    setFieldsData(finalPrefill);
+  }, [isEditMode, editIndex, prizes]);
 
   useEffect(() => {
     if (!selectedPrizeTemplate) {
@@ -80,7 +143,7 @@ export default function PrizePage() {
       />
       {selectedPrizeTemplate && (
         <TelegramMainButton
-          text="Add Prize"
+          text={isEditMode ? "Save" : "Add Prize"}
           disabled={createButtonDisabled}
           onClick={() => {
             if (fieldsData.find((f) => f.label === "Title")?.value === "") {
@@ -92,7 +155,7 @@ export default function PrizePage() {
               return;
             }
 
-            addPrize({
+            const prizePayload = {
               prize_type:
                 GiveawayPrizeTemplateType[
                   Object.keys(GiveawayPrizeTemplateType).find(
@@ -103,7 +166,6 @@ export default function PrizePage() {
                   ) as keyof typeof GiveawayPrizeTemplateType
                 ],
               fields: [
-                // Persist in fields so the setup page can map to the new request shape
                 {
                   type: "text",
                   name: "title",
@@ -124,7 +186,13 @@ export default function PrizePage() {
                     fieldsData.find((f) => f.label === "Quantity")?.value || "",
                 },
               ],
-            });
+            };
+
+            if (isEditMode) {
+              updatePrize(editIndex!, prizePayload);
+            } else {
+              addPrize(prizePayload);
+            }
             navigate("/giveaway/setup");
           }}
         />
@@ -133,7 +201,7 @@ export default function PrizePage() {
       <PageLayout>
         <Block margin="top" marginValue={44}>
           <Text type="title" align="center" weight="bold">
-            Add Prize
+            {isEditMode ? "Edit Prize" : "Add Prize"}
           </Text>
         </Block>
         <Block margin="top" marginValue={44}>

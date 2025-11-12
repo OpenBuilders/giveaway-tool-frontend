@@ -10,6 +10,15 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "SF Pro";
+  src:
+    local("SF Pro"),
+    url("https://github.com/sahibjotsaggu/San-Francisco-Pro-Fonts/blob/master/SF-Pro.ttf")
+      format("truetype");
+  font-display: swap;
+}
+
 :root {
   --second-button-color: rgba(0, 122, 255, 0.1);
   --toast-link: rgba(90, 200, 250, 1);
@@ -52,7 +61,7 @@
   --color-destructive: var(--no-tg-theme-destructive_text_color, #ff3b30);
   --color-button: var(--no-tg-theme-button-color, #007aff);
   --color-button-text: var(--no-tg-theme-button-text-color, #ffffff);
-  --color-section-bg: var(--no-tg-theme-section-bg-color, #FFFFFF);
+  --color-section-bg: var(--no-tg-theme-section-bg-color, #ffffff);
   --color-section-header-text: var(
     --no-tg-theme-section_header_text_color,
     #8d8e93
