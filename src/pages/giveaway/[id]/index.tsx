@@ -664,7 +664,7 @@ export default function GiveawayPage() {
                 <span className="max-w-[calc(100%-28px)] overflow-hidden text-ellipsis whitespace-nowrap">
                   {giveawayLink}
                 </span>
-                <div className="h-[28px] w-[28px]">
+                <div className="h-[28px] w-[28px] text-accent-text">
                   <CopyIcon />
                 </div>
               </div>
