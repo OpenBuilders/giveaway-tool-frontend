@@ -57,11 +57,11 @@ html[data-theme='dark'] {
 
   --color-bg: var(--no-tg-theme-secondary-bg-color, #1C1C1D);
   --color-text: var(--no-tg-theme-text-color, #FFFFFF);
-  --color-accent-text: var(--no-tg-theme-accent_text_color, #3E88F7);
+  --color-accent-text: var(--tg-theme-accent_text_color, #3E88F7);
   --color-hint: var(--no-tg-theme-hint-color, #8E8E93);
-  --color-link: var(--no-tg-theme-link-color, #0A84FF);
+  --color-link: var(--tg-theme-link-color, #0A84FF);
   --color-destructive: var(--no-tg-theme-destructive_text_color, #EB5545);
-  --color-button: var(--no-tg-theme-button-color, #0A84FF);
+  --color-button: var(--tg-theme-button-color, #0A84FF);
   --color-button-text: var(--no-tg-theme-button-text-color, #ffffff);
   --color-section-bg: var(--no-tg-theme-section-bg-color, #2C2C2E);
   --color-section-header-text: var(
