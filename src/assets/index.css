@@ -55,11 +55,11 @@
 
   --color-bg: var(--no-tg-theme-secondary-bg-color, transparent);
   --color-text: var(--no-tg-theme-text-color, #000000);
-  --color-accent-text: var(--no-tg-theme-accent_text_color, #007aff);
+  --color-accent-text: var(--tg-theme-accent_text_color, #007aff);
   --color-hint: var(--no-tg-theme-hint-color, #8e8e93);
-  --color-link: var(--no-tg-theme-link-color, #007aff);
+  --color-link: var(--tg-theme-link-color, #007aff);
   --color-destructive: var(--no-tg-theme-destructive_text_color, #ff3b30);
-  --color-button: var(--no-tg-theme-button-color, #007aff);
+  --color-button: var(--tg-theme-button-color, #007aff);
   --color-button-text: var(--no-tg-theme-button-text-color, #ffffff);
   --color-section-bg: var(--no-tg-theme-section-bg-color, #ffffff);
   --color-section-header-text: var(

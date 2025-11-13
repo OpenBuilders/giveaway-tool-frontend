@@ -28,6 +28,7 @@ export const getTopGiveaways = async (): Promise<IGiveaway[]> => {
 };
 
 export const getGiveawayById = async (id: string): Promise<IGiveaway> => {
+  await new Promise(resolve => setTimeout(resolve, 5000));
   const res = await api.get(`/v1/giveaways/${id}`);
   return res.data;
 };

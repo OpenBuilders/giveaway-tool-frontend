@@ -18,6 +18,7 @@ import {
   TelegramMainButton,
   Text,
   useToast,
+  DialogModal,
 } from "@/components/kit";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { IListItem } from "@/interfaces";
@@ -35,6 +36,7 @@ import { AxiosError } from "axios";
 export default function GiveawaySetUpPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
   const [addButtonPressed, setAddButtonPressed] = useState(false);
+  const [confirmFewPrizesModal, setConfirmFewPrizesModal] = useState(false);
 
   const {
     title,
@@ -83,27 +85,14 @@ export default function GiveawaySetUpPage() {
     refetchInterval: addButtonPressed ? 2000 : false,
   });
 
-  const handleClick = () => {
-    if (createGiveawayFetch.isPending) return;
-    if (createButtonDisabled) {
-      showToast({
-        message: "Fill all fields",
-        type: "error",
-        time: 2000,
-      });
-      return;
-    }
-
-    createGiveawayFetch.mutate({
+  const buildCreatePayload = (): IGiveawayCreateRequest => {
+    return {
       title,
       winners_count,
       duration: duration * 60,
       prizes: prizes.map((prize, index) => {
         // Extract new shape from stored fields (kept in store for UI)
-        type PrizeField = { name?: string; value?: string } & Record<
-          string,
-          string
-        >;
+        type PrizeField = { name?: string; value?: string } & Record<string, string>;
         const fields = prize.fields as PrizeField[];
 
         const titleField =
@@ -155,7 +144,43 @@ export default function GiveawaySetUpPage() {
       sponsors: sponsors.map((sponsor) => ({
         id: sponsor.id,
       })),
-    });
+    };
+  };
+
+  const totalPrizeQuantity = () => {
+    type PrizeField = { name?: string; value?: string } & Record<string, string>;
+    return prizes.reduce((sum, prize) => {
+      const fields = prize.fields as PrizeField[];
+      const quantityField =
+        fields.find((f) => (f.name ?? "") === "quantity")?.value || "";
+      const quantity =
+        quantityField === "" ? 1 : (Number(quantityField) || 0);
+      return sum + quantity;
+    }, 0);
+  };
+
+  const attemptCreate = () => {
+    const payload = buildCreatePayload();
+    createGiveawayFetch.mutate(payload);
+  };
+
+  const handleClick = () => {
+    if (createGiveawayFetch.isPending) return;
+    if (createButtonDisabled) {
+      showToast({
+        message: "Fill all fields",
+        type: "error",
+        time: 2000,
+      });
+      return;
+    }
+
+    if (totalPrizeQuantity() < winners_count) {
+      setConfirmFewPrizesModal(true);
+      return;
+    }
+
+    attemptCreate();
   };
 
   useEffect(() => {
@@ -373,6 +398,19 @@ export default function GiveawaySetUpPage() {
           />
         </Block>
       </PageLayout>
+
+      <DialogModal
+        active={confirmFewPrizesModal}
+        title="Not enough prizes"
+        description="The total quantity of prizes (defaults to 1 if not set) is less than the number of winners. Create the giveaway anyway?"
+        confirmText="Create"
+        closeText="Cancel"
+        onConfirm={() => {
+          setConfirmFewPrizesModal(false);
+          attemptCreate();
+        }}
+        onClose={() => setConfirmFewPrizesModal(false)}
+      />
     </>
   );
 }

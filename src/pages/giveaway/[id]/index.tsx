@@ -19,6 +19,7 @@ import {
   StickerPlayer,
   DialogModal,
   DialogSheet,
+  SkeletonElement,
 } from "@/components/kit";
 import { IListItem } from "@/interfaces";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -75,6 +76,61 @@ const SmallDetailsCard = ({
   );
 };
 
+const SkeletonHeader = () => {
+  return (
+    <>
+      <div className="flex w-full items-center justify-center">
+        <SkeletonElement style={{ width: 112, height: 112, borderRadius: 56 }} />
+      </div>
+      <Block margin="top" marginValue={8}>
+        <div className="flex flex-col items-center gap-2">
+          {/* Title */}
+          <SkeletonElement style={{ width: "70%", height: 28, borderRadius: 8 }} />
+          {/* Big timer digits */}
+          <SkeletonElement style={{ width: 240, height: 72, borderRadius: 12 }} />
+          {/* Secondary timer text (e.g., "until end today at ...") */}
+          <SkeletonElement style={{ width: "60%", height: 16, borderRadius: 6 }} />
+        </div>
+      </Block>
+    </>
+  );
+};
+
+const SkeletonContent = () => {
+  return (
+    <Block gap={24} margin="top" marginValue={24}>
+      <Block gap={10}>
+        <div className="grid w-full grid-cols-2 gap-2.5">
+          <SkeletonElement style={{ width: "100%", height: 72, borderRadius: 12 }} />
+          <SkeletonElement style={{ width: "100%", height: 72, borderRadius: 12 }} />
+        </div>
+      </Block>
+
+      <Block padding="bottom" paddingValue={32}>
+        <Block margin="top" marginValue={24} gap={24}>
+          <div className="grid grid-cols-2 gap-2.5">
+            {Array.from({ length: 4 }).map((_, idx) => (
+              <SkeletonElement
+                key={`prize-skel-${idx}`}
+                style={{ width: "100%", height: 50, borderRadius: 10 }}
+              />
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-2.5">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <SkeletonElement
+                key={`req-skel-${idx}`}
+                style={{ width: "100%", height: 52, borderRadius: 10 }}
+              />
+            ))}
+          </div>
+        </Block>
+      </Block>
+    </Block>
+  );
+};
+
 export default function GiveawayPage() {
   const { id } = useParams();
   const queryClient = useQueryClient();
@@ -83,7 +139,7 @@ export default function GiveawayPage() {
   //   [key: string]: boolean;
   // }>({});
 
-  const { data: giveaway } = useQuery({
+  const { data: giveaway, isLoading: isGiveawayLoading } = useQuery({
     queryKey: ["giveaway", id],
     queryFn: () => giveawayApi.getGiveawayById(String(id)),
     enabled: !!id,
@@ -475,6 +531,24 @@ export default function GiveawayPage() {
       });
     },
   });
+
+  if (isGiveawayLoading) {
+    return (
+      <>
+        <BackButton
+          onClick={() => {
+            navigate("/");
+          }}
+        />
+        <PageLayout>
+          <>
+            <SkeletonHeader />
+            <SkeletonContent />
+          </>
+        </PageLayout>
+      </>
+    );
+  }
 
   return (
     <>
