@@ -9,7 +9,13 @@ import { ListItem } from "@/components/ui/list/ListItem";
 import { Select } from "@/components/ui/inputs/SelectInput";
 import { useGiveawayStore } from "@/store/giveaway.slice";
 import { GiveawayPrizeTemplateType } from "@/interfaces/giveaway.interface";
-import { Block, Text, PageLayout, TelegramMainButton, useToast } from "@/components/kit";
+import {
+  Block,
+  Text,
+  PageLayout,
+  TelegramMainButton,
+  useToast,
+} from "@/components/kit";
 import { getPrizeIcon } from "@/assets/icons/helper";
 import { MAX_PRIZE_TITLE_LENGTH } from "@/utils";
 
@@ -39,7 +45,8 @@ export default function PrizePage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const editIndex = Number.isFinite(Number(id)) ? Number(id) : null;
-  const isEditMode = editIndex !== null && editIndex >= 0 && editIndex < (prizes?.length ?? 0);
+  const isEditMode =
+    editIndex !== null && editIndex >= 0 && editIndex < (prizes?.length ?? 0);
 
   const {
     data: prizeTemplatesData,
@@ -65,7 +72,8 @@ export default function PrizePage() {
     if (!existingPrize) return;
 
     // Determine selected template from existing prize
-    const templateFromPrize = existingPrize.prize_type || GiveawayPrizeTemplateType.Custom;
+    const templateFromPrize =
+      existingPrize.prize_type || GiveawayPrizeTemplateType.Custom;
     setSelectedPrizeTemplate(String(templateFromPrize));
 
     // Map stored fields (with names) to UI fieldsData (with labels)
@@ -312,6 +320,19 @@ export default function PrizePage() {
                         fieldsData.find((f) => f.label === "Quantity")?.value
                       }
                       onChange={(value) => {
+                        if (Number(value) <= 0) {
+                          showToast({
+                            message: "Quantity must be greater than 0",
+                            type: "error",
+                            time: 2000,
+                          });
+                          setFieldsData((prev) => {
+                            return prev.map((f) =>
+                              f.label === "Quantity" ? { ...f, value: "1" } : f,
+                            );
+                          });
+                          return;
+                        }
                         setFieldsData((prev) => {
                           const existingField = prev.find(
                             (f) => f.label === "Quantity",
