@@ -102,16 +102,14 @@ export const Select: React.FC<SelectProps> = ({
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           onClick={toggleOpen}
-          className={`relative outline-0 inline-flex items-center gap-2 rounded-lg py-[5px] ${
+          className={`relative inline-flex items-center gap-2 rounded-lg py-[5px] outline-0 ${
             type === "default" ? "bg-tertiary-fill-bg" : ""
-          } ${type !== "withIcon" && "px-3"}`}
+          } ${type !== "withIcon" && "px-3"} ${isOpen || type === "withIcon" ? "text-accent-text" : ""}`}
         >
-          <span
-            className={`${isOpen || type === "withIcon" ? "text-accent-text" : ""} transition-all duration-100`}
-          >
+          <span className="transition-all duration-100">
             {selectedOption?.label}
           </span>
-          {type === "withIcon" && <SelectIcon />}
+          {type === "withIcon" && <SelectIcon isCustomColor />}
         </button>
       </div>
 
