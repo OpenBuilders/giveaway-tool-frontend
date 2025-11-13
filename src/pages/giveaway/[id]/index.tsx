@@ -665,7 +665,7 @@ export default function GiveawayPage() {
                   {giveawayLink}
                 </span>
                 <div className="h-[28px] w-[28px] text-accent-text">
-                  <CopyIcon />
+                  <CopyIcon isCustomColor />
                 </div>
               </div>
 
