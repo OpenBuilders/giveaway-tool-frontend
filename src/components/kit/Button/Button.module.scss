@@ -35,13 +35,13 @@
   }
 
   &-primary {
-    background-color: var(--primary-background);
-    color: var(--color-textIconsWhite);
+    background-color: var(--color-accent-text);
+    color: var(--color-text);
   }
 
   &-accent {
-    background-color: rgba(#007aff, 0.1);
-    color: var(--color-accentsBrandCommunity);
+    background-color: rgba(var(--color-accent-text), 0.1);
+    color: var(--color-text);
   }
 
   &-link {

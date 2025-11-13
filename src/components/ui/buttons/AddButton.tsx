@@ -16,10 +16,10 @@ export const AddButton = ({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-center gap-4 w-full ${className}`}
+      className={`text-accent-text flex w-full items-center gap-4 ${className}`}
     >
-      <CirclePlusIcon  />
-      <span className="text-accent-text">{children}</span>
+      <CirclePlusIcon isCustomColor />
+      <span>{children}</span>
     </button>
   );
 };
