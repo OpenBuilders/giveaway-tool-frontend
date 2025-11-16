@@ -23,6 +23,7 @@ import {
   Block,
   Text,
   useToast,
+  ListToggler,
 } from "@/components/kit";
 import { getAvailableChannels } from "@/api/user.api";
 import { AddButton } from "@/components/ui/buttons/AddButton";
@@ -53,6 +54,7 @@ export default function RequirementPage() {
   const [selectedRequirementType, setSelectedRequirementType] = useState<
     string | null
   >(null);
+  const [isPremiumEnabled, setIsPremiumEnabled] = useState(false);
   const [subscriptionData, setSubscriptionData] =
     useState<IAvailableChannelsResponse>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -161,6 +163,8 @@ export default function RequirementPage() {
             customData.description.trim().length > 0
           ),
         );
+      } else if (selectedRequirementType === "premium") {
+        setCreateButtonDisabled(!isPremiumEnabled);
       } else if (selectedRequirementType === "holdton") {
         const n = Number(holdTonAmount.replace(/,/g, ""));
         setCreateButtonDisabled(!(n > 0));
@@ -178,6 +182,7 @@ export default function RequirementPage() {
     customData,
     holdTonAmount,
     holdJetton,
+    isPremiumEnabled,
   ]);
 
   return (
@@ -189,6 +194,7 @@ export default function RequirementPage() {
             setSubscriptionData([]);
             setHoldTonAmount("");
             setHoldJetton({ address: "", amount: "" });
+            setIsPremiumEnabled(false);
           } else {
             navigate(-1);
           }
@@ -213,6 +219,19 @@ export default function RequirementPage() {
                 name: customData.title,
                 description: customData.description,
               });
+            } else if (selectedRequirementType === "premium") {
+              if (isPremiumEnabled) {
+                addRequirement({
+                  type: "premium",
+                });
+              } else {
+                showToast({
+                  message: "Enable the toggle to add Premium requirement",
+                  type: "error",
+                  time: 2000,
+                });
+                return;
+              }
             } else if (selectedRequirementType === "holdton") {
               const amount = Number(holdTonAmount.replace(/,/g, ""));
               if (amount > 0) {
@@ -492,6 +511,22 @@ export default function RequirementPage() {
                       ></List>
                     )}
                 </Block>
+              )}
+
+              {selectedRequirementType === "premium" && (
+                <List footer="We check for Telegram Premium only at the moment of joining the chat or channel">
+                  <ListItem
+                    id="premium"
+                    className="px-4 py-1.5"
+                    title="Request Telegram Premium"
+                    after={
+                      <ListToggler
+                        isEnabled={!!isPremiumEnabled}
+                        onChange={(value) => setIsPremiumEnabled(value)}
+                      />
+                    }
+                  />
+                </List>
               )}
 
               {selectedRequirementType === "custom" && (

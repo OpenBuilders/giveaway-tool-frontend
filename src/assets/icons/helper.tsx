@@ -10,6 +10,7 @@ import { HoldTonIcon } from "./requirements/HoldTonIcon";
 import { HoldJettonIcon } from "./requirements/HoldJettonIcon";
 import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
 import { ConnectWalletIcon } from "./requirements/ConnectWalletIcon";
+import { PremiumIcon } from "./requirements/PremiumIcon";
 import { toTon } from "@/utils/toTon";
 
 export const getRequirementIcon = (
@@ -93,6 +94,8 @@ export const getRequirementIcon = (
       return <HoldJettonIcon />;
     case "connectwallet":
       return <ConnectWalletIcon />;
+    case "premium":
+      return <PremiumIcon />;
     default:
       return (
         <ChannelAvatar
@@ -121,6 +124,8 @@ export const getRequirementTitle = (requirement: IGiveawayRequirement) => {
       return `Hold ${requirement.jetton_min_amount || requirement.amount} ${"$" + requirement.jetton_symbol || "tokens"}`;
     case "connectwallet":
       return "Connect Wallet";
+    case "premium":
+      return "Telegram Premium";
     default:
       return String(requirement.type);
   }

@@ -17,7 +17,8 @@ export type GiveawayRequirementType =
   | "custom"
   | "holdton"
   | "holdjetton"
-  | "connectwallet";
+  | "connectwallet"
+  | "premium";
 export type GiveawayStatus =
   | "active"
   | "cancelled"
