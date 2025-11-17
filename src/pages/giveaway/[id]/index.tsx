@@ -700,16 +700,22 @@ export default function GiveawayPage() {
                       </span>
                     </div>
 
-                    <span className="text-timer-bold !leading-[62px]">:</span>
+                    {Number(timerParts.days) > 0 ? null : (
+                      <>
+                        <span className="text-timer-bold !leading-[62px]">
+                          :
+                        </span>
 
-                    <div className="flex flex-col items-center">
-                      <span className="text-timer-bold">
-                        {timerParts.seconds}
-                      </span>
-                      <span className="text-hint text-sm-max tracking-subheadline">
-                        seconds
-                      </span>
-                    </div>
+                        <div className="flex flex-col items-center">
+                          <span className="text-timer-bold">
+                            {timerParts.seconds}
+                          </span>
+                          <span className="text-hint text-sm-max tracking-subheadline">
+                            seconds
+                          </span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </>
               )}
@@ -748,7 +754,10 @@ export default function GiveawayPage() {
                     const result = await giveawayApi.prepareGiveawayMessage(
                       String(giveaway.id),
                     );
-                    if (result?.msg_id !== undefined && result?.msg_id !== null) {
+                    if (
+                      result?.msg_id !== undefined &&
+                      result?.msg_id !== null
+                    ) {
                       WebApp.shareMessage(String(result.msg_id));
                       return;
                     }
