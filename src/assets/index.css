@@ -154,6 +154,8 @@
   font-size: 64px;
   line-height: 72px;
   letter-spacing: 0.38px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
   background: linear-gradient(131.09deg, #ff9d00 13.86%, #fd571a 88.77%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

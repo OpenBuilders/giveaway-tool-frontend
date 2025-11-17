@@ -6,6 +6,7 @@ import {
 } from "@tonconnect/ui-react";
 import useWallet from "@/hooks/useWallet";
 import { Text } from "@/components/kit";
+import { ConnectWalletIcon } from "@/assets/icons/ConnectWalletIcon";
 
 export const ConnectWalletButton = ({
   className = "",
@@ -46,7 +47,7 @@ export const ConnectWalletButton = ({
 
   return (
     <Button
-      className={`flex items-center justify-center gap-2.5 !rounded-[30px] !px-2.5 !py-[5px] bg-sheet-background ${className}`}
+      className={`flex items-center justify-center gap-1 !rounded-[30px] !px-2.5 !py-[5px] bg-secondary-full-bg ${className}`}
       onClick={() => {
         if (!connectionRestored || !userFriendlyAddress) {
           connectWallet();
@@ -56,6 +57,7 @@ export const ConnectWalletButton = ({
       }}
       disabled={!connectionRestored}
     >
+      <ConnectWalletIcon isCustomColor />
       <ButtonText />
     </Button>
   );

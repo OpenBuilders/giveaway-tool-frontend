@@ -80,16 +80,24 @@ const SkeletonHeader = () => {
   return (
     <>
       <div className="flex w-full items-center justify-center">
-        <SkeletonElement style={{ width: 112, height: 112, borderRadius: 56 }} />
+        <SkeletonElement
+          style={{ width: 112, height: 112, borderRadius: 56 }}
+        />
       </div>
       <Block margin="top" marginValue={8}>
         <div className="flex flex-col items-center gap-2">
           {/* Title */}
-          <SkeletonElement style={{ width: "70%", height: 28, borderRadius: 8 }} />
+          <SkeletonElement
+            style={{ width: "70%", height: 28, borderRadius: 8 }}
+          />
           {/* Big timer digits */}
-          <SkeletonElement style={{ width: 240, height: 72, borderRadius: 12 }} />
+          <SkeletonElement
+            style={{ width: 240, height: 72, borderRadius: 12 }}
+          />
           {/* Secondary timer text (e.g., "until end today at ...") */}
-          <SkeletonElement style={{ width: "60%", height: 16, borderRadius: 6 }} />
+          <SkeletonElement
+            style={{ width: "60%", height: 16, borderRadius: 6 }}
+          />
         </div>
       </Block>
     </>
@@ -101,8 +109,12 @@ const SkeletonContent = () => {
     <Block gap={24} margin="top" marginValue={24}>
       <Block gap={10}>
         <div className="grid w-full grid-cols-2 gap-2.5">
-          <SkeletonElement style={{ width: "100%", height: 72, borderRadius: 12 }} />
-          <SkeletonElement style={{ width: "100%", height: 72, borderRadius: 12 }} />
+          <SkeletonElement
+            style={{ width: "100%", height: 72, borderRadius: 12 }}
+          />
+          <SkeletonElement
+            style={{ width: "100%", height: 72, borderRadius: 12 }}
+          />
         </div>
       </Block>
 
@@ -155,6 +167,12 @@ export default function GiveawayPage() {
 
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [timeRemainingText, setTimeRemainingText] = useState<string>("");
+  const [timerParts, setTimerParts] = useState<{
+    days?: string;
+    hours: string;
+    minutes: string;
+    seconds: string;
+  }>({ days: "0", hours: "0", minutes: "00", seconds: "00" });
   const [resultCardData, setResultCardData] = useState<IListItem | null>(null);
   const [alreadyViewed, setAlreadyViewed] = useState(true);
   const [showMore, setShowMore] = useState(false);
@@ -365,7 +383,7 @@ export default function GiveawayPage() {
     );
 
     if (timeDiff <= 0) {
-      setTimeRemaining("00:00");
+      setTimerParts({ hours: "0", minutes: "00", seconds: "00" });
       return;
     }
 
@@ -376,19 +394,12 @@ export default function GiveawayPage() {
     const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
 
-    if (days > 0) {
-      setTimeRemaining(
-        `${days}:${hours.toString().padStart(2, "0")}:${minutes
-          .toString()
-          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`,
-      );
-    } else {
-      setTimeRemaining(
-        `${hours.toString().padStart(2, "0")}:${minutes
-          .toString()
-          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`,
-      );
-    }
+    setTimerParts({
+      days: days > 0 ? String(days) : undefined,
+      hours: String(hours),
+      minutes: minutes.toString().padStart(2, "0"),
+      seconds: seconds.toString().padStart(2, "0"),
+    });
   }, [giveaway?.ends_at]);
 
   useEffect(() => {
@@ -637,12 +648,71 @@ export default function GiveawayPage() {
             </Text>
 
             <div className="flex flex-col items-center justify-center">
-              <span className="text-timer-bold">
-                {timeRemaining || "00:00"}
-              </span>
               <span className="tracking-body font-medium">
                 {timeRemainingText}
               </span>
+              {timeRemaining ? (
+                <span className="text-timer-bold">{timeRemaining}</span>
+              ) : (
+                <>
+                  <div className="flex items-start justify-center gap-0.5">
+                    {timerParts.days && (
+                      <>
+                        <div className="flex flex-col items-center">
+                          <span className="text-timer-bold">
+                            {timerParts.hours}
+                          </span>
+                          <span className="text-hint text-sm-max tracking-subheadline">
+                            days
+                          </span>
+                        </div>
+
+                        <span className="text-timer-bold !leading-[62px]">
+                          :
+                        </span>
+                      </>
+                    )}
+
+                    {Number(timerParts.hours) > 0 && (
+                      <>
+                        <div className="flex flex-col items-center">
+                          <span className="text-timer-bold">
+                            {timerParts.hours}
+                          </span>
+                          <span className="text-hint text-sm-max tracking-subheadline">
+                            hours
+                          </span>
+                        </div>
+                        <span className="text-timer-bold !leading-[62px]">
+                          :
+                        </span>
+                      </>
+                    )}
+
+                    <div className="flex flex-col items-center">
+                      <span className="text-timer-bold">
+                        {Number(timerParts.minutes) > 0
+                          ? timerParts.minutes
+                          : "00"}
+                      </span>
+                      <span className="text-hint text-sm-max tracking-subheadline">
+                        minutes
+                      </span>
+                    </div>
+
+                    <span className="text-timer-bold !leading-[62px]">:</span>
+
+                    <div className="flex flex-col items-center">
+                      <span className="text-timer-bold">
+                        {timerParts.seconds}
+                      </span>
+                      <span className="text-hint text-sm-max tracking-subheadline">
+                        seconds
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </Block>
         </>
@@ -664,17 +734,34 @@ export default function GiveawayPage() {
                 <span className="max-w-[calc(100%-28px)] overflow-hidden text-ellipsis whitespace-nowrap">
                   {giveawayLink}
                 </span>
-                <div className="h-[28px] w-[28px] text-accent-text">
+                <div className="text-accent-text h-[28px] w-[28px]">
                   <CopyIcon isCustomColor />
                 </div>
               </div>
 
               <Button
-                onClick={() => {
-                  // WebApp.shareMessage(String(giveaway?.msg_id));
-                  goTo(
-                    `https://t.me/share?url=${giveawayLink}&text=${giveaway?.title}`,
-                  );
+                onClick={async () => {
+                  try {
+                    if (!giveaway?.id) {
+                      throw new Error("No giveaway id");
+                    }
+                    const result = await giveawayApi.prepareGiveawayMessage(
+                      String(giveaway.id),
+                    );
+                    if (result?.msg_id !== undefined && result?.msg_id !== null) {
+                      WebApp.shareMessage(String(result.msg_id));
+                      return;
+                    }
+                    // Fallback if response is missing id
+                    goTo(
+                      `https://t.me/share?url=${giveawayLink}&text=${giveaway?.title}`,
+                    );
+                  } catch {
+                    // Fallback on any error
+                    goTo(
+                      `https://t.me/share?url=${giveawayLink}&text=${giveaway?.title}`,
+                    );
+                  }
                 }}
                 className="flex items-center justify-center gap-1.5"
               >
@@ -974,9 +1061,11 @@ export default function GiveawayPage() {
                     <button
                       type="button"
                       onClick={downloadResultsCsv}
-                      className={`text-link uppercase flex items-center cursor-pointer disabled:cursor-not-allowed disabled:opacity-70`}
+                      className={`text-link flex cursor-pointer items-center uppercase disabled:cursor-not-allowed disabled:opacity-70`}
                     >
-                      <Text type="caption" color="accent">Download</Text>
+                      <Text type="caption" color="accent">
+                        Download
+                      </Text>
                     </button>
                   )
                 }

@@ -36,6 +36,7 @@ import { AxiosError } from "axios";
 export default function GiveawaySetUpPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
   const [addButtonPressed, setAddButtonPressed] = useState(false);
+  const [channelsSnapshot, setChannelsSnapshot] = useState<number[] | null>(null);
   const [confirmFewPrizesModal, setConfirmFewPrizesModal] = useState(false);
 
   const {
@@ -84,6 +85,45 @@ export default function GiveawaySetUpPage() {
     queryFn: getAvailableChannels,
     refetchInterval: addButtonPressed ? 2000 : false,
   });
+
+  useEffect(() => {
+    if (!addButtonPressed) return;
+    if (!Array.isArray(availableChannelsData)) return;
+
+    // Initialize snapshot on the first fetch after pressing Add
+    if (channelsSnapshot === null) {
+      const ids = availableChannelsData
+        .map((c) => c.id)
+        .filter((id): id is number => typeof id === "number");
+      setChannelsSnapshot(ids);
+      return;
+    }
+
+    // Compare current list with snapshot to find newly appeared channels
+    const snapshotSet = new Set(channelsSnapshot);
+    const newChannels =
+      availableChannelsData.filter(
+        (c) => typeof c.id === "number" && !snapshotSet.has(c.id as number),
+      ) || [];
+
+    if (newChannels.length > 0) {
+      // Prefer the last new channel assuming newest appended last
+      const picked = newChannels[newChannels.length - 1];
+      if (picked && typeof picked.id === "number") {
+        const isAlreadySelected = sponsors.some((s) => s.id === picked.id);
+        if (!isAlreadySelected) {
+          addSponsor({
+            id: picked.id,
+            title: (picked.title || picked.username) as string,
+            avatar_url: picked.avatar_url,
+          });
+        }
+      }
+      // Stop polling and clear snapshot
+      setAddButtonPressed(false);
+      setChannelsSnapshot(null);
+    }
+  }, [availableChannelsData, addButtonPressed]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const buildCreatePayload = (): IGiveawayCreateRequest => {
     return {
@@ -164,11 +204,30 @@ export default function GiveawaySetUpPage() {
     createGiveawayFetch.mutate(payload);
   };
 
+  const getMissingFields = (): string[] => {
+    const missing: string[] = [];
+    if (!(typeof title === "string" && title.trim().length > 0)) {
+      missing.push("Name");
+    }
+    if (!(typeof winners_count === "number" && winners_count > 0)) {
+      missing.push("Winners");
+    }
+    if (!(Array.isArray(prizes) && prizes.length > 0)) {
+      missing.push("Prizes");
+    }
+    if (!(Array.isArray(sponsors) && sponsors.length > 0)) {
+      missing.push("Creators");
+    }
+    return missing;
+  };
+
   const handleClick = () => {
     if (createGiveawayFetch.isPending) return;
     if (createButtonDisabled) {
+      const missing = getMissingFields();
+      const details = missing.length > 0 ? `: ${missing.join(", ")}` : "";
       showToast({
-        message: "Fill all fields",
+        message: `Fill all fields${details}`,
         type: "error",
         time: 2000,
       });
@@ -275,6 +334,15 @@ export default function GiveawaySetUpPage() {
                 onClick={() => {
                   addBotToChannelLink();
                   setAddButtonPressed(true);
+                  // Capture current snapshot immediately if data already loaded.
+                  if (Array.isArray(availableChannelsData)) {
+                    const ids = availableChannelsData
+                      .map((c) => c.id)
+                      .filter((id): id is number => typeof id === "number");
+                    setChannelsSnapshot(ids);
+                  } else {
+                    setChannelsSnapshot(null);
+                  }
                 }}
               >
                 Add Creator

@@ -22,6 +22,7 @@ interface BlockProps {
     | 32
     | 44
     | 'auto'
+    | string
   padding?: 'top' | 'bottom' | 'left' | 'right' | 'full'
   paddingValue?:
     | 0

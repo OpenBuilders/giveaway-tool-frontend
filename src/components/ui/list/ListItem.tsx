@@ -118,8 +118,11 @@ export const ListItem = ({
             className="text-subtitle flex items-center justify-center"
             onClick={(e) => {
               e.stopPropagation();
-              if (onActionClick)
+              if (onActionClick) {
                 onActionClick({ id, logo, title, description, giveaway });
+              } else if (onClick && !disabled) {
+                onClick({ id, logo, title, description, giveaway });
+              }
             }}
           >
             {isArrowIcon && <ArrowIcon isCustomColor={true} />}

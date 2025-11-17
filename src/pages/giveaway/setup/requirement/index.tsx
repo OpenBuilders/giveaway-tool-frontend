@@ -39,6 +39,7 @@ import { JETTON_TEMPLATES } from "@/utils/jettonTemplates";
 export default function RequirementPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
   const [addButtonPressed, setAddButtonPressed] = useState(false);
+  const [channelsSnapshot, setChannelsSnapshot] = useState<number[] | null>(null);
   const [customData, setCustomData] = useState({
     title: "",
     description: "",
@@ -78,6 +79,48 @@ export default function RequirementPage() {
       selectedRequirementType === "boost",
     refetchInterval: addButtonPressed ? 5000 : false,
   });
+
+  useEffect(() => {
+    if (!addButtonPressed) return;
+    if (!Array.isArray(availableChannelsData)) return;
+    if (
+      !(selectedRequirementType === "subscription" ||
+        selectedRequirementType === "boost")
+    ) {
+      return;
+    }
+
+    // Initialize snapshot on the first fetch after pressing Add
+    if (channelsSnapshot === null) {
+      const ids = availableChannelsData
+        .map((c) => c.id)
+        .filter((id): id is number => typeof id === "number");
+      setChannelsSnapshot(ids);
+      return;
+    }
+
+    // Compare current list with snapshot to find newly appeared channels
+    const snapshotSet = new Set(channelsSnapshot);
+    const newChannels =
+      availableChannelsData.filter(
+        (c) => typeof c.id === "number" && !snapshotSet.has(c.id as number),
+      ) || [];
+
+    if (newChannels.length > 0) {
+      const picked = newChannels[newChannels.length - 1];
+      if (picked && typeof picked.id === "number") {
+        const alreadyInSelection = subscriptionData.some(
+          (s) => s.id === picked.id,
+        );
+        if (!alreadyInSelection) {
+          setSubscriptionData((prev) => [...prev, picked]);
+        }
+      }
+      // Stop polling and clear snapshot
+      setAddButtonPressed(false);
+      setChannelsSnapshot(null);
+    }
+  }, [availableChannelsData, addButtonPressed, selectedRequirementType]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const addHoldJettonWithMetadata = useMutation({
     mutationFn: ({ address }: { address: string; amount: number }) =>
@@ -358,6 +401,16 @@ export default function RequirementPage() {
                         onClick={() => {
                           addBotToChannelLink();
                           setAddButtonPressed(true);
+                          if (Array.isArray(availableChannelsData)) {
+                            const ids = availableChannelsData
+                              .map((c) => c.id)
+                              .filter(
+                                (id): id is number => typeof id === "number",
+                              );
+                            setChannelsSnapshot(ids);
+                          } else {
+                            setChannelsSnapshot(null);
+                          }
                         }}
                       >
                         Add Channel

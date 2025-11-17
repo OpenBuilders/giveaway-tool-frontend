@@ -14,9 +14,11 @@ import giftLottie from "@assets/tgs/gift.json";
 import { useEffect } from "react";
 import WebApp from "@twa-dev/sdk";
 import { ConnectWalletButton } from "@/components/ui/buttons/ConnectWalletButton";
+import { usePlatform } from "@/hooks/usePlatform";
 
 export default function MainPage() {
   const navigate = useNavigate();
+  const { isMobile } = usePlatform();
 
   const { data: myGiveaways } = useQuery({
     queryKey: ["my-giveaways"],
@@ -171,11 +173,13 @@ export default function MainPage() {
       />
 
       <PageLayout>
-        <Block padding="full" paddingValue={10} align="end">
-          <div>
-            <ConnectWalletButton />
-          </div>
-        </Block>
+        {!isMobile && (
+          <Block padding="full" paddingValue={10} align="end">
+            <div>
+              <ConnectWalletButton />
+            </div>
+          </Block>
+        )}
 
         <Block padding="full" paddingValue={24} align="center">
           <Block align="center">
@@ -198,7 +202,13 @@ export default function MainPage() {
         </Block>
 
         <div className="flex h-full flex-1 items-end">
-          <Block padding="full" paddingValue={12} align="end">
+          <Block
+            padding="full"
+            paddingValue={12}
+            align="end"
+            margin="bottom"
+            marginValue="-12px"
+          >
             <Text align="center" type="caption" color="tertiary">
               This is open source contributed by independent
               <br />

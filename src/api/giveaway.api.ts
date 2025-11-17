@@ -49,3 +49,14 @@ export const updateGiveawayStatus = async (
   const res = await api.patch(`/v1/giveaways/${id}/status`, { status });
   return res.data;
 };
+
+export interface IPrepareMessageResponse {
+  msg_id: string | number;
+}
+
+export const prepareGiveawayMessage = async (
+  id: string,
+): Promise<IPrepareMessageResponse> => {
+  const res = await api.post(`/v1/giveaways/${id}/prepare-message`);
+  return res.data;
+};
