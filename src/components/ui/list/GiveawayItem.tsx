@@ -108,6 +108,7 @@ export const GiveawayItem = ({
                 ? giveaway?.sponsors.map((sponsor) => ({
                     title: sponsor.title,
                     avatar_url: sponsor.avatar_url as string,
+                    id: sponsor.id,
                   }))
                 : logo
                   ? [

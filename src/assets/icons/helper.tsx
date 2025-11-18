@@ -32,6 +32,7 @@ export const getRequirementIcon = (
           // `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
           `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
         }
+        id={requirement?.channel?.id || requirement?.chat_info?.id}
       />
     );
   }
@@ -58,6 +59,7 @@ export const getRequirementIcon = (
               // `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
               // `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
             }
+            id={requirement?.channel?.id || requirement?.chat_info?.id}
           />
         );
       return <SubscribeIcon />;
@@ -73,6 +75,7 @@ export const getRequirementIcon = (
               // `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
               // `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
             }
+            id={requirement?.channel?.id || requirement?.chat_info?.id}
           />
         );
       return <BoostIcon />;
@@ -105,6 +108,7 @@ export const getRequirementIcon = (
               : requirement.name?.charAt(1)
           }
           avatar_url={avatarUrl}
+          id={requirement?.channel?.id || requirement?.chat_info?.id}
         />
       );
   }

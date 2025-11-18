@@ -36,12 +36,17 @@ export interface UseTabsResult {
 export const useTabs = ({ tabs, defaultTab = 0, onTabChange }: UseTabsProps): UseTabsResult => {
   const [activeTab, setActiveTabState] = useState<number>(defaultTab);
 
+  const webApp = window.Telegram?.WebApp;
+
   const setActiveTab = useCallback((index: number): void => {
-    setActiveTabState(index);
-    if (onTabChange) {
-      onTabChange(index);
+    if (index !== activeTab) {
+      webApp?.HapticFeedback?.impactOccurred('light');
+      setActiveTabState(index);
+      if (onTabChange) {
+        onTabChange(index);
+      }
     }
-  }, [onTabChange]);
+  }, [onTabChange, activeTab, webApp]);
 
   // Props object that can be directly spread into the Tabs component
   const tabProps = {

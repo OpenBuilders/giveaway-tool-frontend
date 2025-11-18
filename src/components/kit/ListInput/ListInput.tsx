@@ -74,8 +74,8 @@ export const ListInput: React.FC<ListInputProps> = ({
           time: 2000,
         });
       }
-      const next = maxLength && e.target.value.length > maxLength ? e.target.value.slice(0, maxLength) : e.target.value;
-      onChange(next);
+      const value = e.target.value;
+      onChange(value);
     }
   };
 

@@ -6,9 +6,11 @@ import GiveawaySetUpPage from "./pages/giveaway/setup/page";
 import PrizePage from "./pages/giveaway/setup/prize";
 import RequirementPage from "./pages/giveaway/setup/requirement";
 import GiveawayPage from "./pages/giveaway/[id]";
+import { usePlatform } from "./hooks/usePlatform";
 
 function App() {
   const { darkTheme } = useContext(ThemeContext);
+  const { isMobile } = usePlatform();
   const webApp = window?.Telegram?.WebApp;
 
   useEffect(() => {
@@ -37,6 +39,12 @@ function App() {
       console.error("Failed to request write access:", error);
     }
   }, [webApp]);
+
+  useEffect(() => {
+    if (isMobile && webApp) {
+      webApp.requestFullscreen();
+    }
+  }, [isMobile, webApp]);
 
   return (
     <BrowserRouter>

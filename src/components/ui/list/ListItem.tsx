@@ -65,7 +65,7 @@ export const ListItem = ({
   return (
     <div
       className={`bg-section-bg border-giveaway flex w-full justify-between px-4 ${
-        (logo || before) ? "py-[5px] after:left-[65px]" : "py-[11px] after:left-[16px]"
+        (logo || before) ? "py-[5px] after:left-[65px] min-h-8 min-w-8" : "py-[11px] after:left-[16px]"
       } ${!separator ? "after:hidden" : ""} ${
         (description || text) ? "items-start" : "items-center"
       } ${disabled ? "opacity-50 cursor-default" : onClick ? "cursor-pointer" : ""} ${className || ""}`}
@@ -76,14 +76,14 @@ export const ListItem = ({
       }}
       onClick={handleRootClick}
     >
-      <div className="flex w-full items-center gap-2.5 max-w-full min-w-0">
+      <div className="flex w-full items-center gap-2.5 max-w-full min-w-0 p-1">
         {before ? (
-          <div className="min-h-10 min-w-10 flex items-center justify-center">{before}</div>
+          <div className="min-h-8 min-w-8 flex items-center justify-center">{before}</div>
         ) : (
           logo && (
             <div
-              className={`aspect-square min-h-10 min-w-10 overflow-hidden rounded-full ${
-                typeof logo === "string" ? "h-10 w-10" : ""
+              className={`aspect-square min-h-8 min-w-8 [&>img]:max-h-8 [&>img]:max-w-8 [&>svg]:max-h-8 [&>svg]:max-w-8 overflow-hidden rounded-full ${
+                typeof logo === "string" ? "h-8 w-8" : ""
               }`}
             >
               {typeof logo === "string" ? (

@@ -36,12 +36,12 @@
 
   &-primary {
     background-color: var(--color-accent-text);
-    color: var(--color-text);
+    color: var(--color-text-overlay);
   }
 
   &-accent {
     background-color: rgba(var(--color-accent-text), 0.1);
-    color: var(--color-text);
+    color: var(--color-text-overlay);
   }
 
   &-link {

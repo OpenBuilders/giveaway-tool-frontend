@@ -42,15 +42,7 @@ export const useGiveawayStore = create<IGiveaway & IGiveawayActions>()(
       setRequirements: (requirements) => set({ requirements }),
       addRequirement: (requirement: IGiveawayRequirement) =>
         set((state) => {
-          if (
-            state.requirements.some(
-              (r) =>
-                r.username === requirement.username &&
-                r.avatar_url === requirement.avatar_url &&
-                r.type === requirement.type &&
-                r.channel == requirement.channel,
-            )
-          ) {
+          if (state.requirements.some((r) => JSON.stringify(r) === JSON.stringify(requirement))) {
             return {
               requirements: state.requirements,
             };

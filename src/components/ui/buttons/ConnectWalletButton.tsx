@@ -23,7 +23,11 @@ export const ConnectWalletButton = ({
 
   const ButtonText = () => {
     if (!connectionRestored) {
-      return <span>Connecting...</span>;
+      return (
+        <Text type="subheadline1" color="primary" weight="semibold">
+          Connecting...
+        </Text>
+      );
     } else {
       if (userFriendlyAddress) {
         if (isHeader) {
@@ -36,18 +40,24 @@ export const ConnectWalletButton = ({
           );
         } else {
           return (
-            <Text type="subheadline1" color="primary" weight="semibold">Disconnect</Text>
+            <Text type="subheadline1" color="primary" weight="semibold">
+              Disconnect
+            </Text>
           );
         }
       } else {
-        return <Text type="subheadline1" color="primary" weight="semibold">Connect Wallet</Text>;
+        return (
+          <Text type="subheadline1" color="primary" weight="semibold">
+            Connect Wallet
+          </Text>
+        );
       }
     }
   };
 
   return (
     <Button
-      className={`flex items-center justify-center gap-1 !rounded-[30px] !px-2.5 !py-[5px] bg-secondary-full-bg ${className}`}
+      className={`bg-secondary-full-bg backdrop-blur-sm flex items-center justify-center gap-1 !rounded-[30px] !px-2.5 !py-[5px] ${className}`}
       onClick={() => {
         if (!connectionRestored || !userFriendlyAddress) {
           connectWallet();
@@ -57,7 +67,9 @@ export const ConnectWalletButton = ({
       }}
       disabled={!connectionRestored}
     >
-      <ConnectWalletIcon isCustomColor />
+      <div className="text-text">
+        <ConnectWalletIcon isCustomColor />
+      </div>
       <ButtonText />
     </Button>
   );

@@ -91,12 +91,12 @@ const SkeletonHeader = () => {
             style={{ width: "70%", height: 28, borderRadius: 8 }}
           />
           {/* Big timer digits */}
-          <SkeletonElement
-            style={{ width: 240, height: 72, borderRadius: 12 }}
-          />
           {/* Secondary timer text (e.g., "until end today at ...") */}
           <SkeletonElement
             style={{ width: "60%", height: 16, borderRadius: 6 }}
+          />
+          <SkeletonElement
+            style={{ width: 240, height: 90, borderRadius: 12 }}
           />
         </div>
       </Block>
@@ -210,6 +210,7 @@ export default function GiveawayPage() {
       ? giveaway?.sponsors.map((sponsor) => ({
           title: sponsor.title,
           avatar_url: sponsor.avatar_url as string,
+          id: sponsor.id,
         }))
       : undefined;
   }, [giveaway]);
@@ -640,7 +641,9 @@ export default function GiveawayPage() {
         <>
           {!alreadyViewed && <ConfettiAnimation active />}
 
-          <GiveawayAvatar avatars={giveawaySponsors} />
+          <div className="flex w-full items-center justify-center">
+            <GiveawayAvatar avatars={giveawaySponsors} />
+          </div>
 
           <Block margin="top" marginValue={8}>
             <Text type="title" align="center" weight="bold">
@@ -1130,6 +1133,7 @@ export default function GiveawayPage() {
                         <ChannelAvatar
                           title={sponsor.title}
                           avatar_url={sponsor.avatar_url}
+                          id={sponsor.id}
                         />
                       ),
                       title: sponsor.username || sponsor.title,

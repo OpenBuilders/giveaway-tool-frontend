@@ -39,7 +39,9 @@ import { JETTON_TEMPLATES } from "@/utils/jettonTemplates";
 export default function RequirementPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
   const [addButtonPressed, setAddButtonPressed] = useState(false);
-  const [channelsSnapshot, setChannelsSnapshot] = useState<number[] | null>(null);
+  const [channelsSnapshot, setChannelsSnapshot] = useState<number[] | null>(
+    null,
+  );
   const [customData, setCustomData] = useState({
     title: "",
     description: "",
@@ -84,8 +86,10 @@ export default function RequirementPage() {
     if (!addButtonPressed) return;
     if (!Array.isArray(availableChannelsData)) return;
     if (
-      !(selectedRequirementType === "subscription" ||
-        selectedRequirementType === "boost")
+      !(
+        selectedRequirementType === "subscription" ||
+        selectedRequirementType === "boost"
+      )
     ) {
       return;
     }
@@ -501,7 +505,7 @@ export default function RequirementPage() {
               {selectedRequirementType === "holdton" && (
                 <List>
                   <LabeledInput
-                    containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
+                    containerClassName="rounded-none border-b-[1px] border-border-separator last:border-b-0"
                     label="Amount"
                     placeholder="0"
                     inputMode="decimal"
@@ -518,7 +522,7 @@ export default function RequirementPage() {
                 <Block gap={24}>
                   <List>
                     <LabeledInput
-                      containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
+                      containerClassName="rounded-none border-b-[1px] border-border-separator last:border-b-0"
                       label="Token Contract"
                       placeholder="EQC..."
                       value={holdJetton.address}
@@ -527,7 +531,7 @@ export default function RequirementPage() {
                       }}
                     />
                     <LabeledInput
-                      containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
+                      containerClassName="rounded-none border-b-[1px] border-border-separator last:border-b-0"
                       label="Amount"
                       placeholder="0"
                       inputMode="decimal"
@@ -567,25 +571,27 @@ export default function RequirementPage() {
               )}
 
               {selectedRequirementType === "premium" && (
-                <List footer="We check for Telegram Premium only at the moment of joining the chat or channel">
-                  <ListItem
-                    id="premium"
-                    className="px-4 py-1.5"
-                    title="Request Telegram Premium"
-                    after={
-                      <ListToggler
-                        isEnabled={!!isPremiumEnabled}
-                        onChange={(value) => setIsPremiumEnabled(value)}
-                      />
-                    }
-                  />
-                </List>
+                <List
+                  footer="We check for Telegram Premium only at the moment of joining the chat or channel"
+                  items={[
+                    {
+                      id: "premium",
+                      title: "Request Telegram Premium",
+                      after: (
+                        <ListToggler
+                          isEnabled={!!isPremiumEnabled}
+                          onChange={(value) => setIsPremiumEnabled(value)}
+                        />
+                      ),
+                    } as IListItem,
+                  ]}
+                />
               )}
 
               {selectedRequirementType === "custom" && (
                 <List>
                   <LabeledInput
-                    containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
+                    containerClassName="rounded-none border-b-[1px] border-border-separator last:border-b-0"
                     label="Title"
                     placeholder="Title"
                     maxLength={30}
@@ -598,7 +604,7 @@ export default function RequirementPage() {
                     }}
                   />
                   <LabeledInput
-                    containerClassName="rounded-none border-b-[1px] border-[#E5E7EB] last:border-b-0"
+                    containerClassName="rounded-none border-b-[1px] border-border-separator last:border-b-0"
                     label="Description"
                     placeholder="Description"
                     maxLength={300}

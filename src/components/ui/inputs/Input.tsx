@@ -1,5 +1,5 @@
 import { ListInput, ListInputProps, Text } from "@/components/kit";
-import React, { useCallback, useState } from "react";
+import React from "react";
 
 interface LabeledInputProps extends ListInputProps {
   label: string;
@@ -26,20 +26,16 @@ export const LabeledInput: React.FC<LabeledInputProps> = ({
   type = "text",
   ...rest
 }) => {
-  const [additionalLabelNode, setAdditionalLabelNode] =
-    useState<HTMLSpanElement | null>(null);
-  const callbackAddLabelRef = useCallback((el: HTMLSpanElement | null) => {
-    setAdditionalLabelNode(el);
-  }, []);
+  const { className, ...inputProps } = rest;
 
   return (
     <div
       className={`bg-section-bg relative flex h-11 items-center justify-between overflow-hidden rounded-[10px] px-4 ${containerClassName} `}
     >
-      <span className="w-full">{label}</span>
+      <span className="whitespace-nowrap">{label}</span>
 
       <div
-        className={`flex w-full justify-end ${
+        className={`flex flex-1 items-center justify-end overflow-hidden ${
           Number(value) <= 0 || !value ? "text-hint" : ""
         }`}
       >
@@ -52,18 +48,12 @@ export const LabeledInput: React.FC<LabeledInputProps> = ({
           inputMode={rest.inputMode}
           autoCorrect="off"
           spellCheck="false"
-          style={{
-            paddingRight: `${additionalLabelNode?.clientWidth}px`,
-          }}
-          className="placeholder:text-hint bg-transparent text-right focus:outline-none text-[17px]"
-          {...rest}
+          className={`placeholder:text-hint bg-transparent text-right focus:outline-none text-[17px] flex-1 min-w-0 ${className || ""}`}
+          {...inputProps}
         />
 
         {additionalLabel && additionalLabel.length > 0 && (
-          <div
-            ref={callbackAddLabelRef}
-            className="pointer-events-none absolute top-1/2 right-5 -translate-y-1/2 transform pl-2"
-          >
+          <div className="pl-2 flex-shrink-0 pointer-events-none">
             <Text type="text" color="hint" align="right" weight="normal">
               {additionalLabel}
             </Text>

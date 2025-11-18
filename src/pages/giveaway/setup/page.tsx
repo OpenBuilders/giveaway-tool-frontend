@@ -301,7 +301,7 @@ export default function GiveawaySetUpPage() {
             }
             onChange={(value) => {
               const number = parseInt(value.replace(",", "")) || 0;
-              if (number > 999999 || number < 1) setWinners(NaN);
+              if (number > 999999 || number < 0) return;
 
               setWinners(number);
             }}
@@ -356,6 +356,7 @@ export default function GiveawaySetUpPage() {
                       <ChannelAvatar
                         title={channel.title}
                         avatar_url={channel.avatar_url}
+                        id={channel.id}
                       />
                     ),
                     title: (channel.title || channel.username) as string,

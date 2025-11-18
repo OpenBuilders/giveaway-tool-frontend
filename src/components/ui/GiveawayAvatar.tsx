@@ -7,7 +7,7 @@ export const GiveawayAvatar = memo(
     avatars,
     isMini,
   }: {
-    avatars?: { title?: string; avatar_url: string }[];
+    avatars?: { title?: string; avatar_url: string; id?: number }[];
     isMini?: boolean;
   }) => {
     // const fallback = "/gateway_gift.png";
@@ -29,8 +29,9 @@ export const GiveawayAvatar = memo(
       return 112;
     }, [avatars, isMini]);
 
-    const Fallback = ({ title }: { title?: string }) => {
-      if (title) return <ChannelAvatar title={title} size={getSize()} />;
+    const Fallback = ({ title, id }: { title?: string; id?: number }) => {
+      if (title)
+        return <ChannelAvatar title={title} size={getSize()} id={id} />;
 
       return "/gateway_gift.png";
     };
@@ -38,15 +39,17 @@ export const GiveawayAvatar = memo(
     const GiveawayImage = ({
       avatar_url,
       title,
+      id,
     }: {
       avatar_url: string;
       title?: string;
+      id?: number;
     }) => {
       console.log(avatar_url, title);
       return (
         <Image
           src={avatar_url}
-          fallback={<Fallback title={title} />}
+          fallback={<Fallback title={title} id={id} />}
           size={getSize()}
         />
       );
@@ -60,12 +63,14 @@ export const GiveawayAvatar = memo(
               <GiveawayImage
                 avatar_url={avatars[0].avatar_url}
                 title={avatars[0].title}
+                id={avatars[0].id}
               />
             </div>
             <div className="border-section-bg absolute -right-[3px] -bottom-[3px] overflow-hidden rounded-full border-[3px]">
               <GiveawayImage
                 avatar_url={avatars[1].avatar_url}
                 title={avatars[1].title}
+                id={avatars[1].id}
               />
             </div>
           </div>
@@ -77,12 +82,14 @@ export const GiveawayAvatar = memo(
               <GiveawayImage
                 avatar_url={avatars[0].avatar_url}
                 title={avatars[0].title}
+                id={avatars[0].id}
               />
             </div>
             <div className="border-section-bg absolute -top-[3px] -right-[3px] overflow-hidden rounded-full border-[3px]">
               <GiveawayImage
                 avatar_url={avatars[1].avatar_url}
                 title={avatars[1].title}
+                id={avatars[1].id}
               />
             </div>
             <div className="absolute -bottom-[3px] flex w-full justify-center">
@@ -90,6 +97,7 @@ export const GiveawayAvatar = memo(
                 <GiveawayImage
                   avatar_url={avatars[2].avatar_url}
                   title={avatars[2].title}
+                  id={avatars[2].id}
                 />
               </div>
             </div>
@@ -108,6 +116,7 @@ export const GiveawayAvatar = memo(
             <GiveawayImage
               avatar_url={avatar.avatar_url}
               title={avatar.title}
+              id={avatar.id}
             />
           </div>
         ))}
