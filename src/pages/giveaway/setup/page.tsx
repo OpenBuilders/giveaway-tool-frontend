@@ -297,10 +297,17 @@ export default function GiveawaySetUpPage() {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 0,
                   })
-                : undefined
+                : ""
             }
             onChange={(value) => {
-              const number = parseInt(value.replace(",", "")) || 0;
+              if (value === "") {
+                setWinners(0);
+                return;
+              }
+              const rawValue = value.replace(/,/g, "");
+              if (!/^\d+$/.test(rawValue)) return;
+
+              const number = parseInt(rawValue, 10);
               if (number > 999999 || number < 0) return;
 
               setWinners(number);

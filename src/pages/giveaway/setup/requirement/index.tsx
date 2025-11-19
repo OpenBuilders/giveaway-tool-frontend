@@ -204,12 +204,7 @@ export default function RequirementPage() {
       setCreateButtonDisabled(true);
     } else {
       if (selectedRequirementType === "custom") {
-        setCreateButtonDisabled(
-          !(
-            customData.title.trim().length > 0 &&
-            customData.description.trim().length > 0
-          ),
-        );
+        setCreateButtonDisabled(!(customData.title.trim().length > 0));
       } else if (selectedRequirementType === "premium") {
         setCreateButtonDisabled(!isPremiumEnabled);
       } else if (selectedRequirementType === "holdton") {
@@ -261,11 +256,20 @@ export default function RequirementPage() {
 
               return;
             } else if (selectedRequirementType === "custom") {
-              addRequirement({
-                type: selectedRequirementType,
-                name: customData.title,
-                description: customData.description,
-              });
+              if (customData.title.trim().length > 0) {
+                addRequirement({
+                  type: selectedRequirementType,
+                  name: customData.title,
+                  description: customData.description,
+                });
+              } else {
+                showToast({
+                  message: "Title is required",
+                  type: "error",
+                  time: 2000,
+                });
+                return;
+              }
             } else if (selectedRequirementType === "premium") {
               if (isPremiumEnabled) {
                 addRequirement({
