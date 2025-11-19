@@ -89,7 +89,7 @@ export default function MainPage() {
     tabs: [
       {
         key: "top-100",
-        label: "TOP-100",
+        label: "Top Giveaways",
         content: (
           <>
             {topGiveaways && topGiveaways?.length > 0 ? (

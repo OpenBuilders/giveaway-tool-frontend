@@ -42,7 +42,11 @@ function App() {
 
   useEffect(() => {
     if (isMobile && webApp) {
-      webApp.requestFullscreen();
+      try {
+        webApp.requestFullscreen();
+      } catch (error) {
+        console.error("Failed to request fullscreen:", error);
+      }
     }
   }, [isMobile, webApp]);
 

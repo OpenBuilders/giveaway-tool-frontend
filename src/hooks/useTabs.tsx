@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import type { ReactElement, ReactNode } from 'react';
+import { useState, useCallback, useRef } from 'react';
+import type { ReactElement, ReactNode, TouchEvent } from 'react';
 import { Tabs } from '../components/ui/other/Tabs';
 
 export interface TabItem {
@@ -38,6 +38,54 @@ export const useTabs = ({ tabs, defaultTab = 0, onTabChange }: UseTabsProps): Us
 
   const webApp = window.Telegram?.WebApp;
 
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+  const touchEndY = useRef<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+    touchStartY.current = e.targetTouches[0].clientY;
+    touchEndX.current = null;
+    touchEndY.current = null;
+  };
+
+  const onTouchMove = (e: TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+    touchEndY.current = e.targetTouches[0].clientY;
+  };
+
+  const onTouchEnd = () => {
+    if (
+      !touchStartX.current ||
+      !touchEndX.current ||
+      !touchStartY.current ||
+      !touchEndY.current
+    )
+      return;
+
+    const diffX = touchStartX.current - touchEndX.current;
+    const diffY = touchStartY.current - touchEndY.current;
+
+    const isHorizontal = Math.abs(diffX) > Math.abs(diffY);
+
+    if (isHorizontal && Math.abs(diffX) > minSwipeDistance) {
+      if (diffX > 0) {
+        // Swiped left -> next tab
+        if (activeTab < tabs.length - 1) {
+          setActiveTab(activeTab + 1);
+        }
+      } else {
+        // Swiped right -> prev tab
+        if (activeTab > 0) {
+          setActiveTab(activeTab - 1);
+        }
+      }
+    }
+  };
+
   const setActiveTab = useCallback((index: number): void => {
     if (index !== activeTab) {
       webApp?.HapticFeedback?.impactOccurred('light');
@@ -70,8 +118,17 @@ export const useTabs = ({ tabs, defaultTab = 0, onTabChange }: UseTabsProps): Us
   const TabContent = useCallback((): ReactElement | null => {
     const currentTab = tabs[activeTab];
     if (!currentTab?.content) return null;
-    return <>{currentTab.content}</>;
-  }, [activeTab, tabs]);
+    return (
+      <div
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        style={{ height: '100%', width: '100%' }}
+      >
+        {currentTab.content}
+      </div>
+    );
+  }, [activeTab, tabs, activeTab]);
 
   return {
     activeTab,
