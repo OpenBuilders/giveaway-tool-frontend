@@ -38,6 +38,13 @@ export const useGiveawayStore = create<IGiveaway & IGiveawayActions>()(
         }),
       addPrize: (prize: IGiveawayPrize) =>
         set((state) => ({ prizes: [...state.prizes, prize] })),
+      removePrize: (index) =>
+        set((state) => {
+          const newPrizes = [...state.prizes];
+          newPrizes.splice(index, 1);
+
+          return { prizes: newPrizes };
+        }),
 
       setRequirements: (requirements) => set({ requirements }),
       addRequirement: (requirement: IGiveawayRequirement) =>

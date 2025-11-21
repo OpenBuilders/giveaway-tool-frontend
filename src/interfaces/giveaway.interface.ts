@@ -103,6 +103,7 @@ export interface IGiveawayActions {
   setPrizes: (prizes: IGiveawayPrize[]) => void;
   updatePrize: (index: number, prize: IGiveawayPrize) => void;
   addPrize: (prize: IGiveawayPrize) => void;
+  removePrize: (index: number) => void;
 
   setRequirements: (requirements: IGiveawayRequirement[]) => void;
   addRequirement: (requirement: IGiveawayRequirement) => void;

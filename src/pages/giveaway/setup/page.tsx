@@ -36,7 +36,9 @@ import { AxiosError } from "axios";
 export default function GiveawaySetUpPage() {
   const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
   const [addButtonPressed, setAddButtonPressed] = useState(false);
-  const [channelsSnapshot, setChannelsSnapshot] = useState<number[] | null>(null);
+  const [channelsSnapshot, setChannelsSnapshot] = useState<number[] | null>(
+    null,
+  );
   const [confirmFewPrizesModal, setConfirmFewPrizesModal] = useState(false);
 
   const {
@@ -132,7 +134,10 @@ export default function GiveawaySetUpPage() {
       duration: duration * 60,
       prizes: prizes.map((prize, index) => {
         // Extract new shape from stored fields (kept in store for UI)
-        type PrizeField = { name?: string; value?: string } & Record<string, string>;
+        type PrizeField = { name?: string; value?: string } & Record<
+          string,
+          string
+        >;
         const fields = prize.fields as PrizeField[];
 
         const titleField =
@@ -188,13 +193,15 @@ export default function GiveawaySetUpPage() {
   };
 
   const totalPrizeQuantity = () => {
-    type PrizeField = { name?: string; value?: string } & Record<string, string>;
+    type PrizeField = { name?: string; value?: string } & Record<
+      string,
+      string
+    >;
     return prizes.reduce((sum, prize) => {
       const fields = prize.fields as PrizeField[];
       const quantityField =
         fields.find((f) => (f.name ?? "") === "quantity")?.value || "";
-      const quantity =
-        quantityField === "" ? 1 : (Number(quantityField) || 0);
+      const quantity = quantityField === "" ? 1 : Number(quantityField) || 0;
       return sum + quantity;
     }, 0);
   };
@@ -396,7 +403,7 @@ export default function GiveawaySetUpPage() {
 
           <List
             header="prizes"
-            className="grid grid-cols-2 gap-2.5"
+            className={`gap-2.5 ${prizes.length === 1 ? "grid grid-cols-1" : "grid grid-cols-2"}`}
             addButton={
               <AddButton
                 onClick={() => {
@@ -421,23 +428,18 @@ export default function GiveawaySetUpPage() {
                 fields.find((f) => (f.name ?? "") === "title")?.value || ""
               ).trim();
 
-              const safeTitle =
-                typeof typeValue === "string" && typeValue.length > 0
-                  ? typeValue.charAt(0).toUpperCase() + typeValue.slice(1)
-                  : titleValue || "Prize";
-
-              const inputsCount = Array.isArray(prize.fields)
-                ? prize.fields.length
-                : 0;
-
               return (
                 <ListItem
                   id={index.toString()}
                   logo={getPrizeIcon(
                     (typeValue as GiveawayPrizeTemplateType) || "custom",
                   )}
-                  title={safeTitle}
-                  description={`${inputsCount} inputs`}
+                  title={titleValue}
+                  description={
+                    typeValue
+                      ? typeValue.charAt(0).toUpperCase() + typeValue.slice(1)
+                      : undefined
+                  }
                   onClick={() => {
                     navigate(`/giveaway/setup/prize/${index}`);
                   }}

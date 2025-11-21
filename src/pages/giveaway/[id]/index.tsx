@@ -39,7 +39,7 @@ import {
 } from "@/api/utils.api";
 import { ArrowIcon } from "@/assets/icons/ArrowIcon";
 import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
-import { getRequirementIcon, getRequirementTitle } from "@/assets/icons/helper";
+import { getRequirementIcon, getRequirementTitle, getPrizeIcon } from "@/assets/icons/helper";
 // import removed: legacy prize icon logic no longer used
 import { useIsConnectionRestored, useTonAddress } from "@tonconnect/ui-react";
 import useWallet from "@/hooks/useWallet";
@@ -663,7 +663,7 @@ export default function GiveawayPage() {
                       <>
                         <div className="flex flex-col items-center">
                           <span className="text-timer-bold">
-                            {timerParts.hours}
+                            {timerParts.days}
                           </span>
                           <span className="text-hint text-sm-max tracking-subheadline">
                             days
@@ -676,7 +676,7 @@ export default function GiveawayPage() {
                       </>
                     )}
 
-                    {Number(timerParts.hours) > 0 && (
+                    {(timerParts.days || Number(timerParts.hours) > 0) && (
                       <>
                         <div className="flex flex-col items-center">
                           <span className="text-timer-bold">
@@ -820,7 +820,14 @@ export default function GiveawayPage() {
                 (giveaway?.prizes ?? []).length > 0 ? "gap-2.5" : ""
               }`}
             >
-              <List header="prizes" className="grid grid-cols-2 gap-2.5">
+              <List
+                header="prizes"
+                className={`gap-2.5 ${
+                  (giveaway?.prizes ?? []).length === 1
+                    ? "grid grid-cols-1"
+                    : "grid grid-cols-2"
+                }`}
+              >
                 {(giveaway?.prizes ?? []).map((prize: PrizeLike, index) => {
                   // New API shape: { title, description?, quantity?, place? }
                   const newTitle = prize?.title as string | undefined;
@@ -838,18 +845,23 @@ export default function GiveawayPage() {
                     ? `${prize.fields.length} inputs`
                     : undefined;
 
+                  const typeValue = prize?.prize_type;
+
                   return (
                     <ListItem
                       key={index}
                       id={index.toString()}
-                      logo="/gift.svg"
-                      title={newTitle || legacyTitle || "Prize"}
-                      // description={
-                      //   newDescription ||
-                      //   (typeof newQuantity === "number" && newQuantity > 0
-                      //     ? `Quantity: ${newQuantity}`
-                      //     : legacyDescription)
-                      // }
+                      logo={
+                        getPrizeIcon((typeValue as any) || "custom") ||
+                        "/gift.svg"
+                      }
+                      title={newTitle || "Prize"}
+                      description={
+                        typeValue
+                          ? typeValue.charAt(0).toUpperCase() +
+                            typeValue.slice(1)
+                          : undefined
+                      }
                       className="rounded-[10px] after:h-0 [&_img]:scale-75"
                       rightIcon={undefined}
                       onClick={() => {
