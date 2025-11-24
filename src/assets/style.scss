@@ -1,0 +1,46 @@
+@use "tailwindcss";
+@use "variables"as *;
+@use "themes"as *;
+@use "./index.css";
+
+* {
+  box-sizing: border-box;
+
+  font-family:
+    -apple-system, 'SF Pro Text', 'SF UI Text', system-ui, 'Helvetica Neue',
+    Helvetica, Arial, sans-serif;
+
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+}
+
+::-webkit-scrollbar-track {
+  visibility: hidden;
+}
+
+::-webkit-scrollbar-thumb {
+  visibility: hidden;
+}
+
+::-webkit-scrollbar:window-inactive {
+  visibility: hidden;
+}
+
+body::-webkit-scrollbar {
+  /*Chrome, Safari, Edge*/
+  display: none;
+}

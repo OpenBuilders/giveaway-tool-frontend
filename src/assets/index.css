@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "SF Pro Rounded";
+  src:
+    local("SF Pro Rounded"),
+    url("./fonts/SF-Pro-Rounded-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro";
+  src:
+    local("SF Pro"),
+    url("https://github.com/sahibjotsaggu/San-Francisco-Pro-Fonts/blob/master/SF-Pro.ttf")
+      format("truetype");
+  font-display: swap;
+}
+
+:root {
+  --second-button-color: rgba(0, 122, 255, 0.1);
+  --toast-link: rgba(90, 200, 250, 1);
+  --toast-background: rgba(45, 45, 45, 0.8);
+  --segmented_control_active_bg: rgba(255, 255, 255, 1);
+  --toast-link: rgba(90, 200, 250, 1);
+  --secondary-full-bg: rgba(116, 116, 128, 0.16);
+  --tertiary-fill-bg: rgba(116, 116, 128, 0.12);
+  --quaternary-fill-bg: rgba(116, 116, 128, 0.08);
+  --text-overlay: rgba(255, 255, 255, 1);
+  --quick-menu-background: rgba(255, 255, 255, 0.55);
+  --quick-menu-foreground: rgba(0, 0, 0, 1);
+  --button-confirm-color: rgba(47, 178, 80, 1);
+  --sheet-background: rgba(255, 255, 255, 1);
+  --primary-background: rgba(0, 122, 255, 1);
+  --border-separator: rgba(198, 198, 200, 1);
+}
+
+@theme {
+  --bottom-bar-height: 56px;
+
+  --color-second-button-color: var(--second-button-color);
+  --color-toast-link: var(--toast-link);
+  --color-toast-background: var(--toast-background);
+  --color-segmented_control_active_bg: var(--segmented_control_active_bg);
+  --color-toast-link: var(--toast-link);
+  --color-secondary-full-bg: var(--secondary-full-bg);
+  --color-tertiary-fill-bg: var(--tertiary-fill-bg);
+  --color-quaternary-fill-bg: var(--quaternary-fill-bg);
+  --color-text-overlay: var(--text-overlay);
+  --color-quick-menu-background: var(--quick-menu-background);
+  --color-quick-menu-foreground: var(--quick-menu-foreground);
+  --color-button-confirm-color: var(--button-confirm-color);
+
+  --color-bg: var(--no-tg-theme-secondary-bg-color, transparent);
+  --color-text: var(--no-tg-theme-text-color, #000000);
+  --color-accent-text: var(--tg-theme-accent-text-color, #007aff);
+  --color-hint: var(--no-tg-theme-hint-color, #8e8e93);
+  --color-link: var(--tg-theme-link-color, #007aff);
+  --color-destructive: var(--no-tg-theme-destructive-text-color, #ff3b30);
+  --color-button: var(--tg-theme-button-color, #007aff);
+  --color-button-text: var(--no-tg-theme-button-text-color, #ffffff);
+  --color-section-bg: var(--no-tg-theme-section-bg-color, #ffffff);
+  --color-section-header-text: var(
+    --no-tg-theme-section-header-text-color,
+    #8d8e93
+  );
+  --color-section-separator: var(
+    --no-tg-theme-section-separator-color,
+    #545458
+  );
+  --color-subtitle: var(--no-tg-theme-subtitle-color, #8e8e93);
+  --color-border-separator: var(--border-separator);
+  --color-sheet-background: var(--sheet-background);
+  --color-primary-background: var(--primary-background);
+
+  --text-xs: 11px;
+  --text-xs--line-height: 13px;
+  --text-sm: 13px;
+  --text-sm--line-height: 18px;
+  --text-sm-max: 14px;
+  --text-sm-max--line-height: 18px;
+  --text-sm-bold: 15px;
+  --text-sm-bold--line-height: 20px;
+  --text-base: 17px;
+  --text-base--line-height: 22px;
+  --text-3xl: 28px;
+  --text-3xl--line-height: 38px;
+  --text-big-title: 64px;
+  --text-big-title--line-height: 72px;
+  --tracking-footnote: -0.08px;
+  --tracking-subheadline: -0.15px;
+  --tracking-title: 0.38px;
+  --tracking-body: -0.43px;
+  --tracking-big-title: 0.38px;
+  --tracking-sm-bold: 0.44px;
+  --rounded-sm: 4px;
+  --rounded-md: 6px;
+  --rounded-lg: 9px;
+  --shadow-tab:
+    0px 3px 8px rgba(0, 0, 0, 0.12), 0px 3px 1px rgba(0, 0, 0, 0.04);
+
+  --font-rounded: "SF Pro Rounded";
+
+  --drop-shadow-quick-menu: 0px 4px 24px rgba(0, 0, 0, 0.16);
+}
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@layer base {
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+
+    font-family: "SF Pro", sans-serif;
+    font-weight: 400;
+    line-height: 22px;
+    font-size: 17px;
+  }
+
+  #root {
+    @apply flex min-h-screen flex-col justify-between;
+  }
+
+  main {
+    @apply px-6 py-3;
+  }
+
+  .border-top-button {
+    border-top: 0.33px solid rgba(60, 60, 67, 0.36);
+  }
+
+  .border-giveaway {
+    @apply after:bg-section-separator relative after:absolute after:right-0 after:bottom-0 after:h-[0.33px] after:content-[''];
+  }
+
+  .dropdown-menu {
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.16);
+    background: var(--color-quick-menu-background);
+    backdrop-filter: blur(15px);
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+
+  .dropdown-menu li:not(:last-child) {
+    border-bottom: 0.5px solid var(--color-section-separator);
+  }
+}
+
+.text-timer-bold {
+  font-family: "SF Pro Rounded";
+  font-weight: 700;
+  font-size: 64px;
+  line-height: 72px;
+  letter-spacing: 0.38px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  background: linear-gradient(131.09deg, #ff9d00 13.86%, #fd571a 88.77%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

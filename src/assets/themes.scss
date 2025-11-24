@@ -1,0 +1,71 @@
+@use 'variables'as *;
+
+html[data-theme='light'] {
+  --color-backgroundSecondary: #{$palette-dark4};
+  --color-backgroundTertiary: #{$palette-white100};
+  --color-backgroundPrimary: var(--no-tg-theme-section_bg_color, #FFFFFF);
+  --color-textIconsPrimary: var(--no-tg-theme-text-color, #000000);
+  --color-textIconsSecondary: var(--no-tg-theme-hint-color, #8E8E93);
+  --color-textIconsTertiary: var(--no-tg-theme-hint-color, #8E8E93);
+  --color-textIconsBlack: #{$palette-dark100};
+  --color-textIconsWhite: #{$palette-white100};
+  --color-appliedSeparator: #{$palette-transparentDark8};
+  --color-accentsBrandCommunity: #{$palette-accentLight};
+  --color-accentsRed: #{$palette-extraRed};
+  --color-accentsBgNegative: #{$palette-extraRed10};
+  --color-accentsGreen: #{$palette-extraGreenDark};
+  --color-backgroundBlack: #{$palette-dark100};
+  --color-backgroundWhite: #{$palette-white100};
+  --color-input: #{$palette-transparentWhite80};
+}
+
+html[data-theme='dark'] {
+  --color-backgroundSecondary: #{$palette-dark90};
+  --color-backgroundTertiary: #{$palette-dark85};
+  --color-backgroundPrimary: var(--no-tg-theme-section_bg_color, #FFFFFF);
+  --color-textIconsPrimary: var(--no-tg-theme-text-color, #FFFFFF);
+  --color-textIconsSecondary: var(--no-tg-theme-hint-color, #8E8E93);
+  --color-textIconsTertiary: var(--no-tg-theme-hint-color, #8E8E93);
+  --color-textIconsBlack: #{$palette-dark100};
+  --color-textIconsWhite: #{$palette-white100};
+  --color-appliedSeparator: #{$palette-transparentWhite8};
+  --color-accentsBrandCommunity: #{$palette-accentDark};
+  --color-accentsRed: #{$palette-extraRed};
+  --color-accentsBgNegative: #{$palette-extraRed15};
+  --color-accentsGreen: #{$palette-extraGreenLight};
+  --color-backgroundBlack: #{$palette-dark100};
+  --color-backgroundWhite: #{$palette-white100};
+  --color-input: #{$palette-transparentDark80};
+
+  --second-button-color: rgba(62, 136, 247, 0.1);
+  --toast-link: rgba(90, 200, 250, 1);
+  --toast-background: rgba(45, 45, 45, 0.8);
+  --segmented_control_active_bg: rgba(99, 99, 102, 1);
+  --secondary-full-bg: rgba(120, 120, 128, 0.32);
+  --tertiary-fill-bg: rgba(118, 118, 128, 0.24);
+  --quaternary-fill-bg: rgba(118, 118, 128, 0.18);
+  --text-overlay: rgba(255, 255, 255, 1);
+  --quick-menu-background: rgba(0, 0, 0, 0.78);
+  --quick-menu-foreground: rgba(255, 255, 255, 1);
+  --button-confirm-color: rgba(53, 202, 91, 1);
+  --sheet-background: rgba(44, 44, 46, 1);
+  --primary-background: rgba(10, 132, 255, 1);
+  --border-separator: rgba(58, 58, 60, 1);
+
+
+  --color-bg: var(--no-tg-theme-secondary-bg-color, #1C1C1D);
+  --color-text: var(--no-tg-theme-text-color, #FFFFFF);
+  --color-accent-text: var(--no-tg-theme-accent_text_color, #3E88F7);
+  --color-hint: var(--no-tg-theme-hint-color, #8E8E93);
+  --color-link: var(--no-tg-theme-link-color, #0A84FF);
+  --color-destructive: var(--no-tg-theme-destructive_text_color, #EB5545);
+  --color-button: var(--no-tg-theme-button-color, #0A84FF);
+  --color-button-text: var(--no-tg-theme-button-text-color, #ffffff);
+  --color-section-bg: var(--no-tg-theme-section-bg-color, #2C2C2E);
+  --color-section-header-text: var(
+    --no-tg-theme-section_header_text_color,
+    #8D8E93
+  );
+  --color-section-separator: var(--no-tg-theme-section-separator-color, #545458);
+  --color-subtitle: var(--no-tg-theme-subtitle-color, #8E8E93);
+}

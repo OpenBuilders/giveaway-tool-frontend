@@ -1,0 +1,101 @@
+.title {
+  font-size: 28px;
+  font-style: normal;
+  line-height: 34px;
+  letter-spacing: 0.38px;
+}
+
+.title1 {
+  font-size: 26px;
+  font-style: normal;
+}
+
+.title2 {
+  font-size: 22px;
+  line-height: 28px;
+  letter-spacing: -0.26px;
+}
+
+.text {
+  text-align: center;
+  font-size: 17px;
+  font-style: normal;
+  line-height: 22px;
+}
+
+.subheadline1 {
+  font-size: 15px;
+  font-style: normal;
+  line-height: 20px;
+}
+
+.caption {
+  font-size: 13px;
+  font-style: normal;
+  line-height: 18px;
+}
+
+.caption2 {
+  font-size: 14px;
+  font-style: normal;
+}
+
+.normal {
+  font-weight: 400;
+}
+
+.medium {
+  font-weight: 500;
+}
+
+.bold {
+  font-weight: 700;
+}
+
+.semibold {
+  font-weight: 600;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.accent {
+  color: var(--color-accent-text);
+}
+
+.tertiary {
+  color: var(--color-textIconsTertiary);
+}
+
+.secondary {
+  color: var(--color-textIconsSecondary);
+}
+
+.primary {
+  color: var(--color-textIconsPrimary);
+}
+
+.danger {
+  color: var(--color-accentsRed);
+}
+
+.hint {
+  color: var(--color-hint);
+}
+
+.overlay {
+  color: var(--color-text-overlay);
+}
+
+.center {
+  text-align: center;
+}
+
+.left {
+  text-align: left;
+}
+
+.right {
+  text-align: right;
+}
