@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { VerifyTonProvider } from "./VerifyTonProvider.tsx";
-import { UiLoader } from "./UiLoader.tsx";
 import { ToastProvider } from "./kit/Toast/Toast.tsx";
 import { ThemeProvider } from "../context/ThemeProvider/ThemeProvider.tsx";
 import { TonConnectMainButtonManager } from "./TonConnectMainButtonManager.tsx";
@@ -44,7 +43,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           >
             <VerifyTonProvider />
             <TonConnectMainButtonManager />
-            <UiLoader>{children}</UiLoader>
+            {children}
           </TonConnectUIProvider>
         </ThemeProvider>
       </ToastProvider>

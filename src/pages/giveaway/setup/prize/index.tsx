@@ -154,13 +154,21 @@ export default function PrizePage() {
           text={isEditMode ? "Save" : "Add Prize"}
           disabled={createButtonDisabled}
           onClick={() => {
-            if (fieldsData.find((f) => f.label === "Title")?.value === "") {
-              showToast({
-                message: "Title is required",
-                type: "error",
-                time: 2000,
-              });
-              return;
+            const isCustomPrize =
+              selectedPrizeTemplate === GiveawayPrizeTemplateType.Custom;
+            if (isCustomPrize) {
+              const titleValue = fieldsData.find(
+                (f) => f.label === "Title",
+              )?.value;
+
+              if (!titleValue || !titleValue.trim()) {
+                showToast({
+                  message: "Title is required",
+                  type: "error",
+                  time: 2000,
+                });
+                return;
+              }
             }
 
             const prizePayload = {

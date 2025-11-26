@@ -7,6 +7,7 @@ import PrizePage from "./pages/giveaway/setup/prize";
 import RequirementPage from "./pages/giveaway/setup/requirement";
 import GiveawayPage from "./pages/giveaway/[id]";
 import { usePlatform } from "./hooks/usePlatform";
+import { UiLoader } from "./components/UiLoader";
 
 function App() {
   const { darkTheme } = useContext(ThemeContext);
@@ -51,25 +52,27 @@ function App() {
   }, [isMobile, webApp]);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" index element={<MainPage />} />
+    <UiLoader>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" index element={<MainPage />} />
 
-        <Route path="giveaway">
-          <Route path=":id">
-            <Route index element={<GiveawayPage />} />
+          <Route path="giveaway">
+            <Route path=":id">
+              <Route index element={<GiveawayPage />} />
+            </Route>
+
+            <Route path="setup">
+              <Route index element={<GiveawaySetUpPage />} />
+
+              <Route path="prize" element={<PrizePage />} />
+              <Route path="prize/:id" element={<PrizePage />} />
+              <Route path="requirement" element={<RequirementPage />} />
+            </Route>
           </Route>
-
-          <Route path="setup">
-            <Route index element={<GiveawaySetUpPage />} />
-
-            <Route path="prize" element={<PrizePage />} />
-            <Route path="prize/:id" element={<PrizePage />} />
-            <Route path="requirement" element={<RequirementPage />} />
-          </Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </UiLoader>
   );
 }
 
