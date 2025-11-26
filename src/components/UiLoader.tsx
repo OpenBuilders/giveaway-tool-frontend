@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useUserStore } from "@/store/user.slice";
+import { LoaderIcon } from "@/assets/icons/LoaderIcon";
+import { Text } from "@/components/kit/Text/Text";
 
 const Loader = () => (
   <div className="flex gap-1">
     <svg
-      className="animate-spin h-5 w-5 text-inherit"
+      className="h-5 w-5 animate-spin text-inherit"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
@@ -34,14 +36,14 @@ export const UiLoader = ({ children }: { children: React.ReactNode }) => {
   const [renderModal, setRenderModal] = useState(!user);
 
   const modalClassName =
-    "fixed z-[99999999] top-0 left-0 w-screen h-screen flex justify-center items-center text-text";
+    "fixed z-[99999999] top-0 left-0 w-screen h-screen flex justify-center items-center";
 
   // trigger user-load
   useEffect(() => {
     if (!user && status === "idle") {
       updateUser();
     }
-  }, [user, status]);
+  }, [user, status, updateUser]);
 
   // after 1s, start fading out
   useEffect(() => {
@@ -64,8 +66,17 @@ export const UiLoader = ({ children }: { children: React.ReactNode }) => {
   // error state: show loader indefinitely
   if (status === "error") {
     return (
-      <div className={modalClassName}>
-        <Loader />
+      <div
+        className={
+          modalClassName + " flex-col"
+        }
+      >
+        <div className="mb-6 h-[120px] w-[120px]">
+          <LoaderIcon />
+        </div>
+        <Text type="title2" align="center">
+          InitData expired please restart app
+        </Text>
       </div>
     );
   }
