@@ -39,7 +39,11 @@ import {
 } from "@/api/utils.api";
 import { ArrowIcon } from "@/assets/icons/ArrowIcon";
 import { ChannelAvatar } from "@/components/ui/ChannelAvatar";
-import { getRequirementIcon, getRequirementTitle, getPrizeIcon } from "@/assets/icons/helper";
+import {
+  getRequirementIcon,
+  getRequirementTitle,
+  getPrizeIcon,
+} from "@/assets/icons/helper";
 // import removed: legacy prize icon logic no longer used
 import { useIsConnectionRestored, useTonAddress } from "@tonconnect/ui-react";
 import useWallet from "@/hooks/useWallet";
@@ -151,7 +155,11 @@ export default function GiveawayPage() {
   //   [key: string]: boolean;
   // }>({});
 
-  const { data: giveaway, isLoading: isGiveawayLoading } = useQuery({
+  const {
+    data: giveaway,
+    isLoading: isGiveawayLoading,
+    refetch: refetchGiveaway,
+  } = useQuery({
     queryKey: ["giveaway", id],
     queryFn: () => giveawayApi.getGiveawayById(String(id)),
     enabled: !!id,
@@ -173,6 +181,7 @@ export default function GiveawayPage() {
     minutes: string;
     seconds: string;
   }>({ days: "0", hours: "0", minutes: "00", seconds: "00" });
+  const [isEnded, setIsEnded] = useState(false);
   const [resultCardData, setResultCardData] = useState<IListItem | null>(null);
   const [alreadyViewed, setAlreadyViewed] = useState(true);
   const [showMore, setShowMore] = useState(false);
@@ -204,6 +213,12 @@ export default function GiveawayPage() {
   const userFriendlyAddress = useTonAddress();
   const connectionRestored = useIsConnectionRestored();
   const walletConnected = !!userFriendlyAddress && connectionRestored;
+
+  useEffect(() => {
+    if (walletConnected) {
+      refetchCheckRequirements();
+    }
+  }, [walletConnected, refetchCheckRequirements]);
 
   const giveawaySponsors = useMemo(() => {
     return giveaway?.sponsors && giveaway?.sponsors.length > 0
@@ -385,9 +400,11 @@ export default function GiveawayPage() {
 
     if (timeDiff <= 0) {
       setTimerParts({ hours: "0", minutes: "00", seconds: "00" });
+      setIsEnded(true);
       return;
     }
 
+    setIsEnded(false);
     const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
     const hours = Math.floor(
       (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
@@ -410,6 +427,19 @@ export default function GiveawayPage() {
       return () => clearInterval(interval);
     }
   }, [updateTimer, giveaway?.status]);
+
+  useEffect(() => {
+    if (!giveaway) return;
+
+    const isStatusFinal = ["pending", "completed"].includes(giveaway.status);
+
+    if (isEnded && !isStatusFinal) {
+      const interval = setInterval(() => {
+        refetchGiveaway();
+      }, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [isEnded, giveaway, refetchGiveaway]);
 
   const hasHoldRequirement = (giveaway?.requirements ?? []).some(
     (r) => r.type === "holdton" || r.type === "holdjetton",
@@ -1148,7 +1178,7 @@ export default function GiveawayPage() {
                           id={sponsor.id}
                         />
                       ),
-                      title: sponsor.username || sponsor.title,
+                      title: sponsor.title || sponsor.username,
                       rightIcon: "arrow",
                       onClick: () => {
                         if (sponsor.url) goTo(sponsor.url);
