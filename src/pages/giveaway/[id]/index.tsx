@@ -52,9 +52,9 @@ import {
   IUserPreviewCheckWinner,
 } from "@/interfaces/giveaway.interface";
 import { CancelButton } from "@/components/ui/buttons/CancelButton";
-import { WhiteListIcon } from "@/assets/icons/requirements/WhiteListIcon";
 import { AxiosError } from "axios";
 import { WinnerItem } from "@/components/ui/list/WinnerItem";
+import { CustomIcon } from "@/assets/icons/prizes/CustomIcon";
 
 type PrizeLike = {
   title?: string;
@@ -664,7 +664,7 @@ export default function GiveawayPage() {
       <DialogSheet
         opened={customReqSheetState.opened}
         onClose={() => setCustomReqSheetState((s) => ({ ...s, opened: false }))}
-        icon={<WhiteListIcon />}
+        icon={<CustomIcon />}
         title={customReqSheetState.title}
         description={customReqSheetState.description}
         primaryText="Understood"

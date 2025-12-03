@@ -98,7 +98,7 @@ export const getRequirementIcon = (
     case "premium":
       return <PremiumIcon />;
     case "account_age":
-      return <WhiteListIcon />;
+      return <CustomIcon />;
     default:
       return (
         <ChannelAvatar
