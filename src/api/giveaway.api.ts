@@ -11,7 +11,7 @@ export const getMyGiveaways = async (): Promise<IGiveaway[]> => {
 };
 
 export const createGiveaway = async (
-  data: IGiveawayCreateRequest
+  data: IGiveawayCreateRequest,
 ): Promise<IGiveaway> => {
   const res = await api.post("/v1/giveaways", data);
   return res.data;
@@ -22,6 +22,8 @@ export const getTopGiveaways = async (): Promise<IGiveaway[]> => {
     params: {
       limit: 100,
       offset: 0,
+      min_participants:
+        import.meta.env.NODE_ENV === "production" ? 25 : undefined,
     },
   });
   return res.data;
@@ -37,7 +39,9 @@ export const joinToGiveaway = async (id: string): Promise<void> => {
   return res.data;
 };
 
-export const checkGiveawayRequirements = async (id: string): Promise<IGiveawayCheckRequirementsResponse> => {
+export const checkGiveawayRequirements = async (
+  id: string,
+): Promise<IGiveawayCheckRequirementsResponse> => {
   const res = await api.get(`/v1/giveaways/${id}/check-requirements`);
   return res.data;
 };

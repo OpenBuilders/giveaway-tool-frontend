@@ -55,7 +55,7 @@ export const getRequirementIcon = (
           <ChannelAvatar
             title={title}
             avatar_url={
-              avatarUrl// ||
+              avatarUrl // ||
               // `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
               // `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
             }
@@ -67,11 +67,9 @@ export const getRequirementIcon = (
       if (avatarUrl)
         return (
           <ChannelAvatar
-            title={
-              title
-            }
+            title={title}
             avatar_url={
-              avatarUrl// ||
+              avatarUrl // ||
               // `${import.meta.env.VITE_API_URL}/public/channels/${requirement.username}/avatar`
               // `https://t.me/i/userpic/160/${requirement.username?.replace("@", "")}.jpg`
             }
@@ -99,6 +97,8 @@ export const getRequirementIcon = (
       return <ConnectWalletIcon />;
     case "premium":
       return <PremiumIcon />;
+    case "account_age":
+      return <WhiteListIcon />;
     default:
       return (
         <ChannelAvatar
@@ -130,6 +130,8 @@ export const getRequirementTitle = (requirement: IGiveawayRequirement) => {
       return "Connect Wallet";
     case "premium":
       return "Telegram Premium";
+    case "account_age":
+      return "Account Age";
     default:
       return String(requirement.type);
   }

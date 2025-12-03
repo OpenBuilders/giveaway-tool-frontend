@@ -47,7 +47,10 @@ import {
 // import removed: legacy prize icon logic no longer used
 import { useIsConnectionRestored, useTonAddress } from "@tonconnect/ui-react";
 import useWallet from "@/hooks/useWallet";
-import { IUserPreviewCheckWinner } from "@/interfaces/giveaway.interface";
+import {
+  GiveawayPrizeTemplateType,
+  IUserPreviewCheckWinner,
+} from "@/interfaces/giveaway.interface";
 import { CancelButton } from "@/components/ui/buttons/CancelButton";
 import { WhiteListIcon } from "@/assets/icons/requirements/WhiteListIcon";
 import { AxiosError } from "axios";
@@ -882,8 +885,9 @@ export default function GiveawayPage() {
                       key={index}
                       id={index.toString()}
                       logo={
-                        getPrizeIcon((typeValue as any) || "custom") ||
-                        "/gift.svg"
+                        getPrizeIcon(
+                          (typeValue as GiveawayPrizeTemplateType) || "custom",
+                        ) || "/gift.svg"
                       }
                       title={newTitle || "Prize"}
                       description={
@@ -1005,6 +1009,15 @@ export default function GiveawayPage() {
                               opened: true,
                               title: requirement.name,
                               description: requirement.description || "",
+                            });
+                          }
+                          if (requirement.type === "account_age") {
+                            setCustomReqSheetState({
+                              opened: true,
+                              title: "Account Age",
+                              description:
+                                requirement.error ||
+                                "Your Telegram account registration date meets the requirements.",
                             });
                           }
                         },

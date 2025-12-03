@@ -18,7 +18,8 @@ export type GiveawayRequirementType =
   | "holdton"
   | "holdjetton"
   | "connectwallet"
-  | "premium";
+  | "premium"
+  | "account_age";
 export type GiveawayStatus =
   | "active"
   | "cancelled"
@@ -59,6 +60,10 @@ export interface IGiveawayRequirement {
 
   channel?: IChannelInfo;
   chat_info?: IChannelInfo;
+
+  // Account age requirement fields
+  account_age_min_year?: number;
+  account_age_max_year?: number;
 }
 
 export interface IGiveawayWinners {

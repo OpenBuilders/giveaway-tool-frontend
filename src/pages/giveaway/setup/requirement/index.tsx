@@ -54,6 +54,13 @@ export default function RequirementPage() {
     address: "",
     amount: "",
   });
+  const [accountAge, setAccountAge] = useState<{
+    minYear: string;
+    maxYear: string;
+  }>({
+    minYear: "",
+    maxYear: "",
+  });
   const [selectedRequirementType, setSelectedRequirementType] = useState<
     string | null
   >(null);
@@ -214,6 +221,17 @@ export default function RequirementPage() {
         const n = Number(holdJetton.amount.replace(/,/g, ""));
         const addrOk = holdJetton.address.trim().length > 0;
         setCreateButtonDisabled(!(addrOk && n > 0));
+      } else if (selectedRequirementType === "account_age") {
+        const minStr = accountAge.minYear.trim();
+        const maxStr = accountAge.maxYear.trim();
+        const min = minStr ? Number(minStr) : undefined;
+        const max = maxStr ? Number(maxStr) : undefined;
+
+        const hasMin = min !== undefined && !isNaN(min) && min > 0;
+        const hasMax = max !== undefined && !isNaN(max) && max > 0;
+
+        const isValid = (hasMin || hasMax) && (!hasMin || !hasMax || (max as number) >= (min as number));
+        setCreateButtonDisabled(!isValid);
       } else {
         setCreateButtonDisabled(false);
       }
@@ -225,6 +243,7 @@ export default function RequirementPage() {
     holdTonAmount,
     holdJetton,
     isPremiumEnabled,
+    accountAge,
   ]);
 
   return (
@@ -237,6 +256,7 @@ export default function RequirementPage() {
             setHoldTonAmount("");
             setHoldJetton({ address: "", amount: "" });
             setIsPremiumEnabled(false);
+            setAccountAge({ minYear: "", maxYear: "" });
           } else {
             navigate(-1);
           }
@@ -322,6 +342,29 @@ export default function RequirementPage() {
                   time: 2000,
                 });
               }
+            } else if (selectedRequirementType === "account_age") {
+              const minStr = accountAge.minYear.trim();
+              const maxStr = accountAge.maxYear.trim();
+              const min = minStr ? Number(minStr) : undefined;
+              const max = maxStr ? Number(maxStr) : undefined;
+
+              const hasMin = min !== undefined && !isNaN(min) && min > 0;
+              const hasMax = max !== undefined && !isNaN(max) && max > 0;
+
+              if ((hasMin || hasMax) && (!hasMin || !hasMax || (max as number) >= (min as number))) {
+                addRequirement({
+                  type: "account_age",
+                  account_age_min_year: hasMin ? min : undefined,
+                  account_age_max_year: hasMax ? max : undefined,
+                });
+              } else {
+                showToast({
+                  message: "Invalid years",
+                  type: "error",
+                  time: 2000,
+                });
+                return;
+              }
             }
 
             navigate("/giveaway/setup");
@@ -363,6 +406,7 @@ export default function RequirementPage() {
                   setSubscriptionData([]);
                   setHoldTonAmount("");
                   setHoldJetton({ address: "", amount: "" });
+                  setAccountAge({ minYear: "", maxYear: "" });
                 }}
               />
 
@@ -590,6 +634,33 @@ export default function RequirementPage() {
                     } as IListItem,
                   ]}
                 />
+              )}
+
+              {selectedRequirementType === "account_age" && (
+                <List
+                  footer="Specify the range of Telegram account registration years allowed for participation"
+                >
+                  <LabeledInput
+                    containerClassName="rounded-none border-b-[1px] border-border-separator last:border-b-0"
+                    label="Min Registration Year"
+                    placeholder="2018"
+                    inputMode="numeric"
+                    value={accountAge.minYear}
+                    onChange={(value) => {
+                      setAccountAge((prev) => ({ ...prev, minYear: value }));
+                    }}
+                  />
+                  <LabeledInput
+                    containerClassName="rounded-none border-b-[1px] border-border-separator last:border-b-0"
+                    label="Max Registration Year"
+                    placeholder={new Date().getFullYear().toString()}
+                    inputMode="numeric"
+                    value={accountAge.maxYear}
+                    onChange={(value) => {
+                      setAccountAge((prev) => ({ ...prev, maxYear: value }));
+                    }}
+                  />
+                </List>
               )}
 
               {selectedRequirementType === "custom" && (
