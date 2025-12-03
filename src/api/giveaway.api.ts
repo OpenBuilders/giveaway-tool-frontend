@@ -22,8 +22,7 @@ export const getTopGiveaways = async (): Promise<IGiveaway[]> => {
     params: {
       limit: 100,
       offset: 0,
-      min_participants:
-        import.meta.env.NODE_ENV === "production" ? 25 : undefined,
+      min_participants: 25,
     },
   });
   return res.data;
