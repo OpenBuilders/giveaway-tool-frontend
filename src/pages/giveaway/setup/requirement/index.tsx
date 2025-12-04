@@ -640,7 +640,7 @@ export default function RequirementPage() {
                 <List
                   footer="Specify the range of Telegram account registration years allowed for participation"
                 >
-                  <LabeledInput
+                  {/* <LabeledInput
                     containerClassName="rounded-none border-b-[1px] border-border-separator last:border-b-0"
                     label="Min Registration Year"
                     placeholder="2018"
@@ -649,9 +649,9 @@ export default function RequirementPage() {
                     onChange={(value) => {
                       setAccountAge((prev) => ({ ...prev, minYear: value }));
                     }}
-                  />
+                  /> */}
                   <LabeledInput
-                    containerClassName="rounded-none border-b-[1px] border-border-separator last:border-b-0"
+                    containerClassName="rounded-none"
                     label="Max Registration Year"
                     placeholder={new Date().getFullYear().toString()}
                     inputMode="numeric"
