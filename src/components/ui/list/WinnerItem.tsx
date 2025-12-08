@@ -13,7 +13,6 @@ export const WinnerItem = ({
   className?: string;
   separator?: boolean;
 }) => {
-  console.log(winner);
   return (
     <div
       className={`py-[5px] px-4 items-center flex bg-section-bg w-full justify-between ${

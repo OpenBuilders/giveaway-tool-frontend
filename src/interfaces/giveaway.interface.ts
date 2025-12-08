@@ -72,7 +72,7 @@ export interface IGiveawayWinners {
   name: string;
   avatar_url?: string;
   place: number;
-  prizes: { title: string; description?: string }[];
+  prizes: { title: string; description?: string; quantity?: number }[];
 }
 
 export interface IGiveawayCreator {
