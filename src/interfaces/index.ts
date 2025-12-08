@@ -14,6 +14,7 @@ export interface IListItem {
     isAdmin: boolean;
     endsAt: string;
     participants: number;
+    participants_count: number;
     telegramUsername?: string;
     requirements?: IGiveawayRequirement[];
     prizes?: IGiveawayPrize[];

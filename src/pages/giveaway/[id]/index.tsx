@@ -613,6 +613,15 @@ export default function GiveawayPage() {
         <TelegramMainButton
           text="Join Giveaway"
           onClick={() => {
+            if (hasHoldRequirement && !walletConnected) {
+              showToast({
+                message: "Connect wallet to join",
+                type: "error",
+                time: 3000,
+              });
+              connectWallet();
+              return;
+            }
             joinToGiveawayFetch.mutate({ id: String(id) });
           }}
         />
