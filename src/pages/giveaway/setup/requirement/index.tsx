@@ -270,6 +270,15 @@ export default function RequirementPage() {
               selectedRequirementType === "subscription" ||
               selectedRequirementType === "boost"
             ) {
+              if (subscriptionData.length === 0) {
+                showToast({
+                  message: "Please add at least one channel",
+                  type: "error",
+                  time: 2000,
+                });
+                return;
+              }
+              
               checkBotExistInChannelsFetch.mutate(
                 subscriptionData.map((sub) => sub.id?.toString() || ""),
               );

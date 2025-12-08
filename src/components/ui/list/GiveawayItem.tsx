@@ -158,7 +158,7 @@ export const GiveawayItem = ({
 
             <Text type="caption" weight="medium">
               {/* {giveaway?.winners_count} winners */}
-              {giveaway?.participants} participants
+              {giveaway?.participants_count} participants
             </Text>
           </div>
         </Block>
