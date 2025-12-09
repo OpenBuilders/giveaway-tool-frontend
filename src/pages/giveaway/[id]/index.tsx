@@ -1160,7 +1160,7 @@ export default function GiveawayPage() {
                                 winner.user_id ===
                                 WebApp.initDataUnsafe.user?.id,
                             )
-                            ?.prizes?.map((prize) => prize.title)
+                            ?.prizes?.map((prize) => `${prize.quantity} ${prize.title}`)
                             ?.join(", ") || "",
                         isWinner: true,
                       }}
@@ -1175,7 +1175,7 @@ export default function GiveawayPage() {
                       title: winner.name || winner.username,
                       winner: {
                         place: winner.prizes
-                          ?.map((prize) => prize.title)
+                          ?.map((prize) => `${prize.quantity} ${prize.title}`)
                           ?.join(", "),
                         isWinner:
                           WebApp.initDataUnsafe.user?.id === winner.user_id,
